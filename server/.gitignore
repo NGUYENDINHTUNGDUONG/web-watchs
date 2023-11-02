@@ -1,0 +1,10 @@
+# dependencies
+/dist
+/.vscode
+/node_modules
+# misc
+.DS_Store
+
+yarn.lock
+yarn-error.log
+package-lock.json
