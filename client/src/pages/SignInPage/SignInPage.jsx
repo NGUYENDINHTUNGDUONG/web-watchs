@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Image } from 'antd';
 import jwt_decode from 'jwt-decode';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { EyeFilled, EyeInvisibleFilled } from '@ant-design/icons';
 
-import * as UserService from '../../services/UserService';
+import * as UserService from '../../services/UserService.js';
 import imageLogoLogin from '../../assets/images/logo-login.png';
-// import LoadingComponent from "../../components/LoadingComponent/LoadingComponent.js";
-import InputFormComponent from '../../components/InputFormComponent/InputFormComponent';
-import ButtonComponent from '../../components/ButtonComponent/ButtonComponent';
-import { useMutationHooks } from '../../hooks/useMutationHook';
-import { updateUser } from '../../redux/slides/userSlide';
+import LoadingComponent from "../../components/LoadingComponent/LoadingComponent.jsx";
+import InputFormComponent from '../../components/InputFormComponent/InputFormComponent.jsx';
+import ButtonComponent from '../../components/ButtonComponent/ButtonComponent.jsx';
+import { useMutationHooks } from '../../hooks/useMutationHook.js';
+import { updateUser } from '../../redux/slides/userSlide.js';
 import {
   WrapperContainerLeft,
   WrapperContainerRight,
   WrapperTextLight,
-} from './style';
+} from './style.js';
 
 const SignInPage = () => {
   const [isShowPassword, setIsShowPassword] = useState(false);
@@ -24,7 +24,7 @@ const SignInPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
-  // const user = useSelector((state) => state.user);
+  const user = useSelector((state) => state.user);
 
   const navigate = useNavigate();
 
@@ -42,7 +42,6 @@ const SignInPage = () => {
       localStorage.setItem('refresh_token', `${data?.refresh_token}`);
       if (data?.access_token) {
         const decoded = jwt_decode(data?.access_token);
-        console.log(data?.access_token);
         if (decoded?.id) {
           handleGetDetailsUser(decoded?.id, data?.access_token);
         }

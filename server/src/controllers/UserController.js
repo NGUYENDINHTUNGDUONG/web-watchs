@@ -131,7 +131,7 @@ const getUser = async (req, res, next) => {
       data: {
         id: user.id,
         email: user.email,
-        fullName: user.firstName,
+        fullName: user.fullName,
         phone: user.phone,
         address: user.address,
         role: user.role,

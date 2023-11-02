@@ -14,7 +14,7 @@ const UserSchema = new mongoose.Schema(
       required: true,
       minlength: 6,
     },
-    
+
     role: {
       type: String,
       default: "user",
@@ -22,8 +22,6 @@ const UserSchema = new mongoose.Schema(
     },
     phone: { type: Number, required: true },
     address: { type: String, required: true },
-    accessToken: { type: String },
-    refreshToken: { type: String },
   },
   {
     versionKey: false,

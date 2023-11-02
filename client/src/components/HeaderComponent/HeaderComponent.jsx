@@ -4,11 +4,11 @@ import { HomeOutlined } from "@ant-design/icons";
 
 import SearchComponent from "../SearchComponent/SearchComponent";
 import logo from "../../assets/images/Logo-DWatch.png";
-import TypeComponent from "../../components/TypeComponent/TypeComponent";
+import TypeComponent from "../TypeComponent/TypeComponent";
 import {
   UserOutlined,
   CaretDownOutlined,
-  ShoppingCartOutlined,
+  ShoppingOutlined,
 } from "@ant-design/icons";
 import {
   WrapperContentPopup,
@@ -60,14 +60,16 @@ const HeaderComponent = () => {
       <WrapperContentPopup onClick={() => handleClickNavigate("profile")}>
         Thông tin người dùng
       </WrapperContentPopup>
-      {user?.isAdmin && (
+      {user?.role === "admin" && (
         <WrapperContentPopup onClick={() => handleClickNavigate("admin")}>
           Quản lí hệ thống
         </WrapperContentPopup>
       )}
-      <WrapperContentPopup onClick={() => handleClickNavigate(`my-order`)}>
-        Đơn hàng của tôi
-      </WrapperContentPopup>
+      {user?.role === "user" && (
+        <WrapperContentPopup onClick={() => handleClickNavigate(`my-order`)}>
+          Đơn hàng của tôi
+        </WrapperContentPopup>
+      )}
       <WrapperContentPopup onClick={() => handleClickNavigate()}>
         Đăng xuất
       </WrapperContentPopup>
@@ -78,7 +80,7 @@ const HeaderComponent = () => {
     if (type === "profile") {
       navigate("/profile-user");
     } else if (type === "admin") {
-      navigate("/system/admin");
+      navigate("/admin");
     } else if (type === "my-order") {
       navigate("/my-order", {
         state: {
@@ -126,11 +128,11 @@ const HeaderComponent = () => {
               size="large"
               placeholder="Tìm kiếm sản phẩm"
               textbutton="Tìm kiếm"
-              // onSearch={onSearch}
+              onSearch={onSearch}
             />
           </Col>
           <Col
-            span={7}
+            span={4}
             style={{
               padding: "0 50px",
               display: "flex",
@@ -165,7 +167,7 @@ const HeaderComponent = () => {
                       }}
                       onClick={() => setIsOpenPopup((prev) => !prev)}
                     >
-                      {userName?.length ? userName : user?.email}
+                      {userName?.length ? userName : user?.fullName}
                     </div>
                   </Popover>
                 </>
@@ -184,11 +186,19 @@ const HeaderComponent = () => {
                 </div>
               )}
             </WrapperHeaderAccount>
+          </Col>
+          <Col
+            span={3}
+            style={{
+              marginLeft: "-30px",
+              display: "flex",
+              gap: "20px",
+              alignItems: "left",
+            }}
+          >
             <div>
-              <Badge count={1} size="small">
-                <ShoppingCartOutlined
-                  style={{ fontSize: "30px", color: "#fff" }}
-                />
+              <Badge count={0} size="small">
+                <ShoppingOutlined style={{ fontSize: "30px", color: "#fff" }} />
               </Badge>
               <WrapperHeaderTextSmall>Giỏ hàng</WrapperHeaderTextSmall>
             </div>

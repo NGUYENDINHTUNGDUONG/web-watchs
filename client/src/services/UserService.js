@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 
 export const axiosJWT = axios.create();
 
@@ -44,14 +44,11 @@ export const deleteUser = async (id, access_token, data) => {
 };
 
 export const getAllUser = async (access_token) => {
-  const res = await axiosJWT.get(
-    `${process.env.REACT_APP_API_URL}/user/getAll`,
-    {
-      headers: {
-        authorization: `Bearer ${access_token}`,
-      },
-    }
-  );
+  const res = await axiosJWT.get(`${process.env.REACT_APP_API_URL}/user/list`, {
+    headers: {
+      authorization: `Bearer ${access_token}`,
+    },
+  });
   return res.data;
 };
 

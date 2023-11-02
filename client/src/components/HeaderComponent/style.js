@@ -26,7 +26,7 @@ export const WrapperHeaderAccount = styled.div`
 `;
 export const WrapperType = styled.div`
   display: flex;
-  font-size: 16px;
+  font-size: 14px;
   align-items: center;
   gap: 16px;
   justify-content: space-between;

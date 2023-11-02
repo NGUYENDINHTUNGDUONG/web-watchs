@@ -62,6 +62,7 @@ function App() {
   const handleGetDetailsUser = async (id, access_token) => {
     const refreshToken = localStorage.getItem("refresh_token");
     const res = await UserService.getDetailsUser(id, access_token);
+    console.log(res);
     dispatch(
       updateUser({
         ...res?.data,
