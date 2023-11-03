@@ -163,6 +163,7 @@ const SignUpPage = () => {
           )}
           {/* <Loading isLoading={isLoading}> */}
           <ButtonComponent
+            htmlType='submit'
             disabled={
               !email.length || !password.length || !confirmPassword.length
             }

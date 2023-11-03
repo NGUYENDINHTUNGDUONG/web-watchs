@@ -1,4 +1,5 @@
 const OrderRepo = require("../repository/OrderRepo");
+const Mail = require("../mail/OrderMail");
 
 // --Admin--
 const getAllOrders = async (req, res, next) => {
@@ -46,6 +47,10 @@ const createOrder = async (req, res, next) => {
     if (!order) {
       return res.status(400).json({ message: "Order not found" });
     }
+    void Mail.sendEmailOrderProduct({
+      fullName: req.payload.fullName,
+      email: req.payload.email,
+    });
     return res.status(200).json({ message: "Order success", data: order });
   } catch (error) {
     next(error);

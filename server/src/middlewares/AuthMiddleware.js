@@ -9,7 +9,7 @@ const verifyUser = async (req, res, next) => {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
     const user = await UserRepo.findUser({ _id: payload.id });
     if (user) {
-      req.payload = payload;
+      req.payload = user;
       next();
     } else {
       return res.status(401).json({ message: "user not found" });
