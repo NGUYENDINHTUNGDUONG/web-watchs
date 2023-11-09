@@ -49,10 +49,13 @@ export const userSlide = createSlice({
       state.role = "";
       state.refreshToken = "";
     },
+    listUser: (state, action) => {
+      state.listUser = action.payload;
+    },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { updateUser, resetUser } = userSlide.actions;
+export const { updateUser, resetUser, listUser } = userSlide.actions;
 
 export default userSlide.reducer;

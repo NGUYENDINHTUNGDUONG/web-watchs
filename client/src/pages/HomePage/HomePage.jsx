@@ -1,16 +1,25 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import * as ProductService from "../../services/ProductService";
 
 import { WrapperButtonMore, WrapperProducts } from "./style";
-import slider_1 from "../../assets/images/Slider_1.jpg";
-import slider_2 from "../../assets/images/Slider_2.jpg";
-import slider_3 from "../../assets/images/Slider_3.jpg";
-import slider_4 from "../../assets/images/Slider_4.jpg";
-import slider_5 from "../../assets/images/Slider_5.jpg";
 
 import CardComponent from "../../components/CardComponent/CardComponent";
 import SliderComponent from "../../components/SliderComponent/SliderComponent";
 
 const HomePage = () => {
+  const [product, setProduct] = useState([]);
+  const getAllProducts = async () => {
+    try {
+      const res = await ProductService.getAllProduct();
+      if (res?.data) {
+        setProduct(res?.data);
+        console.log(res?.data);
+      }
+    } catch (error) {}
+  };
+  useEffect(() => {
+    getAllProducts();
+  }, []);
   return (
     <>
       <div
@@ -20,23 +29,12 @@ const HomePage = () => {
           backgroundColor: "#000",
         }}
       >
-        <SliderComponent
-          arrImages={[slider_1, slider_2, slider_3, slider_4, slider_5]}
-        />
+        <SliderComponent />
       </div>
       <WrapperProducts>
-        <CardComponent />
-        <CardComponent />
-        <CardComponent />
-        <CardComponent />
-        <CardComponent />
-        <CardComponent />
-        <CardComponent />
-        <CardComponent />
-        <CardComponent />
-        <CardComponent />
-        <CardComponent />
-        <CardComponent />
+        {product.map((value) => (
+          <CardComponent src={value?.images[0]} name={value?.name} price={value?.price} rate={value?.rating} />
+        ))}
       </WrapperProducts>
       <div
         style={{

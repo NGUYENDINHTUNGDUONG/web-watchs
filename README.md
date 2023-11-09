@@ -90,16 +90,7 @@
 - **Request**:
 
   - Method: DELETE
-  - Path: /user/::userId
-  - Body:
-
-  | Field              | Type   | Require | Description                      |
-  | ------------------ | ------ | ------- | -------------------------------- |
-  | fullName           | string | require | họ tên của người dùng            |
-  | email              | string | require | email của người dùng             |
-  | password           | string | require | mật khẩu của người dùng          |
-  | phone              | number | require | số điện thoại  của người dùng    |
-  | address            | string | require | địa chỉ của người dùng           |
+  - Path: /user/:userId
 
 ### 1.8 Get user
 

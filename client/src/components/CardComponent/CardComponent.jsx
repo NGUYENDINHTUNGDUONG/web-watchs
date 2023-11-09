@@ -12,7 +12,7 @@ import {
   WrapperStyleTextSell,
 } from "./style";
 
-const CartComponent = () => {
+const CartComponent = (props) => {
   return (
     <WrapperCardStyle
       hoverable
@@ -22,7 +22,7 @@ const CartComponent = () => {
       cover={
         <img
           alt="example"
-          src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png"
+          src={props.src}
         />
       }
     >
@@ -36,10 +36,10 @@ const CartComponent = () => {
           borderTopLeftRadius: "3px",
         }}
       />
-      <StyleNameProduct>ĐỒNG HỒ NAM</StyleNameProduct>
+      <StyleNameProduct>{props.name}</StyleNameProduct>
       <WrapperReportText>
         <span style={{ marginRight: "4px" }}>
-          <span>4.96 </span>{" "}
+          <span>{props.rate} </span>{" "}
           <StarFilled
             style={{ fontSize: "12px", color: "rgb(253, 216, 54)" }}
           />
@@ -47,7 +47,7 @@ const CartComponent = () => {
         <WrapperStyleTextSell> | Đã bán 1000+</WrapperStyleTextSell>
       </WrapperReportText>
       <WrapperPriceText>
-        <span style={{ marginRight: "8px" }}>10.000.000đ</span>
+        <span style={{ marginRight: "8px" }}>{props.price}đ</span>
         <WrapperDiscountText> - 5 %</WrapperDiscountText>
       </WrapperPriceText>
     </WrapperCardStyle>

@@ -11,6 +11,14 @@ const getAllProducts = async (req, res, next) => {
     console.log(error);
   }
 };
+const getAllTypesProduct = async (req, res, next) => {
+	try {
+		const types = await ProductRepo.getAllTypesProduct();
+		res.status(200).json({types});
+	} catch (error) {
+		next(error);
+	}
+};
 const getProduct = async (req, res, next) => {
   try {
     const productId = req.params.id;
@@ -140,4 +148,5 @@ module.exports = {
   createReview,
   updateProduct,
   deleteProduct,
+  getAllTypesProduct
 };

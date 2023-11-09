@@ -8,7 +8,7 @@ const router = express.Router();
 router.post('/sign-up', userController.registerUser);
 router.post('/sign-in', userController.loginUser);
 router.patch('/:id', userController.updatedUser);
-router.delete('/:id', verify.verifyUser, userController.deletedUser);
+router.delete('/:id', userController.deletedUser);
 router.get('/', verify.verifyUser, userController.getUser);
 router.get(
   '/list',

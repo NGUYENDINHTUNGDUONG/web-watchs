@@ -70,7 +70,6 @@ const SignInPage = () => {
   const handleSignIn = (e) => {
     e.preventDefault();
 
-    console.log('logingloin');
     mutation.mutate({
       email,
       password,

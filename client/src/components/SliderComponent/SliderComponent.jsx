@@ -1,8 +1,9 @@
 import { Image } from "antd";
 import React from "react";
 import { WrapperSliderStyle } from "./style";
+import { sliderData } from "./Slider-data";
 
-const SliderComponent = ({ arrImages }) => {
+const SliderComponent = () => {
   const settings = {
     dots: true,
     infinite: true,
@@ -14,7 +15,7 @@ const SliderComponent = ({ arrImages }) => {
   };
   return (
     <WrapperSliderStyle {...settings}>
-      {arrImages.map((image) => {
+      {sliderData.map((image) => {
         return (
           <Image
             key={image}
