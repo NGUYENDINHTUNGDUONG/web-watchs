@@ -40,14 +40,14 @@ export const createProduct = async (data, access_token) => {
 
 export const getDetailsProduct = async (id) => {
   const res = await axios.get(
-    `${process.env.REACT_APP_API_URL}/product/get-details/${id}`
+    `${process.env.REACT_APP_API_URL}/product/${id}`
   );
   return res.data;
 };
 
 export const updateProduct = async (id, access_token, data) => {
-  const res = await axiosJWT.put(
-    `${process.env.REACT_APP_API_URL}/product/update/${id}`,
+  const res = await axiosJWT.patch(
+    `${process.env.REACT_APP_API_URL}/product/${id}`,
     data,
     {
       headers: {
@@ -60,10 +60,10 @@ export const updateProduct = async (id, access_token, data) => {
 
 export const deleteProduct = async (id, access_token) => {
   const res = await axiosJWT.delete(
-    `${process.env.REACT_APP_API_URL}/product/delete/${id}`,
+    `${process.env.REACT_APP_API_URL}/product/${id}`,
     {
       headers: {
-        token: `Bearer ${access_token}`,
+        authorization: `Bearer ${access_token}`,
       },
     }
   );

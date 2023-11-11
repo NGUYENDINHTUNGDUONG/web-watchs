@@ -356,6 +356,7 @@ const AdminProduct = () => {
       render: renderAction,
     },
   ];
+  console.log(products?.data);
   const dataTable =
     products?.data?.length &&
     products?.data?.map((product) => {
@@ -412,7 +413,7 @@ const AdminProduct = () => {
   };
 
   const handleDeleteProduct = () => {
-    mutationDeleted.mutate(
+   mutationDeleted.mutate(
       { id: rowSelected, token: user?.access_token },
       {
         onSettled: () => {
@@ -420,6 +421,9 @@ const AdminProduct = () => {
         },
       }
     );
+    setTimeout(() => {
+      setIsModalOpenDelete(false);
+    },1000)
   };
 
   const handleCancel = () => {
@@ -485,30 +489,28 @@ const AdminProduct = () => {
     });
   };
 
-  const handleOnchangeAvatar = async ({ fileList }) => {
-    const file = fileList[0];
-    if (!file.url && !file.preview) {
-      file.preview = await getBase64(file.originFileObj);
-    }
-    setStateProduct({
-      ...stateProduct,
-      images: file.preview,
-    });
-  };
 
-  const handleOnchangeAvatarDetails = async ({ fileList }) => {
-    const file = fileList[0];
-    if (!file.url && !file.preview) {
-      file.preview = await getBase64(file.originFileObj);
-    }
+
+  const handleOnchangeAvatarDetails = ( event ) => {
+    const uniqueFiles = event.fileList.reduce((accumulator, currentFile) => {
+      const isUnique = accumulator.every(
+        (file) => file.name !== currentFile.name
+      );
+      if (isUnique) {
+        accumulator.push(currentFile);
+      }
+      return accumulator;
+    }, []);
+
     setStateProductDetails({
       ...stateProductDetails,
-      images: file.preview,
+      images: uniqueFiles,
     });
+    
   };
   const onUpdateProduct = () => {
     mutationUpdate.mutate(
-      { id: rowSelected, token: user?.access_token, ...stateProductDetails },
+      { id: rowSelected, token: access_token , ...stateProductDetails },
       {
         onSettled: () => {
           queryProduct.refetch();
@@ -537,12 +539,20 @@ const AdminProduct = () => {
       (item) => item.uid !== file.uid
     );
 
-    // Cập nhật trạng thái với danh sách tệp mới
     setStateProduct({
       ...stateProduct,
       images: newFileList,
     });
   };
+  const onRemoveDetails = (file) => {
+    const newFileList = stateProductDetails.images.filter(
+      (item) => item.uid !== file.uid
+    );
+    setStateProductDetails({
+      ...stateProductDetails,
+      images: newFileList,
+    })
+  }
   const handleChangeSelect = (value) => {
     setStateProduct({
       ...stateProduct,
@@ -767,7 +777,7 @@ const AdminProduct = () => {
                 name="image"
                 rules={[
                   {
-                    required: true, // Kiểm tra xem fileList có giá trị không
+                    required: true,
                     message: "Please input your count image!",
                   },
                 ]}
@@ -803,7 +813,7 @@ const AdminProduct = () => {
         onClose={() => setIsOpenDrawer(false)}
         width="90%"
       >
-        <Loading isLoading={isLoadingUpdate || isLoadingUpdated}>
+        <Loading isLoading={isLoadingUpdate }>
           <Form
             name="basic"
             labelCol={{ span: 2 }}
@@ -910,25 +920,21 @@ const AdminProduct = () => {
                 { required: true, message: "Please input your count image!" },
               ]}
             >
-              <WrapperUploadFile
-                onChange={handleOnchangeAvatarDetails}
-                maxCount={1}
-              >
-                <Button>Select File</Button>
-                {stateProductDetails?.images && (
-                  <img
-                    src={stateProductDetails?.images}
-                    style={{
-                      height: "60px",
-                      width: "60px",
-                      borderRadius: "50%",
-                      objectFit: "cover",
-                      marginLeft: "10px",
-                    }}
-                    alt="avatar"
-                  />
-                )}
-              </WrapperUploadFile>
+             <WrapperUploadFile
+                  beforeUpload={() => false}
+                  listType="picture-card"
+                  onRemove={onRemoveDetails}
+                  onChange={handleOnchangeAvatarDetails}
+                  maxCount={6}
+                  fileList={stateProductDetails?.images}
+                >
+                  {stateProductDetails.images?.length >= 6 ? null : (
+                    <div>
+                      <PlusOutlined />
+                      <div style={{ marginTop: 8 }}>Upload</div>
+                    </div>
+                  )}
+                </WrapperUploadFile>
             </Form.Item>
             <Form.Item wrapperCol={{ offset: 20, span: 16 }}>
               <Button type="primary" htmlType="submit">
@@ -944,9 +950,7 @@ const AdminProduct = () => {
         onCancel={handleCancelDelete}
         onOk={handleDeleteProduct}
       >
-        <Loading isLoading={isLoadingDeleted}>
           <div>Bạn có chắc xóa sản phẩm này không?</div>
-        </Loading>
       </ModalComponent>
     </div>
   );

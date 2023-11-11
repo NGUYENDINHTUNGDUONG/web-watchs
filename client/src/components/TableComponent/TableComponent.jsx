@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Loading from "../../components/LoadingComponent/LoadingComponent";
 import { Excel } from "antd-table-saveas-excel";
 import { useMemo } from "react";
+import "./styles.css";
 
 const TableComponent = (props) => {
   const {
@@ -42,7 +43,7 @@ const TableComponent = (props) => {
           <Button onClick={createUser}>Thêm người dùng</Button>
         ) : null}
       </div>
-      <Table columns={columns} dataSource={dataSource} {...props} />
+      <Table className="table-custom" columns={columns} dataSource={dataSource} {...props} />
     </Loading>
   );
 };

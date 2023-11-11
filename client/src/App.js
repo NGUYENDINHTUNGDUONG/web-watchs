@@ -72,7 +72,7 @@ function App() {
   };
 
   return (
-    <div>
+    <div >
       <Loading isLoading={isLoading}>
         <Router>
           <Routes>
