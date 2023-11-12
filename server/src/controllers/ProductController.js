@@ -61,7 +61,8 @@ const findProductByFilter = async (req, res, next) => {
 };
 const createProduct = async (req, res, next) => {
   try {
-    const images = req.files.map((file) => file.originalname);
+    console.log(req);
+    const images = req.files.map((file) => file.filename);
     const product = await ProductRepo.createProduct({
       images,
       ...req.body,

@@ -51,7 +51,7 @@ export const updateProduct = async (id, access_token, data) => {
     data,
     {
       headers: {
-        token: `Bearer ${access_token}`,
+        authorization: `Bearer ${access_token}`,
       },
     }
   );

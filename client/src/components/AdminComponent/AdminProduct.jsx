@@ -47,6 +47,7 @@ const AdminProduct = () => {
   });
   const access_token = localStorage.getItem("access_token");
   const [stateProduct, setStateProduct] = useState(inittial());
+  const [previewImage, setPreviewImage] = useState([]);
   const [stateProductDetails, setStateProductDetails] = useState(inittial());
 
   const [form] = Form.useForm();
@@ -124,8 +125,27 @@ const AdminProduct = () => {
       });
     }
     setIsLoadingUpdate(false);
+    console.log(res, "detail");
   };
+  const handleChange = (info) => {
+    let fileList = [...info.fileList];
 
+    //  Chuyển đổi URL thành đối tượng File của Upload antd
+    fileList = fileList.map((file) => {
+      if (file.response) {
+        file.thumbUrl = file.response.url;
+      }
+      return file;
+    });
+
+    return fileList;
+  };
+  console.log(
+    stateProductDetails.images?.map((image) =>
+      handleChange(`http://localhost:3001/static/${image}`)
+    ),
+    "stateProductDetails"
+  );
   useEffect(() => {
     if (!isModalOpen) {
       form.setFieldsValue(stateProductDetails);
@@ -356,7 +376,6 @@ const AdminProduct = () => {
       render: renderAction,
     },
   ];
-  console.log(products?.data);
   const dataTable =
     products?.data?.length &&
     products?.data?.map((product) => {
@@ -413,7 +432,7 @@ const AdminProduct = () => {
   };
 
   const handleDeleteProduct = () => {
-   mutationDeleted.mutate(
+    mutationDeleted.mutate(
       { id: rowSelected, token: user?.access_token },
       {
         onSettled: () => {
@@ -423,7 +442,7 @@ const AdminProduct = () => {
     );
     setTimeout(() => {
       setIsModalOpenDelete(false);
-    },1000)
+    }, 1000);
   };
 
   const handleCancel = () => {
@@ -449,7 +468,6 @@ const AdminProduct = () => {
     data.append("name", stateProduct.name);
     data.append("price", stateProduct.price);
     data.append("brand", stateProduct.brand);
-    data.append("rating", stateProduct.rating);
     data.append(
       "type",
       stateProduct.type === "add_type"
@@ -461,7 +479,7 @@ const AdminProduct = () => {
     data.append("category", stateProduct.category);
     data.append("description", stateProduct.description);
     data.append("caliber", stateProduct.caliber);
-    data.append("images", stateProduct.images);
+    stateProduct.images.map((image) => data.append("images", image));
     try {
       const res = await ProductService.createProduct(data, access_token);
       if (res) {
@@ -489,9 +507,7 @@ const AdminProduct = () => {
     });
   };
 
-
-
-  const handleOnchangeAvatarDetails = ( event ) => {
+  const handleOnchangeAvatarDetails = (event) => {
     const uniqueFiles = event.fileList.reduce((accumulator, currentFile) => {
       const isUnique = accumulator.every(
         (file) => file.name !== currentFile.name
@@ -506,17 +522,34 @@ const AdminProduct = () => {
       ...stateProductDetails,
       images: uniqueFiles,
     });
-    
   };
-  const onUpdateProduct = () => {
-    mutationUpdate.mutate(
-      { id: rowSelected, token: access_token , ...stateProductDetails },
-      {
-        onSettled: () => {
-          queryProduct.refetch();
-        },
-      }
+  const onUpdateProduct = async () => {
+    const data = new FormData();
+    data.append("name", stateProductDetails.name);
+    data.append("price", stateProductDetails.price);
+    data.append("brand", stateProductDetails.brand);
+    data.append(
+      "type",
+      stateProductDetails.type === "add_type"
+        ? stateProductDetails.newType
+        : stateProductDetails.type
     );
+    data.append("quantity", stateProductDetails.quantity);
+    data.append("category", stateProductDetails.category);
+    data.append("description", stateProductDetails.description);
+    data.append("caliber", stateProductDetails.caliber);
+    stateProductDetails.images.map((image) => data.append("images", image));
+    try {
+      const res = await ProductService.updateProduct(data, access_token);
+      if (res) {
+        console.log("res", res);
+        message.success("Create product successfully!");
+        handleCancel();
+        queryProduct.refetch();
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
   const handleFileChange = (event) => {
     const uniqueFiles = event.fileList.reduce((accumulator, currentFile) => {
@@ -528,11 +561,14 @@ const AdminProduct = () => {
       }
       return accumulator;
     }, []);
-
+    const newList = uniqueFiles.map((file) => file.originFileObj);
+    setPreviewImage(uniqueFiles);
     setStateProduct({
       ...stateProduct,
-      images: uniqueFiles,
+      images: newList,
     });
+    console.log(uniqueFiles);
+    console.log(event);
   };
   const onRemove = (file) => {
     const newFileList = stateProduct.images.filter(
@@ -551,15 +587,16 @@ const AdminProduct = () => {
     setStateProductDetails({
       ...stateProductDetails,
       images: newFileList,
-    })
-  }
+    });
+  };
   const handleChangeSelect = (value) => {
     setStateProduct({
       ...stateProduct,
       type: value,
     });
   };
-  console.log(stateProduct.images);
+  console.log(stateProductDetails.images);
+  console.log(stateProduct);
   return (
     <div>
       <WrapperHeader>Quản lý sản phẩm</WrapperHeader>
@@ -628,8 +665,6 @@ const AdminProduct = () => {
               >
                 <Select
                   name="type"
-                  // defaultValue="lucy"
-                  // style={{ width: 120 }}
                   value={stateProduct.type}
                   onChange={handleChangeSelect}
                   options={renderOptions(types?.types)}
@@ -677,22 +712,6 @@ const AdminProduct = () => {
                 />
               </Form.Item>
               <Form.Item
-                label="Rating"
-                name="rating"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your count rating!",
-                  },
-                ]}
-              >
-                <InputComponent
-                  value={stateProduct.rating}
-                  onChange={handleOnchange}
-                  name="rating"
-                />
-              </Form.Item>
-              <Form.Item
                 label="Brand"
                 name="brand"
                 rules={[
@@ -703,23 +722,6 @@ const AdminProduct = () => {
                   value={stateProduct.brand}
                   onChange={handleOnchange}
                   name="brand"
-                />
-              </Form.Item>
-
-              <Form.Item
-                label="Discount"
-                name="discount"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your discount of product!",
-                  },
-                ]}
-              >
-                <InputComponent
-                  value={stateProduct.discount}
-                  onChange={handleOnchange}
-                  name="discount"
                 />
               </Form.Item>
               <Form.Item
@@ -775,12 +777,12 @@ const AdminProduct = () => {
               <Form.Item
                 label="Image"
                 name="image"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your count image!",
-                  },
-                ]}
+                // rules={[
+                //   {
+                //     required: true,
+                //     message: "Please input your count image!",
+                //   },
+                // ]}
               >
                 <WrapperUploadFile
                   beforeUpload={() => false}
@@ -788,7 +790,7 @@ const AdminProduct = () => {
                   onRemove={onRemove}
                   onChange={handleFileChange}
                   maxCount={6}
-                  fileList={stateProduct.images}
+                  fileList={previewImage}
                 >
                   {stateProduct.images?.length >= 6 ? null : (
                     <div>
@@ -797,6 +799,15 @@ const AdminProduct = () => {
                     </div>
                   )}
                 </WrapperUploadFile>
+                {/* <input
+                  type="file"
+                  onChange={(file) => {
+                    setStateProduct({
+                      ...stateProduct,
+                      images: [...stateProduct.images, file.target.files?.[0]],
+                    });
+                  }}
+                ></input> */}
               </Form.Item>
             </div>
           </div>
@@ -813,7 +824,7 @@ const AdminProduct = () => {
         onClose={() => setIsOpenDrawer(false)}
         width="90%"
       >
-        <Loading isLoading={isLoadingUpdate }>
+        <Loading isLoading={isLoadingUpdate}>
           <Form
             name="basic"
             labelCol={{ span: 2 }}
@@ -839,12 +850,26 @@ const AdminProduct = () => {
               name="type"
               rules={[{ required: true, message: "Please input your type!" }]}
             >
-              <InputComponent
-                value={stateProductDetails["type"]}
-                onChange={handleOnchangeDetails}
+              <Select
                 name="type"
+                value={stateProductDetails.type}
+                onChange={handleChangeSelect}
+                options={renderOptions(types?.types)}
               />
             </Form.Item>
+            {stateProductDetails.type === "add_type" && (
+              <Form.Item
+                label="New type"
+                name="newType"
+                rules={[{ required: true, message: "Please input your type!" }]}
+              >
+                <InputComponent
+                  value={stateProductDetails.newType}
+                  onChange={handleOnchange}
+                  name="newType"
+                />
+              </Form.Item>
+            )}
             <Form.Item
               label="`Quantity`"
               name="quantity"
@@ -885,56 +910,27 @@ const AdminProduct = () => {
               />
             </Form.Item>
             <Form.Item
-              label="Rating"
-              name="rating"
-              rules={[
-                { required: true, message: "Please input your count rating!" },
-              ]}
-            >
-              <InputComponent
-                value={stateProductDetails.rating}
-                onChange={handleOnchangeDetails}
-                name="rating"
-              />
-            </Form.Item>
-            <Form.Item
-              label="Discount"
-              name="discount"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input your discount of product!",
-                },
-              ]}
-            >
-              <InputComponent
-                value={stateProductDetails.discount}
-                onChange={handleOnchangeDetails}
-                name="discount"
-              />
-            </Form.Item>
-            <Form.Item
               label="Image"
               name="image"
               rules={[
                 { required: true, message: "Please input your count image!" },
               ]}
             >
-             <WrapperUploadFile
-                  beforeUpload={() => false}
-                  listType="picture-card"
-                  onRemove={onRemoveDetails}
-                  onChange={handleOnchangeAvatarDetails}
-                  maxCount={6}
-                  fileList={stateProductDetails?.images}
-                >
-                  {stateProductDetails.images?.length >= 6 ? null : (
-                    <div>
-                      <PlusOutlined />
-                      <div style={{ marginTop: 8 }}>Upload</div>
-                    </div>
-                  )}
-                </WrapperUploadFile>
+              <WrapperUploadFile
+                beforeUpload={() => false}
+                listType="picture-card"
+                onRemove={onRemoveDetails}
+                onChange={handleOnchangeAvatarDetails}
+                maxCount={6}
+                fileList={stateProductDetails?.images}
+              >
+                {stateProductDetails.images?.length >= 6 ? null : (
+                  <div>
+                    <PlusOutlined />
+                    <div style={{ marginTop: 8 }}>Upload</div>
+                  </div>
+                )}
+              </WrapperUploadFile>
             </Form.Item>
             <Form.Item wrapperCol={{ offset: 20, span: 16 }}>
               <Button type="primary" htmlType="submit">
@@ -950,7 +946,7 @@ const AdminProduct = () => {
         onCancel={handleCancelDelete}
         onOk={handleDeleteProduct}
       >
-          <div>Bạn có chắc xóa sản phẩm này không?</div>
+        <div>Bạn có chắc xóa sản phẩm này không?</div>
       </ModalComponent>
     </div>
   );

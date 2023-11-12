@@ -22,7 +22,7 @@ const CartComponent = (props) => {
       cover={
         <img
           alt="example"
-          src={props.src}
+          src={`http://localhost:3001/static/${props.src}`}
         />
       }
     >
