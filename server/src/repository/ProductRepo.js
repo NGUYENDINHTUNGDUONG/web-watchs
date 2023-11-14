@@ -47,14 +47,19 @@ const updateAmountProduct = async (productId, amount) => {
 	);
 };
 
+
 const getAllTypesProduct = async () => {
 	return Product.distinct('type');
 };
+const getAllBrands = async () => {
+	return Product.distinct("brand");
+  };
 
 module.exports = {
 	findProduct,
 	getAllProducts,
 	createProduct,
+	getAllBrands,
 	updateProduct,
 	deleteProduct,
 	createReview,

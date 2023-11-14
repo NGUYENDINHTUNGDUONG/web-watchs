@@ -29,6 +29,7 @@ const AdminProduct = () => {
   const [isLoadingUpdate, setIsLoadingUpdate] = useState(false);
   const [isModalOpenDelete, setIsModalOpenDelete] = useState(false);
   const [types, setTypes] = useState([""]);
+  const [brands, setBrands] = useState([""]);
   const user = useSelector((state) => state?.user);
   const searchInput = useRef(null);
   const inittial = () => ({
@@ -115,7 +116,7 @@ const AdminProduct = () => {
         price: res?.data?.price,
         brand: res?.data?.brand,
         rating: res?.data?.rating,
-        images: res?.data?.images,
+        images: convertImages(res?.data?.images),
         type: res?.data?.type,
         quantity: res?.data?.quantity,
         discount: res?.data?.discount,
@@ -125,27 +126,15 @@ const AdminProduct = () => {
       });
     }
     setIsLoadingUpdate(false);
-    console.log(res, "detail");
   };
-  const handleChange = (info) => {
-    let fileList = [...info.fileList];
-
-    //  Chuyển đổi URL thành đối tượng File của Upload antd
-    fileList = fileList.map((file) => {
-      if (file.response) {
-        file.thumbUrl = file.response.url;
-      }
-      return file;
+  const convertImages = (imagePaths = []) => {
+    return imagePaths.map((path) => {
+      return {
+        name: path,
+        url: `http://localhost:3001/static/${path}`,
+      };
     });
-
-    return fileList;
   };
-  console.log(
-    stateProductDetails.images?.map((image) =>
-      handleChange(`http://localhost:3001/static/${image}`)
-    ),
-    "stateProductDetails"
-  );
   useEffect(() => {
     if (!isModalOpen) {
       form.setFieldsValue(stateProductDetails);
@@ -483,7 +472,6 @@ const AdminProduct = () => {
     try {
       const res = await ProductService.createProduct(data, access_token);
       if (res) {
-        console.log("res", res);
         message.success("Create product successfully!");
         handleCancel();
         queryProduct.refetch();
@@ -517,12 +505,13 @@ const AdminProduct = () => {
       }
       return accumulator;
     }, []);
-
+    const newList = uniqueFiles.map((file) => file.originFileObj);
     setStateProductDetails({
       ...stateProductDetails,
-      images: uniqueFiles,
+      images: newList,
     });
   };
+  console.log(stateProductDetails);
   const onUpdateProduct = async () => {
     const data = new FormData();
     data.append("name", stateProductDetails.name);
@@ -540,7 +529,7 @@ const AdminProduct = () => {
     data.append("caliber", stateProductDetails.caliber);
     stateProductDetails.images.map((image) => data.append("images", image));
     try {
-      const res = await ProductService.updateProduct(data, access_token);
+      const res = await ProductService.updateProduct(rowSelected, access_token,data);
       if (res) {
         console.log("res", res);
         message.success("Create product successfully!");
@@ -548,7 +537,6 @@ const AdminProduct = () => {
         queryProduct.refetch();
       }
     } catch (error) {
-      console.log(error);
     }
   };
   const handleFileChange = (event) => {
@@ -567,8 +555,6 @@ const AdminProduct = () => {
       ...stateProduct,
       images: newList,
     });
-    console.log(uniqueFiles);
-    console.log(event);
   };
   const onRemove = (file) => {
     const newFileList = stateProduct.images.filter(
@@ -595,8 +581,6 @@ const AdminProduct = () => {
       type: value,
     });
   };
-  console.log(stateProductDetails.images);
-  console.log(stateProduct);
   return (
     <div>
       <WrapperHeader>Quản lý sản phẩm</WrapperHeader>
@@ -724,6 +708,33 @@ const AdminProduct = () => {
                   name="brand"
                 />
               </Form.Item>
+              <Form.Item
+                label="Brand"
+                name="brand"
+                rules={[{ required: true, message: "Please input your brand!" }]}
+              >
+                <Select
+                  name="brand"
+                  value={stateProduct.brand}
+                  onChange={handleChangeSelect}
+                  options={renderOptions(types?.types)}
+                />
+              </Form.Item>
+              {stateProduct.type === "add_brand" && (
+                <Form.Item
+                  label="New Brand"
+                  name="newBrand"
+                  rules={[
+                    { required: true, message: "Please input your type!" },
+                  ]}
+                >
+                  <InputComponent
+                    value={stateProduct.newType}
+                    onChange={handleOnchange}
+                    name="newBrand"
+                  />
+                </Form.Item>
+              )}
               <Form.Item
                 label="Description"
                 name="description"

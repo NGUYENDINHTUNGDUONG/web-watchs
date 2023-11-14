@@ -61,7 +61,6 @@ const findProductByFilter = async (req, res, next) => {
 };
 const createProduct = async (req, res, next) => {
   try {
-    console.log(req);
     const images = req.files.map((file) => file.filename);
     const product = await ProductRepo.createProduct({
       images,
@@ -73,7 +72,14 @@ const createProduct = async (req, res, next) => {
     console.log(error);
   }
 };
-
+const getAllBrands = async (req, res, next) => {
+	try {
+	  const Brands = await ProductRepo.getAllBrands();
+	  res.status(200).json({ Brands });
+	} catch (error) {
+	  next(error);
+	}
+  };
 const updateProduct = async (req, res, next) => {
   try {
     const productId = req.params.id;
@@ -147,6 +153,7 @@ module.exports = {
   findProductByFilter,
   createProduct,
   createReview,
+  getAllBrands,
   updateProduct,
   deleteProduct,
   getAllTypesProduct

@@ -97,6 +97,7 @@ const SignInPage = () => {
           <h1>Xin chào</h1>
           <p>Đăng nhập vào tạo tài khoản</p>
           <InputFormComponent
+            type='email'
             style={{ marginBottom: '10px' }}
             placeholder='abc@gmail.com'
             value={email}

@@ -33,6 +33,7 @@ router.delete(
 router.get("/list", productController.getAllProducts);
 router.get("/search/:name", productController.findProductName);
 router.get('/type', productController.getAllTypesProduct);
+router.get('/brand', productController.getAllBrands);
 router.get("/filter", productController.findProductByFilter);
 router.get("/:id", productController.getProduct);
 

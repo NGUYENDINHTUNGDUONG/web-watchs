@@ -100,13 +100,13 @@ const HeaderComponent = () => {
   };
 
   const arr = [
-    <HomeOutlined />,
-    "THƯƠNG HIỆU",
-    "ĐỒNG HỒ NAM",
-    "ĐỒNG HỒ NỮ",
-    "SỬA CHỮA",
-    "KIẾN THỨC",
-    "PHỤ KIỆN",
+    { title: <HomeOutlined />, url: "/" },
+    { title: "THƯƠNG HIỆU", url: "/products" },
+    { title: "ĐỒNG HỒ NAM", url: "/products" },
+    { title: "ĐỒNG HỒ NỮ", url: "/products" },
+    { title: "SỬA CHỮA", url: "/products" },
+    { title: "KIẾN THỨC", url: "/products" },
+    { title: "PHỤ KIỆN", url: "/products" },
   ];
   return (
     <div style={{ position: "sticky", top: "0", zIndex: "999" }}>
@@ -207,7 +207,9 @@ const HeaderComponent = () => {
       </WrapperHeader>
       <WrapperType>
         {arr.map((item) => {
-          return <TypeComponent key={item} title={item} />;
+          return (
+            <TypeComponent key={item.title} title={item.title} url={item.url} />
+          );
         })}
       </WrapperType>
     </div>

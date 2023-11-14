@@ -2,7 +2,6 @@ import HomePage from "../pages/HomePage/HomePage";
 import OrderPage from "../pages/OrderPage/OrderPage";
 import ProductsPage from "../pages/ProductsPage/ProductsPage";
 import NotFoundPage from "../pages/NotFoundPage/NotFoundPage";
-import TypeProductPage from "../pages/TypeProductPage/TypeProductPage";
 import SignInPage from "../pages/SignInPage/SignInPage";
 import ProductDetailsPage from "../pages/ProductsPage/ProductDetailsPage";
 import SignUpPage from "../pages/SignUpPage/SignUpPage";
@@ -36,13 +35,8 @@ export const routes = [
   },
 
   {
-    path: "/product-details/",
+    path: "/product-details/:id",
     element: ProductDetailsPage,
-    isShowHeader: true,
-  },
-  {
-    path: "/type",
-    element: TypeProductPage,
     isShowHeader: true,
   },
   {
