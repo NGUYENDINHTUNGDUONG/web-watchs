@@ -16,9 +16,8 @@ router.post(
 router.post('/:id/reviews', verify.verifyUser, productController.createReview);
 router.patch(
 	'/:id',
-	verify.verifyUser,
-	verify.verifyAdmin,
-	upload.array('images'),
+	// verify.verifyUser,
+	// verify.verifyAdmin,
 	productController.updateProduct
 );
 router.delete(

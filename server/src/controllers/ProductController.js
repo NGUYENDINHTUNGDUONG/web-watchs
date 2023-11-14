@@ -1,6 +1,9 @@
 const express = require('express');
+const fs = require('fs');
 
 const ProductRepo = require('../repository/ProductRepo');
+const path = require('path');
+const {error} = require('console');
 
 const getAllProducts = async (req, res, next) => {
 	try {
@@ -39,7 +42,22 @@ const findProductName = async (req, res, next) => {
 };
 const findProductByFilter = async (req, res, next) => {
 	try {
-		const filter = req.body;
+		const {brand, category, minPrice, maxPrice, minRating} = req.body;
+		const filter = {
+			...(brand && {brand}),
+			...(category && {category}),
+			...(minPrice && {
+				price: {
+					$gte: minPrice,
+				},
+			}),
+			...(maxPrice && {
+				price: {
+					$lte: maxPrice,
+				},
+			}),
+			...(minRating && {rating: {$gte: minRating}}),
+		};
 		console.log(filter);
 		const product = await ProductRepo.getAllProducts(filter);
 		if (!product) {
@@ -72,12 +90,19 @@ const updateProduct = async (req, res, next) => {
 		if (!product) {
 			return res.status(400).json({message: 'Product not found'});
 		}
-		const images = req.files.map((file) => file.originalname);
+		const oldImages = product.images;
+		const newImages = req.body.images;
+		const deleteImages = oldImages.filter((image) => !newImages.includes(image));
+
+		deleteImages.forEach((image) => {
+			fs.unlink(path.join(__dirname, '../uploads', image), (err) => {
+				console.log(err);
+			});
+		});
 		const updateProduct = await ProductRepo.updateProduct({
 			productId,
 			update: {
 				...req.body,
-				images,
 			},
 		});
 		return res
