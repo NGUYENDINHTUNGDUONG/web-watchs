@@ -51,6 +51,9 @@ const updateAmountProduct = async (productId, amount) => {
 const getAllTypesProduct = async () => {
 	return Product.distinct('type');
 };
+const getAllCaliberProduct = async () => {
+	return Product.distinct('caliber');
+};
 const getAllBrands = async () => {
 	return Product.distinct("brand");
   };
@@ -65,4 +68,5 @@ module.exports = {
 	createReview,
 	updateAmountProduct,
 	getAllTypesProduct,
+	getAllCaliberProduct
 };

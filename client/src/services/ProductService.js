@@ -1,17 +1,11 @@
 import axios from "axios";
 import { axiosJWT } from "./UserService";
 
-export const getAllProduct = async (search, limit) => {
-  let res = {};
-  if (search?.length > 0) {
-    res = await axios.get(
-      `${process.env.REACT_APP_API_URL}/product/list?filter=name&filter=${search}&limit=${limit}`
-    );
-  } else {
-    res = await axios.get(
-      `${process.env.REACT_APP_API_URL}/product/list?limit=${limit}`
-    );
-  }
+export const getAllProduct = async (data) => {
+  const res = await axios.get(
+    `${process.env.REACT_APP_API_URL}/product/filter`,
+    { params: data }
+  );
   return res.data;
 };
 
@@ -39,9 +33,7 @@ export const createProduct = async (data, access_token) => {
 };
 
 export const getDetailsProduct = async (id) => {
-  const res = await axios.get(
-    `${process.env.REACT_APP_API_URL}/product/${id}`
-  );
+  const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/${id}`);
   return res.data;
 };
 
@@ -70,24 +62,34 @@ export const deleteProduct = async (id, access_token) => {
   return res.data;
 };
 
-export const deleteManyProduct = async (data, access_token) => {
-  const res = await axiosJWT.post(
-    `${process.env.REACT_APP_API_URL}/product/delete-many`,
-    data,
-    {
-      headers: {
-        token: `Bearer ${access_token}`,
-      },
-    }
+export const getAllTypesProduct = async () => {
+  const res = await axiosJWT.get(
+    `${process.env.REACT_APP_API_URL}/product/type`
+  );
+  return res.data;
+};
+export const getAllCaliberProduct = async () => {
+  const res = await axiosJWT.get(
+    `${process.env.REACT_APP_API_URL}/product/caliber`
   );
   return res.data;
 };
 
-export const getAllTypesProduct = async () => {
-  const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/type`);
+export const getAllBrandsProduct = async () => {
+  const res = await axiosJWT.get(
+    `${process.env.REACT_APP_API_URL}/product/brand`
+  );
   return res.data;
 };
-export const getAllBrandsProduct = async () => {
-  const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/brand`);
+export const uploadFile = async (data, access_token) => {
+  const res = await axiosJWT.post(
+    `${process.env.REACT_APP_API_URL}/file`,
+    data,
+    {
+      headers: {
+        authorization: `Bearer ${access_token}`,
+      },
+    }
+  );
   return res.data;
 };

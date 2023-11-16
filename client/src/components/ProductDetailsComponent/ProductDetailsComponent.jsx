@@ -17,7 +17,7 @@ import {
 } from "./style";
 import ButtonComponent from "../ButtonComponent/ButtonComponent";
 
-const ProductDetailsComponent = () => {
+const ProductDetailsComponent = (props) => {
   return (
     <div>
       <Row
@@ -32,54 +32,25 @@ const ProductDetailsComponent = () => {
           span={10}
           style={{ borderRight: "1px solid #e5e5e5", paddingRight: "8px" }}
         >
-          <Image src={{ imageProduct }} alt="image product" preview={false} />
+          <Image
+            src={`http://localhost:3001/static/${props.images?.[0]}`}
+            alt="image product"
+            preview={false}
+          />
           <Row style={{ paddingTop: "10px", justifyContent: "space-between" }}>
-            <WrapperStyleColImage span={4}>
-              <WrapperStyleImageSmall
-                src={{ imageProductSmall }}
-                alt="image product"
-                preview={false}
-              />
-            </WrapperStyleColImage>
-            <WrapperStyleColImage span={4}>
-              <WrapperStyleImageSmall
-                src={{ imageProductSmall }}
-                alt="image product"
-                preview={false}
-              />
-            </WrapperStyleColImage>
-            <WrapperStyleColImage span={4}>
-              <WrapperStyleImageSmall
-                src={{ imageProductSmall }}
-                alt="image product"
-                preview={false}
-              />
-            </WrapperStyleColImage>
-            <WrapperStyleColImage span={4}>
-              <WrapperStyleImageSmall
-                src={{ imageProductSmall }}
-                alt="image product"
-                preview={false}
-              />
-            </WrapperStyleColImage>
-            <WrapperStyleColImage span={4}>
-              <WrapperStyleImageSmall
-                src={{ imageProductSmall }}
-                alt="image product"
-                preview={false}
-              />
-            </WrapperStyleColImage>
-            <WrapperStyleColImage span={4}>
-              <WrapperStyleImageSmall
-                src={{ imageProductSmall }}
-                alt="image product"
-                preview={false}
-              />
-            </WrapperStyleColImage>
+            {props.images?.map((value) => (
+              <WrapperStyleColImage span={4}>
+                <WrapperStyleImageSmall
+                  src={`http://localhost:3001/static/${value}`}
+                  alt="image product"
+                  preview={false}
+                />
+              </WrapperStyleColImage>
+            ))}
           </Row>
         </Col>
         <Col span={14} style={{ paddingLeft: "10px" }}>
-          <WrapperStyleNameProduct>Sách truyện</WrapperStyleNameProduct>
+          <WrapperStyleNameProduct>{props.name}</WrapperStyleNameProduct>
           <div>
             <StarFilled
               style={{ fontSize: "12px", color: "rgb(253, 216, 54)" }}
@@ -93,12 +64,12 @@ const ProductDetailsComponent = () => {
             <WrapperStyleTextSell> | Đã bán 1000+</WrapperStyleTextSell>
           </div>
           <WrapperPriceProduct>
-            <WrapperPriceTextProduct>20000000đ</WrapperPriceTextProduct>
+            <WrapperPriceTextProduct>{props.price}</WrapperPriceTextProduct>
           </WrapperPriceProduct>
-          <WrapperAddressProduct>
+          {/* <WrapperAddressProduct>
             <span>Giao đến </span>
             <span className="change-address">Đổi địa chỉ</span>
-          </WrapperAddressProduct>
+          </WrapperAddressProduct> */}
           <div
             style={{
               margin: "10px 0 20px",

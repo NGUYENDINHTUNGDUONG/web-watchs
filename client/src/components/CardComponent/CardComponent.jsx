@@ -1,7 +1,7 @@
 import React from "react";
 import { StarFilled } from "@ant-design/icons";
 import { Image } from "antd";
-
+import { useNavigate } from "react-router-dom";
 import official from "../../assets/images/official.png";
 import {
   StyleNameProduct,
@@ -13,8 +13,10 @@ import {
 } from "./style";
 
 const CartComponent = (props) => {
+  const navigate = useNavigate();
   return (
     <WrapperCardStyle
+    onClick={() => navigate(`/product-details/${props.id}`)}
       hoverable
       headStyle={{ width: "220px", height: "220px" }}
       style={{ width: "220px", height: "320px" }}

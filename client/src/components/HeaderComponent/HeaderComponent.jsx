@@ -102,8 +102,8 @@ const HeaderComponent = () => {
   const arr = [
     { title: <HomeOutlined />, url: "/" },
     { title: "THƯƠNG HIỆU", url: "/products" },
-    { title: "ĐỒNG HỒ NAM", url: "/products" },
-    { title: "ĐỒNG HỒ NỮ", url: "/products" },
+    { title: "ĐỒNG HỒ NAM", url: "/products/donghonam" },
+    { title: "ĐỒNG HỒ NỮ", url: "/products/donghonu" },
     { title: "SỬA CHỮA", url: "/products" },
     { title: "KIẾN THỨC", url: "/products" },
     { title: "PHỤ KIỆN", url: "/products" },
@@ -115,9 +115,11 @@ const HeaderComponent = () => {
           <Col span={7}>
             <WrapperHeaderText>
               <img
+                onClick={() => navigate("/")}
                 src={logo}
                 alt="logo"
                 style={{
+                  cursor: "pointer",
                   width: "150px",
                 }}
               />

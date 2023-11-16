@@ -33,7 +33,7 @@ const HomePage = () => {
       </div>
       <WrapperProducts>
         {product.map((value) => (
-          <CardComponent src={value?.images[0]} name={value?.name} price={value?.price} rate={value?.rating} />
+          <CardComponent src={value?.images[0]} name={value?.name} price={value?.price} rate={value?.rating}  id={value?._id}/>
         ))}
       </WrapperProducts>
       <div
