@@ -3,7 +3,8 @@ const fs = require('fs');
 
 const ProductRepo = require('../repository/ProductRepo');
 const path = require('path');
-const {error} = require('console');
+const Order = require('../models/OrderModel');
+const ProductModel = require('../models/ProductModel');
 
 const getAllProducts = async (req, res, next) => {
 	try {
@@ -168,6 +169,49 @@ const getAllTypes = async (req, res, next) => {
 	try {
 		const types = await ProductRepo.getAllTypes();
 		res.status(200).json({types});
+	} catch (error) {
+		next(error);
+	}
+};
+
+const getTopSoldLastMonth = async (req, res, next) => {
+	try {
+		const today = new Date();
+		const endDate = new Date(
+			today.getFullYear(),
+			today.getMonth(),
+			today.getDate()
+		);
+
+		const startDate = new Date(endDate.getTime()).setMonth(today.getMonth() - 1);
+
+		const lastMonthOrders = await Order.find({
+			createdAt: {$gte: startDate, $lte: endDate},
+		});
+
+		const productSales = {};
+		lastMonthOrders.forEach((order) => {
+			order.orderItem.forEach((item) => {
+				const productId = item._id;
+				if (productSales[productId]) {
+					productSales[productId] += item.amount;
+				} else {
+					productSales[productId] = item.amount;
+				}
+			});
+		});
+
+		const sortedProductIds = Object.keys(productSales).sort(
+			(a, b) => productSales[b] - productSales[a]
+		);
+
+		const sortedProducts = await ProductModel.aggregate([
+			{
+				$match: {
+					_id: {$in: sortedProductIds},
+				},
+			},
+		]);
 	} catch (error) {
 		next(error);
 	}
