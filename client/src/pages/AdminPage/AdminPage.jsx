@@ -22,6 +22,7 @@ import * as ProductService from "../../services/ProductService";
 import { listUser } from "../../redux/slides/userSlide";
 import "./style.css";
 import { useNavigate } from "react-router-dom";
+import OrderAdmin from "../../components/OrderAdmin";
 const AdminPage = () => {
   const [loading, setLoading] = useState(false);
   // const user = useSelector((state) => state?.user);
@@ -35,10 +36,10 @@ const AdminPage = () => {
   ];
 
   const [keySelected, setKeySelected] = useState("dashboard");
-  // const getAllOrder = async () => {
-  //   const res = await OrderService.getAllOrder(user?.access_token)
-  //   return {data: res?.data, key: 'orders'}
-  // }
+  const getAllOrder = async () => {
+    const res = await OrderService.getAllOrder(access_token)
+    return {data: res?.data, key: 'orders'}
+  }
 
   const getAllProducts = async () => {
     const res = await ProductService.getAllProduct()
@@ -62,7 +63,7 @@ const AdminPage = () => {
     queries: [
       {queryKey: ['products'], queryFn: getAllProducts},
       { queryKey: ["users"], queryFn: getAllUsers },
-      // {queryKey: ['orders'], queryFn: getAllOrder, staleTime: 1000 * 60},
+      {queryKey: ['orders'], queryFn: getAllOrder},
     ],
   });
   const memoCount = useMemo(() => {
@@ -92,10 +93,10 @@ const AdminPage = () => {
         return <AdminUser />;
       case "products":
         return <AdminProduct />;
-      // case 'orders':
-      //   return (
-      //     <OrderAdmin />
-      //   )
+      case 'orders':
+        return (
+          <OrderAdmin />
+        )
       default:
         return <></>;
     }
@@ -118,9 +119,7 @@ const AdminPage = () => {
           <Menu
             mode="inline"
             style={{
-              width: 256,
               boxShadow: "1px 1px 2px #ccc",
-              height: "100vh",
             }}
             items={items}
             onClick={handleOnCLick}

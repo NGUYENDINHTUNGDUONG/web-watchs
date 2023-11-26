@@ -94,10 +94,10 @@ const HeaderComponent = () => {
     setIsOpenPopup(false);
   };
 
-  const onSearch = (e) => {
-    setSearch(e.target.value);
-    dispatch(searchProduct(e.target.value));
-  };
+  // const onSearch = (e) => {
+  //   setSearch(e.target.value);
+  //   dispatch(searchProduct(e.target.value));
+  // };
 
   const arr = [
     { title: <HomeOutlined />, url: "/" },
@@ -130,7 +130,7 @@ const HeaderComponent = () => {
               size="large"
               placeholder="Tìm kiếm sản phẩm"
               textbutton="Tìm kiếm"
-              onSearch={onSearch}
+              // onSearch={onSearch}
             />
           </Col>
           <Col
@@ -198,8 +198,8 @@ const HeaderComponent = () => {
               alignItems: "left",
             }}
           >
-            <div>
-              <Badge count={0} size="small">
+            <div onClick={() => navigate("/order")}>
+              <Badge count={order?.orderItems?.length} size="small">
                 <ShoppingOutlined style={{ fontSize: "30px", color: "#fff" }} />
               </Badge>
               <WrapperHeaderTextSmall>Giỏ hàng</WrapperHeaderTextSmall>

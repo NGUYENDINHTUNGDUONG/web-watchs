@@ -10,7 +10,12 @@ import { WrapperHeader, WrapperUploadFile } from "./style";
 import TableComponent from "../TableComponent/TableComponent";
 import { useState } from "react";
 import InputComponent from "../InputComponent/InputComponent";
-import { getBase64, renderOptions, renderOptions1 } from "../../util";
+import {
+  getBase64,
+  renderOptions,
+  renderOptions1,
+  renderOptions3,
+} from "../../util";
 import * as ProductService from "../../services/ProductService";
 import { useMutationHooks } from "../../hooks/useMutationHook";
 import Loading from "../../components/LoadingComponent/LoadingComponent";
@@ -22,7 +27,7 @@ import { useSelector } from "react-redux";
 import ModalComponent from "../ModalComponent/ModalComponent";
 import { UPLOAD_BASE_URL } from "../../config";
 import "./styles.css";
-import moment from 'moment';
+import moment from "moment";
 
 const AdminProduct = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -32,6 +37,7 @@ const AdminProduct = () => {
   const [isModalOpenDelete, setIsModalOpenDelete] = useState(false);
   const [types, setTypes] = useState([""]);
   const [brands, setBrands] = useState([""]);
+  const [calibers, setCalibers] = useState([""]);
   const user = useSelector((state) => state?.user);
   const searchInput = useRef(null);
   const inittial = () => ({
@@ -44,6 +50,7 @@ const AdminProduct = () => {
     quantity: "",
     newType: "",
     newBrand: "",
+    newCaliber: "",
     discount: "",
     category: "",
     description: "",
@@ -55,6 +62,7 @@ const AdminProduct = () => {
   const [stateProductDetails, setStateProductDetails] = useState(inittial());
 
   const [form] = Form.useForm();
+  const [form1] = Form.useForm();
 
   const mutation = useMutationHooks((data) => {
     const {
@@ -123,9 +131,7 @@ const AdminProduct = () => {
       });
     }
     setIsLoadingUpdate(false);
-    console.log(res, "detail");
   };
-
   const convertImages = (imagePaths = []) => {
     return imagePaths.map((path) => {
       return {
@@ -137,7 +143,20 @@ const AdminProduct = () => {
 
   useEffect(() => {
     if (!isModalOpen) {
+      form1.setFieldsValue(stateProductDetails);
+      form1.setFieldsValue({
+        image: stateProductDetails?.images,
+      });
+    } else {
+      form1.setFieldsValue(inittial());
+    }
+  }, [form1, stateProductDetails, isModalOpen]);
+  useEffect(() => {
+    if (!isModalOpen) {
       form.setFieldsValue(stateProductDetails);
+      form.setFieldsValue({
+        image: stateProductDetails?.images,
+      });
     } else {
       form.setFieldsValue(inittial());
     }
@@ -164,6 +183,16 @@ const AdminProduct = () => {
       console.log(error);
     }
   };
+  const getAllCaliberProduct = async () => {
+    try {
+      const res = await ProductService.getAllCaliberProduct();
+      if (res) {
+        setCalibers(res);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const getAllBrandProduct = async () => {
     try {
       const res = await ProductService.getAllBrandsProduct();
@@ -177,17 +206,16 @@ const AdminProduct = () => {
   useEffect(() => {
     getAllBrandProduct();
     getAllTypeProduct();
-  }, [isModalOpen]);
-  const { data, isLoading, isSuccess, isError } = mutation;
+    getAllCaliberProduct();
+  }, [isModalOpen, isOpenDrawer]);
+  const { data, isSuccess, isError } = mutation;
   const {
     data: dataUpdated,
-    isLoading: isLoadingUpdated,
     isSuccess: isSuccessUpdated,
     isError: isErrorUpdated,
   } = mutationUpdate;
   const {
     data: dataDeleted,
-    isLoading: isLoadingDeleted,
     isSuccess: isSuccessDelected,
     isError: isErrorDeleted,
   } = mutationDeleted;
@@ -320,6 +348,12 @@ const AdminProduct = () => {
       ...getColumnSearchProps("brand"),
     },
     {
+      title: "Caliber",
+      dataIndex: "caliber",
+      sorter: (a, b) => a.caliber.length - b.caliber.length,
+      ...getColumnSearchProps("caliber"),
+    },
+    {
       title: "Price",
       dataIndex: "price",
       sorter: (a, b) => a.price - b.price,
@@ -341,9 +375,9 @@ const AdminProduct = () => {
       },
       render: (text) => (
         <span>
-          {Number(text).toLocaleString('vi-VN', {
-            style: 'currency',
-            currency: 'VND',
+          {Number(text).toLocaleString("vi-VN", {
+            style: "currency",
+            currency: "VND",
           })}
         </span>
       ),
@@ -362,10 +396,10 @@ const AdminProduct = () => {
     {
       title: "Created At",
       dataIndex: "createdAt",
-      render: (text) => moment(text).format('DD/MM/YYYY'),
+      render: (text) => moment(text).format("DD/MM/YYYY"),
       sorter: (a, b) => moment(a.createdAt).unix() - moment(b.createdAt).unix(),
     },
-    
+
     {
       title: "Action",
       dataIndex: "action",
@@ -410,7 +444,7 @@ const AdminProduct = () => {
       description: "",
       caliber: "",
     });
-    form.resetFields();
+    form1.resetFields();
   };
 
   useEffect(() => {
@@ -441,6 +475,7 @@ const AdminProduct = () => {
   };
 
   const handleCancel = () => {
+    setPreviewImage([]);
     setIsModalOpen(false);
     setStateProduct({
       name: "",
@@ -483,7 +518,6 @@ const AdminProduct = () => {
     try {
       const res = await ProductService.createProduct(data, access_token);
       if (res) {
-        console.log("res", res);
         message.success("Create product successfully!");
         handleCancel();
         queryProduct.refetch();
@@ -508,9 +542,7 @@ const AdminProduct = () => {
   };
 
   const handleOnchangeAvatarDetails = async (event) => {
-    console.log(event);
     if (event.file.status === "removed") {
-      console.log("đã xóa");
     } else {
       try {
         const data = new FormData();
@@ -521,7 +553,6 @@ const AdminProduct = () => {
             ...stateProductDetails,
             images: [...stateProductDetails.images, res.images[0]],
           });
-          console.log("res", res);
         }
       } catch (error) {
         console.log(error);
@@ -556,12 +587,15 @@ const AdminProduct = () => {
         data
       );
       if (res) {
-        console.log("res", res);
         message.success("Apply product successfully!");
         setIsOpenDrawer(false);
         queryProduct.refetch();
+        setIsLoadingUpdate(true);
       }
-    } catch (error) {}
+    } catch (error) {
+    } finally {
+      setIsLoadingUpdate(false);
+    }
   };
   const handleFileChange = (event) => {
     const uniqueFiles = event.fileList.reduce((accumulator, currentFile) => {
@@ -580,6 +614,7 @@ const AdminProduct = () => {
       images: newList,
     });
   };
+
   const onRemove = (file) => {
     const newFileList = stateProduct.images.filter(
       (item) => item.uid !== file.uid
@@ -590,8 +625,6 @@ const AdminProduct = () => {
     });
   };
   const onRemoveDetails = (file) => {
-    console.log(file.name);
-    console.log(stateProductDetails.images);
     const newFileList = stateProductDetails.images.filter(
       (item) => item !== file.name
     );
@@ -601,6 +634,24 @@ const AdminProduct = () => {
     });
   };
   const handleChangeSelect = (value) => {
+    setStateProductDetails({
+      ...stateProductDetails,
+      type: value,
+    });
+  };
+  const handleChangeSelect3 = (value) => {
+    setStateProductDetails({
+      ...stateProductDetails,
+      brand: value,
+    });
+  };
+  const handleChangeSelectCaliber1 = (value) => {
+    setStateProductDetails({
+      ...stateProductDetails,
+      caliber: value,
+    });
+  };
+  const handleChangeSelect2 = (value) => {
     setStateProduct({
       ...stateProduct,
       type: value,
@@ -612,30 +663,19 @@ const AdminProduct = () => {
       brand: value,
     });
   };
-  const checkImageRules = (_, value) => {
-    if (stateProductDetails.images.length === 0) {
-      return Promise.reject("Please upload at least one image!");
-    }
-    return Promise.resolve();
+  const handleChangeSelectCaliber = (value) => {
+    setStateProduct({
+      ...stateProduct,
+      caliber: value,
+    });
   };
+
   return (
     <div>
       <WrapperHeader>Quản lý sản phẩm</WrapperHeader>
-      <div style={{ marginTop: "10px" }}>
-        <Button
-          style={{
-            height: "150px",
-            width: "150px",
-            borderRadius: "6px",
-            borderStyle: "dashed",
-          }}
-          onClick={() => setIsModalOpen(true)}
-        >
-          <PlusOutlined style={{ fontSize: "60px" }} />
-        </Button>
-      </div>
       <div style={{ marginTop: "20px" }}>
         <TableComponent
+          createProduct={() => setIsModalOpen(true)}
           columns={columns}
           isLoading={isLoadingProducts}
           data={dataTable}
@@ -686,7 +726,7 @@ const AdminProduct = () => {
                 <Select
                   name="type"
                   value={stateProduct.type}
-                  onChange={handleChangeSelect}
+                  onChange={handleChangeSelect2}
                   options={renderOptions(types?.types)}
                 />
               </Form.Item>
@@ -812,12 +852,28 @@ const AdminProduct = () => {
                   },
                 ]}
               >
-                <InputComponent
-                  value={stateProduct.caliber}
-                  onChange={handleOnchange}
+                <Select
                   name="caliber"
+                  value={stateProduct.caliber}
+                  onChange={handleChangeSelectCaliber}
+                  options={renderOptions3(calibers?.calibers)}
                 />
               </Form.Item>
+              {stateProduct.caliber === "add_caliber" && (
+                <Form.Item
+                  label="New Caliber"
+                  name="newCaliber"
+                  rules={[
+                    { required: true, message: "Please input your caliber!" },
+                  ]}
+                >
+                  <InputComponent
+                    value={stateProduct.newCaliber}
+                    onChange={handleOnchange}
+                    name="newCaliber"
+                  />
+                </Form.Item>
+              )}
               <Form.Item
                 label="Image"
                 name="image"
@@ -866,7 +922,7 @@ const AdminProduct = () => {
             wrapperCol={{ span: 22 }}
             onFinish={onUpdateProduct}
             autoComplete="on"
-            form={form}
+            form={form1}
           >
             <Form.Item
               label="Name"
@@ -900,13 +956,13 @@ const AdminProduct = () => {
               >
                 <InputComponent
                   value={stateProductDetails.newType}
-                  onChange={handleOnchange}
+                  onChange={handleOnchangeDetails}
                   name="newType"
                 />
               </Form.Item>
             )}
             <Form.Item
-              label="`Quantity`"
+              label="Quantity"
               name="quantity"
               rules={[
                 { required: true, message: "Please input your quantity!" },
@@ -932,24 +988,73 @@ const AdminProduct = () => {
               />
             </Form.Item>
             <Form.Item
-              label="Description"
+              label="Brand"
               name="brand"
-              rules={[
-                { required: true, message: "Please input your count brand!" },
-              ]}
+              rules={[{ required: true, message: "Please input your brand!" }]}
             >
-              <InputComponent
-                value={stateProductDetails.brand}
-                onChange={handleOnchangeDetails}
+              <Select
                 name="brand"
+                value={stateProductDetails.brand}
+                onChange={handleChangeSelect3}
+                options={renderOptions1(brands?.brands)}
               />
             </Form.Item>
+            {stateProductDetails.brand === "add_brand" && (
+              <Form.Item
+                label="New Brand"
+                name="newBrand"
+                rules={[
+                  { required: true, message: "Please input your brand!" },
+                ]}
+              >
+                <InputComponent
+                  value={stateProductDetails.newBrand}
+                  onChange={handleOnchangeDetails}
+                  name="newBrand"
+                />
+              </Form.Item>
+            )}
+            <Form.Item
+              label="Caliber"
+              name="caliber"
+              rules={[{ required: true, message: "Please input your caliber!" }]}
+              
+            >
+              <Select
+                name="caliber"
+                value={stateProductDetails.caliber}
+                onChange={handleChangeSelectCaliber1}
+                options={renderOptions3(calibers?.calibers)}
+              />
+            </Form.Item>
+            {stateProductDetails.caliber === "add_caliber" && (
+              <Form.Item
+                label="New Caliber"
+                name="newCaliber"
+                rules={[
+                  { required: true, message: "Please input your caliber!" },
+                ]}
+              >
+                <InputComponent
+                  value={stateProductDetails.newCaliber}
+                  onChange={handleOnchangeDetails}
+                  name="newCaliber"
+                />
+              </Form.Item>
+            )}
             <Form.Item
               label="Image"
               name="image"
               rules={[
                 {
-                  validator: checkImageRules,
+                  required: true,
+                  message: "Please input your count image!",
+                  validator: (_, value) => {
+                    if (stateProductDetails?.images.length > 0) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject("Please input your count image!");
+                  },
                 },
               ]}
             >

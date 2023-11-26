@@ -5,7 +5,6 @@ const verify = require("../middlewares/AuthMiddleware");
 const upload = require("../utils/Multer");
 const router = express.Router();
 
-
 router.post(
   "/",
   verify.verifyUser,
@@ -13,10 +12,7 @@ router.post(
   upload.array("images"),
   productController.createProduct
 );
-router.post(
-  "/:id/reviews",verify.verifyUser,
-  productController.createReview
-)
+router.post("/:id/reviews", verify.verifyUser, productController.createReview);
 router.patch(
   "/:id",
   verify.verifyUser,
@@ -30,10 +26,9 @@ router.delete(
   verify.verifyAdmin,
   productController.deleteProduct
 );
-router.get("/list", productController.getAllProducts);
 router.get("/search/:name", productController.findProductName);
-router.get('/type', productController.getAllTypesProduct);
-router.get('/brand', productController.getAllBrands);
+router.get("/type", productController.getAllTypes);
+router.get("/brand", productController.getAllBrands);
 router.get("/caliber", productController.getAllCalibers);
 router.get("/filter", productController.findProductByFilter);
 router.get("/:id", productController.getProduct);

@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   search: "",
+  brand: "",
 };
 
 export const productSlide = createSlice({
@@ -11,10 +12,14 @@ export const productSlide = createSlice({
     searchProduct: (state, action) => {
       state.search = action.payload;
     },
+    searchBrand: (state, action) => {
+      const { brand = [] } = action.payload;
+      state.brand = brand ? brand : state.brand;
+    },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { searchProduct } = productSlide.actions;
+export const { searchProduct, searchBrand } = productSlide.actions;
 
 export default productSlide.reducer;

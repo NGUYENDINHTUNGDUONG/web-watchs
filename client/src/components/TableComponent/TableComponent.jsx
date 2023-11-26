@@ -11,6 +11,7 @@ const TableComponent = (props) => {
     isLoading = false,
     columns = [],
     createUser,
+    createProduct,
     keyselected,
   } = props;
   const newColumnExport = useMemo(() => {
@@ -41,9 +42,19 @@ const TableComponent = (props) => {
         <button onClick={exportExcel}>Export Excel</button>
         {keyselected === "users" ? (
           <Button onClick={createUser}>Thêm người dùng</Button>
-        ) : null}
+        ) : (
+          <Button onClick={createProduct}>Thêm sản phẩm</Button>
+        )}
       </div>
-      <Table className="table-custom" columns={columns} dataSource={dataSource} {...props} />
+      <Table
+        className="table-custom"
+        pagination={{
+          pageSize: 7,
+        }}
+        columns={columns}
+        dataSource={dataSource}
+        {...props}
+      />
     </Loading>
   );
 };

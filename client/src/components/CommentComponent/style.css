@@ -1,0 +1,8 @@
+.headerReply .ant-collapse-header {
+  background-color: #fd842126;
+  border-radius: 30px !important;
+  width: 150px;
+}
+.headerReply .ant-collapse-header:active {
+  background-color: #ff943d1b;
+}

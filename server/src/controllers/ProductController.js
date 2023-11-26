@@ -1,4 +1,3 @@
-const express = require("express");
 const fs = require("fs");
 const ProductRepo = require("../repository/ProductRepo");
 const path = require("path");
@@ -12,9 +11,9 @@ const getAllProducts = async (req, res, next) => {
     console.log(error);
   }
 };
-const getAllTypesProduct = async (req, res, next) => {
+const getAllTypes = async (req, res, next) => {
   try {
-    const types = await ProductRepo.getAllTypesProduct();
+    const types = await ProductRepo.getAllTypes();
     res.status(200).json({ types });
   } catch (error) {
     next(error);
@@ -22,7 +21,7 @@ const getAllTypesProduct = async (req, res, next) => {
 };
 const getAllCalibers = async (req, res, next) => {
   try {
-    const calibers = await ProductRepo.getAllCaliberProduct();
+    const calibers = await ProductRepo.getAllCalibers();
     res.status(200).json({ calibers });
   } catch (error) {
     next(error);
@@ -64,7 +63,8 @@ const findProductName = async (req, res, next) => {
 };
 const findProductByFilter = async (req, res, next) => {
   try {
-    const {type, brand, category,caliber, minPrice, maxPrice, minRating } = req.query;
+    const { type, brand, category, caliber, minPrice, maxPrice, minRating } =
+      req.query;
     const filter = {
       ...(type && { type }),
       ...(brand && { brand }),
@@ -114,29 +114,31 @@ const updateProduct = async (req, res, next) => {
     if (!product) {
       return res.status(400).json({ message: "Product not found" });
     }
-    const oldImages = product.images;
-    const newImages = req.body.images;
-    const deleteImages = oldImages.filter(
-      (image) => !newImages.includes(image)
-    );
-
-    deleteImages.forEach((image) => {
-      fs.unlink(path.join(__dirname, "../uploads", image), (err) => {
-        console.log(err);
+    if (req.body.images) {
+      const oldImages = product.images;
+      const newImages = req.body.images;
+      const deleteImages = oldImages.filter(
+        (image) => !newImages.includes(image)
+      );
+      deleteImages.forEach((image) => {
+        fs.unlink(path.join(__dirname, "../uploads", image), (err) => {
+          console.log(err);
+        });
       });
-    });
+    }
     const updateProduct = await ProductRepo.updateProduct({
       productId,
       update: {
         ...req.body,
       },
     });
+    console.log("test: " + req.body.images);
     return res
       .status(200)
       .json({ message: "Product updated", data: updateProduct });
   } catch (error) {
     next(error);
-    console.log(error);
+    console.log("test: " + error);
   }
 };
 const deleteProduct = async (req, res, next) => {
@@ -193,6 +195,6 @@ module.exports = {
   getAllBrands,
   updateProduct,
   deleteProduct,
-  getAllTypesProduct,
+  getAllTypes,
   getAllCalibers,
 };

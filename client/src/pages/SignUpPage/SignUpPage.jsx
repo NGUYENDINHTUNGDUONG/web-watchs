@@ -95,7 +95,7 @@ const SignUpPage = () => {
           display: 'flex',
         }}>
         <WrapperContainerLeft>
-          <h1>Xin chào</h1>
+          <h1 className="font-bold text-3xl">Xin chào</h1>
           <p>Đăng nhập vào tạo tài khoản</p>
           <InputFormComponent
             style={{ marginBottom: '10px' }}
@@ -200,7 +200,7 @@ const SignUpPage = () => {
             height='203px'
             width='203px'
           />
-          <h4>Mua sắm tại LTTD</h4>
+          <h4 className='font-bold'>Mua sắm tại LTTD</h4>
         </WrapperContainerRight>
       </div>
     </div>
