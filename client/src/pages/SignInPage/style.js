@@ -2,13 +2,13 @@ import styled from 'styled-components';
 
 export const WrapperContainerLeft = styled.form`
   flex: 1;
-  padding: 40px 45px 24px;
+  padding: 10px 15px 14px;
   display: flex;
   flex-direction: column;
 `;
 
 export const WrapperContainerRight = styled.div`
-  width: 300px;
+  width: 200px;
   background: linear-gradient(
     136deg,
     rgb(240, 248, 255) -1%,

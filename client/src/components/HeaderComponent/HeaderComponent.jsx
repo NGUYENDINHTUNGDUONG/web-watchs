@@ -1,5 +1,5 @@
 import React from "react";
-import { Badge, Col, Popover, Row } from "antd";
+import { Badge, Col, Modal, Popover, Row } from "antd";
 import { HomeOutlined } from "@ant-design/icons";
 
 import SearchComponent from "../SearchComponent/SearchComponent";
@@ -22,10 +22,13 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import * as UserService from "../../services/UserService";
-import { resetUser } from "../../redux/slides/userSlide";
+import { modalState, resetUser } from "../../redux/slides/userSlide";
 import { useState } from "react";
 import { useEffect } from "react";
 import { searchProduct } from "../../redux/slides/productSlide";
+import SignInPage from "../../pages/SignInPage/SignInPage";
+import SignUpPage from "../../pages/SignUpPage/SignUpPage";
+import Email from "../../pages/ForgotPassword/Email";
 
 const HeaderComponent = () => {
   const navigate = useNavigate();
@@ -37,9 +40,25 @@ const HeaderComponent = () => {
   const [isOpenPopup, setIsOpenPopup] = useState(false);
   const order = useSelector((state) => state.order);
   const [loading, setLoading] = useState(false);
-  const handleNavigateLogin = () => {
-    navigate("/sign-in");
+
+  const handleOpenLogin = () => {
+    dispatch(modalState({ modalSignIn: true }));
   };
+
+  const handleCancelSignIn = () => {
+    dispatch(modalState({ modalSignIn: false }));
+  };
+
+  const handleCancelSignUp = () => {
+    dispatch(modalState({ modalSignUp: false }));
+  };
+  
+  const openSignIn = useSelector((state) => state.user.modalSignIn);
+
+  const openSignUp = useSelector((state) => state.user.modalSignUp);
+  
+  const openEmail = useSelector((state) => state.user.modalEmail);
+
 
   const handleLogout = async () => {
     setLoading(true);
@@ -172,10 +191,7 @@ const HeaderComponent = () => {
                   </Popover>
                 </>
               ) : (
-                <div
-                  onClick={handleNavigateLogin}
-                  style={{ cursor: "pointer" }}
-                >
+                <div onClick={handleOpenLogin} style={{ cursor: "pointer" }}>
                   <WrapperHeaderTextSmall>
                     Đăng nhập/Đăng ký
                   </WrapperHeaderTextSmall>
@@ -210,6 +226,18 @@ const HeaderComponent = () => {
           return <TypeComponent key={item} title={item} />;
         })}
       </WrapperType>
+      <Modal open={openSignIn} onCancel={handleCancelSignIn} footer={false}>
+        <SignInPage />
+      </Modal>
+
+      <Modal open={openSignUp} onCancel={handleCancelSignUp} footer={false}>
+        <SignUpPage />
+      </Modal>
+
+      <Modal open={openEmail} onCancel={handleCancelSignUp} footer={false}>
+        <Email />
+      </Modal>
+
     </div>
   );
 };

@@ -1,32 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import { Image } from 'antd';
-import jwt_decode from 'jwt-decode';
-import { useDispatch, useSelector } from 'react-redux';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { EyeFilled, EyeInvisibleFilled } from '@ant-design/icons';
+import React, { useEffect, useState } from "react";
+import { Button, Form, Image, Input, Modal } from "antd";
+import jwt_decode from "jwt-decode";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
+import { LockOutlined, MailOutlined } from "@ant-design/icons";
 
-import * as UserService from '../../services/UserService.js';
-import imageLogoLogin from '../../assets/images/logo-login.png';
-import LoadingComponent from "../../components/LoadingComponent/LoadingComponent.jsx";
-import InputFormComponent from '../../components/InputFormComponent/InputFormComponent.jsx';
-import ButtonComponent from '../../components/ButtonComponent/ButtonComponent.jsx';
-import { useMutationHooks } from '../../hooks/useMutationHook.js';
-import { updateUser } from '../../redux/slides/userSlide.js';
-import {
-  WrapperContainerLeft,
-  WrapperContainerRight,
-  WrapperTextLight,
-} from './style.js';
+import * as UserService from "../../services/UserService.js";
+import imageLogoLogin from "../../assets/images/logo-login.png";
+import { useMutationHooks } from "../../hooks/useMutationHook.js";
+import { modalState, updateUser } from "../../redux/slides/userSlide.js";
+import { WrapperTextLight } from "./style.js";
+import SignUpPage from "../SignUpPage/SignUpPage.jsx";
 
 const SignInPage = () => {
-  const [isShowPassword, setIsShowPassword] = useState(false);
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const location = useLocation();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [form] = Form.useForm();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
-
   const navigate = useNavigate();
+
+  const handleOpenSignUp = () => {
+    dispatch(modalState({ modalSignUp: true }));
+    dispatch(modalState({ modalSignIn: false }));
+  };
+
+  const handleOpenEmail = () => {
+    dispatch(modalState({ modalEmail: true }));
+  };
+
+  const open = useSelector((state) => state.user.modalSignIn);
+
 
   const mutation = useMutationHooks((data) => UserService.loginUser(data));
   const { data, isSuccess } = mutation;
@@ -36,10 +40,10 @@ const SignInPage = () => {
       if (location?.state) {
         navigate(location?.state);
       } else {
-        navigate('/');
+        navigate("/");
       }
-      localStorage.setItem('access_token', `${data?.access_token}`);
-      localStorage.setItem('refresh_token', `${data?.refresh_token}`);
+      localStorage.setItem("access_token", `${data?.access_token}`);
+      localStorage.setItem("refresh_token", `${data?.refresh_token}`);
       if (data?.access_token) {
         const decoded = jwt_decode(data?.access_token);
         if (decoded?.id) {
@@ -49,124 +53,98 @@ const SignInPage = () => {
     }
   }, [isSuccess]);
 
+  const handleLogin = async () => {
+    const data = {
+      email: form.getFieldValue("email"),
+      password: form.getFieldValue("password"),
+    };
+    const res = await UserService.loginUser(data);
+    if (res) {
+      console.log(res);
+    }
+  };
   const handleGetDetailsUser = async (id, token) => {
-    const refreshToken = localStorage.getItem('refresh_token');
+    const refreshToken = localStorage.getItem("refresh_token");
     const res = await UserService.getDetailsUser(id, token);
     dispatch(updateUser({ ...res?.data, access_token: token, refreshToken }));
   };
 
-  const handleNavigateSignUp = () => {
-    navigate('/sign-up');
-  };
-
-  const handleOnchangeEmail = (value) => {
-    setEmail(value);
-  };
-
-  const handleOnchangePassword = (value) => {
-    setPassword(value);
-  };
-
-  const handleSignIn = (e) => {
-    e.preventDefault();
-
-    console.log('logingloin');
-    mutation.mutate({
-      email,
-      password,
-    });
-  };
-
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'rgba(0, 0, 0, 0.53)',
-        height: '100vh',
-      }}>
-      <div
-        style={{
-          width: '800px',
-          height: '445px',
-          borderRadius: '6px',
-          background: '#fff',
-          display: 'flex',
-        }}>
-        <WrapperContainerLeft>
-          <h1>Xin chào</h1>
-          <p>Đăng nhập vào tạo tài khoản</p>
-          <InputFormComponent
-            style={{ marginBottom: '10px' }}
-            placeholder='abc@gmail.com'
-            value={email}
-            onChange={handleOnchangeEmail}
-          />
-          <div style={{ position: 'relative' }}>
-            <span
-              onClick={() => setIsShowPassword(!isShowPassword)}
-              style={{
-                zIndex: 10,
-                position: 'absolute',
-                top: '4px',
-                right: '8px',
-              }}>
-              {isShowPassword ? <EyeFilled /> : <EyeInvisibleFilled />}
-            </span>
-            <InputFormComponent
-              placeholder='password'
-              type={isShowPassword ? 'text' : 'password'}
-              value={password}
-              onChange={handleOnchangePassword}
-            />
-          </div>
-          {data?.status === 'ERR' && (
-            <span style={{ color: 'red' }}>{data?.message}</span>
-          )}
-          {/* <LoadingComponent isLoading={isLoading}> */}
-          <ButtonComponent
-            htmlType='submit'
-            disabled={!email.length || !password.length}
-            onClick={handleSignIn}
-            size={40}
-            styleButton={{
-              background: 'rgb(255, 57, 69)',
-              height: '48px',
-              width: '100%',
-              border: 'none',
-              borderRadius: '4px',
-              margin: '26px 0 10px',
-            }}
-            textbutton={'Đăng nhập'}
-            styleTextButton={{
-              color: '#fff',
-              fontSize: '15px',
-              fontWeight: '700',
-            }}></ButtonComponent>
-          {/* </LoadingComponent> */}
-          <p>
-            <WrapperTextLight>Quên mật khẩu?</WrapperTextLight>
-          </p>
-          <p>
-            Chưa có tài khoản?{' '}
-            <WrapperTextLight onClick={handleNavigateSignUp}>
-              {' '}
-              Tạo tài khoản
-            </WrapperTextLight>
-          </p>
-        </WrapperContainerLeft>
-        <WrapperContainerRight>
-          <Image
-            src={imageLogoLogin}
-            preview={false}
-            alt='image-logo'
-            height='203px'
-            width='203px'
-          />
-          <h4>Mua sắm tại Dwatch</h4>
-        </WrapperContainerRight>
+    <div className="flex gap-x-10 m-5">
+      <div>
+        <p className="text-3xl font-bold text-orange-600 mb-5">Xin chào</p>
+        <p>Đăng nhập vào tài khoản</p>
+        <div className="mt-5">
+          <Form
+            name="normal_login"
+            className="login-form"
+            form={form}
+            onFinish={handleLogin}
+          >
+            <Form.Item
+              name="email"
+              rules={[
+                { required: true, message: "Please input your Username!" },
+                {
+                  pattern: emailRegex,
+                  message: "Vui lòng nhập địa chỉ email hợp lệ!",
+                },
+                // {validator: (_, value)=>{
+
+                // }}
+              ]}
+            >
+              <Input
+                prefix={<MailOutlined className="site-form-item-icon" />}
+                placeholder="Email"
+              />
+            </Form.Item>
+            <Form.Item
+              name="password"
+              rules={[
+                { required: true, message: "Please input your Password!" },
+              ]}
+            >
+              <Input
+                prefix={<LockOutlined className="site-form-item-icon" />}
+                type="password"
+                placeholder="Password"
+              />
+            </Form.Item>
+
+            <Form.Item>
+              <Button htmlType="submit" className="text-black">
+                Đăng nhập
+              </Button>
+            </Form.Item>
+          </Form>
+        </div>
+        {/* </LoadingComponent> */}
+        <p>
+          <WrapperTextLight onClick={handleOpenEmail}>Quên mật khẩu?</WrapperTextLight>
+        </p>
+        
+        <p>
+          Chưa có tài khoản?{" "}
+          <WrapperTextLight onClick={handleOpenSignUp}>
+            {" "}
+            Tạo tài khoản
+          </WrapperTextLight>
+        </p>
       </div>
+      <div>
+        <Image
+          src={imageLogoLogin}
+          preview={false}
+          alt="image-logo"
+          height="203px"
+          width="203px"
+        />
+        <p className="text-xl font-bold mt-10 text-center">
+          Mua sắm tại Dwatch
+        </p>
+      </div>
+      
     </div>
   );
 };

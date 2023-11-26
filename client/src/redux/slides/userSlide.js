@@ -10,6 +10,10 @@ const initialState = {
   id: "",
   role: "",
   refreshToken: "",
+  modalSignIn: false,
+  modalSignUp: false,
+  modalEmail: false,
+  modalPassword: false,
 };
 
 export const userSlide = createSlice({
@@ -49,10 +53,17 @@ export const userSlide = createSlice({
       state.role = "";
       state.refreshToken = "";
     },
+    modalState: (state, action) => {
+      const { modalSignIn = false, modalSignUp = false, modalEmail = false, modalPassword = false} = action.payload;
+      state.modalSignIn = modalSignIn ? modalSignIn : state.modalSignIn;
+      state.modalSignUp = modalSignUp ? modalSignUp : state.modalSignUp;
+      state.modalEmail = modalEmail ? modalEmail : state.modalEmail;
+      state.modalPassword = modalPassword ? modalPassword : state.modalPassword;
+    }
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { updateUser, resetUser } = userSlide.actions;
+export const { updateUser, resetUser, modalState } = userSlide.actions;
 
 export default userSlide.reducer;
