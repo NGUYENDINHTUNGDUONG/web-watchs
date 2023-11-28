@@ -9,6 +9,7 @@ import AdminPage from "../pages/AdminPage/AdminPage";
 import MyOrderPage from "../pages/MyOder";
 import PaymentPage from "../pages/PaymentPage";
 import OrderSucess from "../pages/OrderSuccess";
+import DetailsOrderPage from "../pages/DetailsOrderPage/DetailsOrderPage";
 
 export const routes = [
   {
@@ -61,6 +62,11 @@ export const routes = [
     isShowHeader: false,
     isPrivated: true,
   },
+  {
+    path: '/details-order/:id',
+    element: DetailsOrderPage,
+    isShowHeader: true
+},
   {
     path: "*",
     element: NotFoundPage,

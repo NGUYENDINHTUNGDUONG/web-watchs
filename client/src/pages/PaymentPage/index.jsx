@@ -313,7 +313,10 @@ const PaymentPage = () => {
                       fontWeight: "bold",
                     }}
                   >
-                    {Number(priceMemo)}
+                    {Number(priceMemo).toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })}
                   </span>
                 </div>
                 <div
@@ -331,7 +334,10 @@ const PaymentPage = () => {
                       fontWeight: "bold",
                     }}
                   >
-                    {Number(priceDiscountMemo)}
+                    {Number(priceDiscountMemo).toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })}
                   </span>
                 </div>
                 <div
@@ -349,7 +355,10 @@ const PaymentPage = () => {
                       fontWeight: "bold",
                     }}
                   >
-                    {Number(diliveryPriceMemo)}
+                    {Number(diliveryPriceMemo).toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })}
                   </span>
                 </div>
               </WrapperInfo>
@@ -363,7 +372,10 @@ const PaymentPage = () => {
                       fontWeight: "bold",
                     }}
                   >
-                    {Number(totalPriceMemo)}
+                    {Number(totalPriceMemo).toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })}
                   </span>
                   <span style={{ color: "#000", fontSize: "11px" }}>
                     (Đã bao gồm VAT nếu có)

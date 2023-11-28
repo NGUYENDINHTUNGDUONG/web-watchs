@@ -86,7 +86,10 @@ const OrderSucess = () => {
                       >
                         <span>
                           <span style={{ fontSize: "13px", color: "#242424" }}>
-                            Giá tiền: {Number(order?.price)}
+                            Giá tiền: {Number(order?.price).toLocaleString("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        })}
                           </span>
                         </span>
                         <span>
@@ -101,7 +104,10 @@ const OrderSucess = () => {
               </WrapperItemOrderInfo>
               <div>
                 <span style={{ fontSize: "16px", color: "red" }}>
-                  Tổng tiền: {Number(state?.totalPriceMemo)}
+                  Tổng tiền: {Number(state?.totalPriceMemo).toLocaleString("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        })}
                 </span>
               </div>
             </WrapperContainer>

@@ -1,14 +1,15 @@
-.img-sidebar{
-    text-align: center;
+.img-sidebar {
+  text-align: center;
 }
-.img-sidebar img{
-    margin: 30px;
-    cursor: pointer;
+.img-sidebar img {
+  margin: 30px;
+  cursor: pointer;
 }
-.sidebar ul{
-    box-shadow: none !important;
-    border: none !important;
+.sidebar ul {
+  box-shadow: none !important;
+  border: none !important;
 }
-.sidebar{
-    box-shadow:rgb(204, 204, 204) 1px 1px 2px
+.sidebar {
+  box-shadow: rgb(204, 204, 204) 1px 1px 2px;
+  height: 100vh;
 }

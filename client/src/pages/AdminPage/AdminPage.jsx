@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Menu } from "antd";
+import { Button, Menu, Result } from "antd";
 import { useQueries } from "@tanstack/react-query";
 import {
   LineChartOutlined,
@@ -37,14 +37,14 @@ const AdminPage = () => {
 
   const [keySelected, setKeySelected] = useState("dashboard");
   const getAllOrder = async () => {
-    const res = await OrderService.getAllOrder(access_token)
-    return {data: res?.data, key: 'orders'}
-  }
+    const res = await OrderService.getAllOrder(access_token);
+    return { data: res?.data, key: "orders" };
+  };
 
   const getAllProducts = async () => {
-    const res = await ProductService.getAllProduct()
-    return {data: res?.data, key: 'products'}
-  }
+    const res = await ProductService.getAllProduct();
+    return { data: res?.data, key: "products" };
+  };
 
   const navigate = useNavigate();
   const getAllUsers = async () => {
@@ -61,9 +61,9 @@ const AdminPage = () => {
 
   const queries = useQueries({
     queries: [
-      {queryKey: ['products'], queryFn: getAllProducts},
+      { queryKey: ["products"], queryFn: getAllProducts },
       { queryKey: ["users"], queryFn: getAllUsers },
-      {queryKey: ['orders'], queryFn: getAllOrder},
+      { queryKey: ["orders"], queryFn: getAllOrder },
     ],
   });
   const memoCount = useMemo(() => {
@@ -93,10 +93,8 @@ const AdminPage = () => {
         return <AdminUser />;
       case "products":
         return <AdminProduct />;
-      case 'orders':
-        return (
-          <OrderAdmin />
-        )
+      case "orders":
+        return <OrderAdmin />;
       default:
         return <></>;
     }
@@ -105,39 +103,58 @@ const AdminPage = () => {
   const handleOnCLick = ({ key }) => {
     setKeySelected(key);
   };
-
+  const user = useSelector((state) => state?.user);
+  const role = user?.role;
   return (
     <>
-      <div style={{ display: "flex", overflowX: "hidden" }}>
-        <div className="sidebar">
-          <div className="img-sidebar">
-            <img alt="logo"
-              onClick={() => navigate("/")}
-              src={require("../../assets/images/Logo-DWatch.png")}
+      {role === "admin" ? (
+        <div style={{ display: "flex", overflowX: "hidden" }}>
+          <div className="sidebar">
+            <div className="img-sidebar">
+              <img
+                alt="logo"
+                onClick={() => navigate("/")}
+                src={require("../../assets/images/Logo-DWatch.png")}
+              />
+            </div>
+            <Menu
+              mode="inline"
+              style={{
+                boxShadow: "1px 1px 2px #ccc",
+              }}
+              items={items}
+              onClick={handleOnCLick}
             />
           </div>
-          <Menu
-            mode="inline"
-            style={{
-              boxShadow: "1px 1px 2px #ccc",
-            }}
-            items={items}
-            onClick={handleOnCLick}
-          />
+          <div style={{ flex: 1, padding: "15px 0 15px 15px" }}>
+            <Loading isLoading={loading}>
+              {!keySelected && (
+                <CustomizedContent
+                  data={memoCount}
+                  colors={COLORS}
+                  setKeySelected={setKeySelected}
+                />
+              )}
+            </Loading>
+            {renderPage(keySelected)}
+          </div>
         </div>
-        <div style={{ flex: 1, padding: "15px 0 15px 15px" }}>
-          <Loading isLoading={loading}>
-            {!keySelected && (
-              <CustomizedContent
-                data={memoCount}
-                colors={COLORS}
-                setKeySelected={setKeySelected}
-              />
-            )}
-          </Loading>
-          {renderPage(keySelected)}
-        </div>
-      </div>
+      ) : (
+        <Result
+          status="403"
+          title="403"
+          subTitle="Sorry, you are not authorized to access this page."
+          extra={
+            <Button
+              className="bg-blue-400"
+              onClick={() => navigate("/")}
+              type="primary"
+            >
+              Back Home
+            </Button>
+          }
+        />
+      )}
     </>
   );
 };

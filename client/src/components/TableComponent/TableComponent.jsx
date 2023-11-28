@@ -42,9 +42,9 @@ const TableComponent = (props) => {
         <button onClick={exportExcel}>Export Excel</button>
         {keyselected === "users" ? (
           <Button onClick={createUser}>Thêm người dùng</Button>
-        ) : (
+        ) : keyselected === "product" ? (
           <Button onClick={createProduct}>Thêm sản phẩm</Button>
-        )}
+        ) : null}
       </div>
       <Table
         className="table-custom"

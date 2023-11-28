@@ -54,7 +54,7 @@ export const WrapperFooterItem = styled.div`
 export const WrapperHeaderItem = styled.div`
   display: flex;
   align-items:flex-start;
-  height: 90px;
+  height: 110px;
   width: 100%;
 `
 

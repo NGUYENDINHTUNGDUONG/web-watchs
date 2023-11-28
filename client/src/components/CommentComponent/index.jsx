@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import "./style.css";
 import { useDispatch, useSelector } from "react-redux";
-import {  Collapse, message } from "antd";
+import { Collapse, message } from "antd";
 import moment from "moment";
 import * as CommentService from "../../services/CommentService";
 import { addComments } from "../../redux/slides/commentSlide";
@@ -122,34 +122,33 @@ export default function Comment({ productId }) {
                           className={`h-fit border-solid rounded-full  border-[1px]   text-center bg-transparent text-white mr-2`}
                         >
                           <p className=" text-black w-8 h-8 text-xl m-0">
-                            {item.sender.fullName.charAt(0).toUpperCase()}
+                            {item?.sender?.fullName.charAt(0).toUpperCase()}
                           </p>
                         </div>
                         <div className="w-full">
                           <div className="flex justify-between items-center">
                             <div className="flex flex-row items-center">
                               <span className="mr-2 text-lg font-bold">
-                                {item.sender.fullName}
+                                {item?.sender?.fullName}
                               </span>
-                            
                             </div>
                             <small>
-                              {moment(item.createdAt).format("DD/MM/YYYY")}
+                              {moment(item?.createdAt).format("DD/MM/YYYY")}
                             </small>
                           </div>
                           <p className="text-justify text-sm mb-0 mt-1 break-words">
-                            {item.content}
+                            {item?.content}
                           </p>
                           <div className="">
                             <div className="flex justify-between">
                               <p
-                                onClick={() => setReply(item._id)}
+                                onClick={() => setReply(item?._id)}
                                 className=" hover:cursor-pointer bg-slate-100 h-7 w-16 rounded-full hover:bg-gray-200 flex justify-center items-center"
                               >
                                 Reply
                               </p>
                             </div>
-                            {reply === item._id ? (
+                            {reply === item?._id ? (
                               <div className=" flex flex-col  p-3 bg-white">
                                 <div className="flex items-center ">
                                   <div
@@ -182,8 +181,8 @@ export default function Comment({ productId }) {
                                     type="button"
                                     onClick={() => {
                                       handleCommentReply(
-                                        item._id,
-                                        item.sender._id
+                                        item?._id,
+                                        item?.sender?._id
                                       );
                                       setReply("");
                                     }}
@@ -201,21 +200,21 @@ export default function Comment({ productId }) {
                               bordered={false}
                               className="!bg-transparent"
                             >
-                              {item.answers && item.answers.length > 0 ? (
+                              {item?.answers && item?.answers.length > 0 ? (
                                 <>
                                   <Panel
                                     header={
-                                      item.answers.filter(
-                                        (val) => val.sender._id !== auth.id
+                                      item?.answers.filter(
+                                        (val) => val.sender?._id !== auth.id
                                       ).length + " replies"
                                     }
                                     key={0}
                                     className="headerReply !border-none"
                                   >
-                                    {item.answers &&
-                                      item.answers
+                                    {item?.answers &&
+                                      item?.answers
                                         .filter(
-                                          (val) => val.sender._id !== auth.id
+                                          (val) => val.sender?._id !== auth.id
                                         )
                                         .map((val, id) => {
                                           return (
@@ -223,10 +222,9 @@ export default function Comment({ productId }) {
                                               <div className="flex flex-row p-3">
                                                 <div
                                                   className={`h-fit border-solid rounded-full  border-[1px]   text-center bg-transparent text-white mr-2`}
-                                                
                                                 >
                                                   <p className=" text-black w-7 h-7 text-lg m-0">
-                                                    {val.sender.fullName
+                                                    {val.sender?.fullName
                                                       .charAt(0)
                                                       .toUpperCase()}
                                                   </p>
@@ -235,7 +233,7 @@ export default function Comment({ productId }) {
                                                   <div className="flex justify-between items-center">
                                                     <div className="flex flex-row items-center">
                                                       <span className="mr-2 text-lg font-bold">
-                                                        {val.sender.fullName}
+                                                        {val.sender?.fullName}
                                                       </span>
                                                     </div>
                                                     <small>
@@ -245,7 +243,7 @@ export default function Comment({ productId }) {
                                                     </small>
                                                   </div>
                                                   <p className="text-justify text-sm mb-0 mt-1 break-words">
-                                                    {val.sender._id ===
+                                                    {val.sender?._id ===
                                                     val.receiver?._id ? (
                                                       ""
                                                     ) : (
@@ -261,7 +259,7 @@ export default function Comment({ productId }) {
                                                       <p
                                                         onClick={() => {
                                                           setReply(val._id);
-                                                          setId(item._id);
+                                                          setId(item?._id);
                                                         }}
                                                         className=" text-sm hover:cursor-pointer bg-slate-100 h-6 w-14 rounded-full hover:bg-gray-200 flex justify-center items-center"
                                                       >
@@ -274,7 +272,6 @@ export default function Comment({ productId }) {
                                                         <div className="flex items-center ">
                                                           <div
                                                             className={`border-solid rounded-full  border-[1px]   text-center bg-transparent text-white mr-2`}
-                                                           
                                                           >
                                                             <p className=" text-black w-6 h-6 m-0">
                                                               {avatar}
@@ -305,8 +302,9 @@ export default function Comment({ productId }) {
                                                             type="button"
                                                             onClick={() =>
                                                               handleCommentReply(
-                                                                item._id,
-                                                                item.sender._id
+                                                                item?._id,
+                                                                item?.sender
+                                                                  ?._id
                                                               )
                                                             }
                                                             disabled={
@@ -330,8 +328,10 @@ export default function Comment({ productId }) {
                                           );
                                         })}
                                   </Panel>
-                                  {item.answers
-                                    .filter((val) => val.sender._id === auth.id)
+                                  {item?.answers
+                                    .filter(
+                                      (val) => val.sender?._id === auth.id
+                                    )
                                     .map((val, id) => {
                                       return (
                                         <>
@@ -339,10 +339,9 @@ export default function Comment({ productId }) {
                                             <div className="flex flex-row mt-3 px-7">
                                               <div
                                                 className={`h-fit border-solid rounded-full  border-[1px]   text-center bg-transparent text-white mr-2`}
-                                               
                                               >
                                                 <p className=" text-black w-7 h-7 text-lg m-0">
-                                                  {val.sender.fullName
+                                                  {val.sender?.fullName
                                                     .charAt(0)
                                                     .toUpperCase()}
                                                 </p>
@@ -351,7 +350,7 @@ export default function Comment({ productId }) {
                                                 <div className="flex justify-between items-center">
                                                   <div className="flex flex-row items-center">
                                                     <span className="mr-2 text-lg font-bold">
-                                                      {val.sender.fullName}
+                                                      {val.sender?.fullName}
                                                     </span>
                                                   </div>
                                                   <small>
@@ -361,7 +360,7 @@ export default function Comment({ productId }) {
                                                   </small>
                                                 </div>
                                                 <p className="text-justify text-sm mb-0 mt-1 break-words">
-                                                  {val.sender._id ===
+                                                  {val.sender?._id ===
                                                   val.receiver?._id ? (
                                                     ""
                                                   ) : (
@@ -376,7 +375,7 @@ export default function Comment({ productId }) {
                                                     <p
                                                       onClick={() => {
                                                         setReply(val._id);
-                                                        setId(item._id);
+                                                        setId(item?._id);
                                                       }}
                                                       className=" text-sm hover:cursor-pointer bg-slate-100 h-6 w-14 rounded-full hover:bg-gray-200 flex justify-center items-center"
                                                     >
@@ -393,7 +392,6 @@ export default function Comment({ productId }) {
                                               <div className="flex items-center ">
                                                 <div
                                                   className={`border-solid rounded-full  border-[1px]   text-center bg-transparent text-white mr-2`}
-                                                 
                                                 >
                                                   <p className=" text-black w-6 h-6 m-0">
                                                     {avatar}
@@ -422,8 +420,8 @@ export default function Comment({ productId }) {
                                                   type="button"
                                                   onClick={() =>
                                                     handleCommentReply(
-                                                      item._id,
-                                                      item.sender._id
+                                                      item?._id,
+                                                      item?.sender?._id
                                                     )
                                                   }
                                                   disabled={

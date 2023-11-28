@@ -675,6 +675,7 @@ const AdminProduct = () => {
       <WrapperHeader>Quản lý sản phẩm</WrapperHeader>
       <div style={{ marginTop: "20px" }}>
         <TableComponent
+          keyselected="product"
           createProduct={() => setIsModalOpen(true)}
           columns={columns}
           isLoading={isLoadingProducts}
@@ -1017,8 +1018,9 @@ const AdminProduct = () => {
             <Form.Item
               label="Caliber"
               name="caliber"
-              rules={[{ required: true, message: "Please input your caliber!" }]}
-              
+              rules={[
+                { required: true, message: "Please input your caliber!" },
+              ]}
             >
               <Select
                 name="caliber"

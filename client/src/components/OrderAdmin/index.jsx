@@ -1,5 +1,5 @@
 import { Button, Form, Space } from "antd";
-import React from "react";
+import React, { useRef } from "react";
 import { WrapperHeader, WrapperUploadFile } from "./style";
 import TableComponent from "../TableComponent/TableComponent";
 import InputComponent from "../InputComponent/InputComponent";
@@ -20,12 +20,21 @@ import PieChartComponent from "./PieChart";
 
 const OrderAdmin = () => {
   const user = useSelector((state) => state?.user);
+  const searchInput = useRef(null);
 
   const getAllOrder = async () => {
     const res = await OrderService.getAllOrder(user?.access_token);
     return res;
   };
-
+  const handleReset = (clearFilters) => {
+    clearFilters();
+    // setSearchText('');
+  };
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    // setSearchText(selectedKeys[0]);
+    // setSearchedColumn(dataIndex);
+  };
   const queryOrder = useQuery({ queryKey: ["orders"], queryFn: getAllOrder });
   const { isLoading: isLoadingOrders, data: orders } = queryOrder;
   const getColumnSearchProps = (dataIndex) => ({
@@ -56,8 +65,9 @@ const OrderAdmin = () => {
         />
         <Space>
           <Button
+          className="bg-blue-400 "
             type="primary"
-            // onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
             icon={<SearchOutlined />}
             size="small"
             style={{
@@ -67,7 +77,7 @@ const OrderAdmin = () => {
             Search
           </Button>
           <Button
-            // onClick={() => clearFilters && handleReset(clearFilters)}
+            onClick={() => clearFilters && handleReset(clearFilters)}
             size="small"
             style={{
               width: 90,
@@ -89,22 +99,22 @@ const OrderAdmin = () => {
       record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
     onFilterDropdownOpenChange: (visible) => {
       if (visible) {
-        // setTimeout(() => searchInput.current?.select(), 100);
+        setTimeout(() => searchInput.current?.select(), 100);
       }
     },
     // render: (text) =>
     //   searchedColumn === dataIndex ? (
-    //     // <Highlighter
-    //     //   highlightStyle={{
-    //     //     backgroundColor: '#ffc069',
-    //     //     padding: 0,
-    //     //   }}
-    //     //   searchWords={[searchText]}
-    //     //   autoEscape
-    //     //   textToHighlight={text ? text.toString() : ''}
-    //     // />
+    //     <Highlighter
+    //       highlightStyle={{
+    //         backgroundColor: '#ffc069',
+    //         padding: 0,
+    //       }}
+    //       searchWords={[searchText]}
+    //       autoEscape
+    //       textToHighlight={text ? text.toString() : ''}
+    //     />
     //   ) : (
-    //     text
+    //     { text }
     //   ),
   });
 
@@ -118,7 +128,7 @@ const OrderAdmin = () => {
     {
       title: "Phone",
       dataIndex: "phone",
-      sorter: (a, b) => a.phone.length - b.phone.length,
+      sorter: (a, b) => a.phone - b.phone,
       ...getColumnSearchProps("phone"),
     },
     {
@@ -142,13 +152,11 @@ const OrderAdmin = () => {
     {
       title: "Payment method",
       dataIndex: "paymentMethod",
-      sorter: (a, b) => a.paymentMethod.length - b.paymentMethod.length,
-      ...getColumnSearchProps("paymentMethod"),
     },
     {
       title: "Total price",
       dataIndex: "totalPrice",
-      sorter: (a, b) => a.totalPrice.length - b.totalPrice.length,
+      sorter: (a, b) => a.totalPrice - b.totalPrice,
       ...getColumnSearchProps("totalPrice"),
     },
   ];
