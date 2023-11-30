@@ -41,7 +41,7 @@ const HeaderComponent = () => {
   const order = useSelector((state) => state.order);
   const [loading, setLoading] = useState(false);
 
-  const handleOpenLogin = () => {
+  const handleOpenSignIn = () => {
     dispatch(modalState({ modalSignIn: true }));
   };
 
@@ -52,13 +52,16 @@ const HeaderComponent = () => {
   const handleCancelSignUp = () => {
     dispatch(modalState({ modalSignUp: false }));
   };
+
+  const handleCancelEmail = () => {
+    dispatch(modalState({ modalEmail: false }));
+  };
   
   const openSignIn = useSelector((state) => state.user.modalSignIn);
 
   const openSignUp = useSelector((state) => state.user.modalSignUp);
   
   const openEmail = useSelector((state) => state.user.modalEmail);
-
 
   const handleLogout = async () => {
     setLoading(true);
@@ -191,7 +194,7 @@ const HeaderComponent = () => {
                   </Popover>
                 </>
               ) : (
-                <div onClick={handleOpenLogin} style={{ cursor: "pointer" }}>
+                <div onClick={handleOpenSignIn} style={{ cursor: "pointer" }}>
                   <WrapperHeaderTextSmall>
                     Đăng nhập/Đăng ký
                   </WrapperHeaderTextSmall>
@@ -234,10 +237,10 @@ const HeaderComponent = () => {
         <SignUpPage />
       </Modal>
 
-      <Modal open={openEmail} onCancel={handleCancelSignUp} footer={false}>
+      <Modal open={openEmail} onCancel={handleCancelEmail} footer={false}>
         <Email />
       </Modal>
-
+        
     </div>
   );
 };

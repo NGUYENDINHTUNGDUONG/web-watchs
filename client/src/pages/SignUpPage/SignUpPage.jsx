@@ -16,56 +16,15 @@ import {
   WrapperContainerRight,
   WrapperTextLight,
 } from "../SignInPage/style";
+import { useDispatch } from "react-redux";
+import { modalState } from "../../redux/slides/userSlide";
 
 const SignUpPage = () => {
-  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  const [isShowPassword, setIsShowPassword] = useState(false);
-  const [isShowConfirmPassword, setIsShowConfirmPassword] = useState(false);
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
-
-  const mutation = useMutationHooks((data) => UserService.registerUser(data));
-
-  const { data, isSuccess, isError } = mutation;
-
-  useEffect(() => {
-    if (isSuccess) {
-      message.success();
-      handleNavigateSignIn();
-    } else if (isError) {
-      message.error();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccess, isError]);
-  const handleOnchangeEmail = (value) => {
-    setEmail(value);
-  };
-  const handleOnchangeFullname = (value) => {
-    setFullName(value);
-  };
-
-  const handleOnchangePassword = (value) => {
-    setPassword(value);
-  };
-
-  const handleOnchangeConfirmPassword = (value) => {
-    setConfirmPassword(value);
-  };
-  const handleOnchangePhone = (value) => {
-    setPhone(value);
-  };
-  const handleOnchangeAddress = (value) => {
-    setAddress(value);
-  };
-
-  const handleNavigateSignIn = () => {
-    navigate("/sign-in");
+  const handleOpenSignIn = () => {
+    dispatch(modalState({ modalSignIn: true }));
   };
 
   return (
@@ -166,7 +125,7 @@ const SignUpPage = () => {
           {/* </Loading> */}
           <p>
             Bạn đã có tài khoản?{" "}
-            <WrapperTextLight onClick={handleNavigateSignIn}>
+            <WrapperTextLight onClick={handleOpenSignIn}>
               {" "}
               Đăng nhập
             </WrapperTextLight>

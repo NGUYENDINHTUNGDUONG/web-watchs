@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Button, Form, Image, Input, Modal } from "antd";
+import React, { useEffect } from "react";
+import { Button, Form, Image, Input } from "antd";
 import jwt_decode from "jwt-decode";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -10,7 +10,6 @@ import imageLogoLogin from "../../assets/images/logo-login.png";
 import { useMutationHooks } from "../../hooks/useMutationHook.js";
 import { modalState, updateUser } from "../../redux/slides/userSlide.js";
 import { WrapperTextLight } from "./style.js";
-import SignUpPage from "../SignUpPage/SignUpPage.jsx";
 
 const SignInPage = () => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -22,14 +21,11 @@ const SignInPage = () => {
 
   const handleOpenSignUp = () => {
     dispatch(modalState({ modalSignUp: true }));
-    dispatch(modalState({ modalSignIn: false }));
   };
 
   const handleOpenEmail = () => {
     dispatch(modalState({ modalEmail: true }));
   };
-
-  const open = useSelector((state) => state.user.modalSignIn);
 
 
   const mutation = useMutationHooks((data) => UserService.loginUser(data));
@@ -123,7 +119,6 @@ const SignInPage = () => {
         <p>
           <WrapperTextLight onClick={handleOpenEmail}>Quên mật khẩu?</WrapperTextLight>
         </p>
-        
         <p>
           Chưa có tài khoản?{" "}
           <WrapperTextLight onClick={handleOpenSignUp}>

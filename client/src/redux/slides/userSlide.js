@@ -55,10 +55,10 @@ export const userSlide = createSlice({
     },
     modalState: (state, action) => {
       const { modalSignIn = false, modalSignUp = false, modalEmail = false, modalPassword = false} = action.payload;
-      state.modalSignIn = modalSignIn ? modalSignIn : state.modalSignIn;
-      state.modalSignUp = modalSignUp ? modalSignUp : state.modalSignUp;
-      state.modalEmail = modalEmail ? modalEmail : state.modalEmail;
-      state.modalPassword = modalPassword ? modalPassword : state.modalPassword;
+      state.modalSignIn = modalSignIn ;
+      state.modalSignUp = modalSignUp ;
+      state.modalEmail = modalEmail ;
+      state.modalPassword = modalPassword ;
     }
   },
 });

@@ -11,7 +11,7 @@ function Email() {
             <Form.Item
               name="email"
               rules={[
-                { required: true, message: "Please input your Username!" },
+                { required: true, message: "Please input your Email!" },
                 {
                   message: "Vui lòng nhập địa chỉ email hợp lệ!",
                 },
