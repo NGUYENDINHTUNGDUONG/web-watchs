@@ -14,6 +14,7 @@ const initialState = {
   modalSignUp: false,
   modalEmail: false,
   modalPassword: false,
+  modalProfile: false,
 };
 
 export const userSlide = createSlice({
@@ -54,11 +55,12 @@ export const userSlide = createSlice({
       state.refreshToken = "";
     },
     modalState: (state, action) => {
-      const { modalSignIn = false, modalSignUp = false, modalEmail = false, modalPassword = false} = action.payload;
+      const { modalSignIn = false, modalSignUp = false, modalEmail = false, modalPassword = false, modalProfile = false} = action.payload;
       state.modalSignIn = modalSignIn ;
       state.modalSignUp = modalSignUp ;
       state.modalEmail = modalEmail ;
       state.modalPassword = modalPassword ;
+      state.modalProfile = modalProfile ;
     }
   },
 });

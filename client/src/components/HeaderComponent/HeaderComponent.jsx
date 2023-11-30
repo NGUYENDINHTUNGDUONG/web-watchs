@@ -3,7 +3,7 @@ import { Badge, Col, Modal, Popover, Row } from "antd";
 import { HomeOutlined } from "@ant-design/icons";
 
 import SearchComponent from "../SearchComponent/SearchComponent";
-import logo from "../../assets/images/Logo-DWatch.png";
+import logo from "../../assets/images/Logo-DWatch.svg";
 import TypeComponent from "../TypeComponent/TypeComponent";
 import {
   UserOutlined,
@@ -29,6 +29,7 @@ import { searchProduct } from "../../redux/slides/productSlide";
 import SignInPage from "../../pages/SignInPage/SignInPage";
 import SignUpPage from "../../pages/SignUpPage/SignUpPage";
 import Email from "../../pages/ForgotPassword/Email";
+import ProfileComponent from "../ProfileComponet/ProfileComponent";
 
 const HeaderComponent = () => {
   const navigate = useNavigate();
@@ -56,6 +57,10 @@ const HeaderComponent = () => {
   const handleCancelEmail = () => {
     dispatch(modalState({ modalEmail: false }));
   };
+
+  const handleCancelProfile = () => {
+    dispatch(modalState({ modalProfile: false }));
+  }
   
   const openSignIn = useSelector((state) => state.user.modalSignIn);
 
@@ -68,8 +73,15 @@ const HeaderComponent = () => {
     await UserService.logoutUser();
     dispatch(resetUser());
     setLoading(false);
+    localStorage.removeItem('access_token')
+    localStorage.removeItem('refresh_token')
   };
 
+  const handleOpenProfile = () => {
+    dispatch(modalState({ modalProfile: true}))
+
+  }
+  const openProfile = useSelector((state) => state.user.modalProfile);
   useEffect(() => {
     setLoading(true);
     setUserName(user?.fullName);
@@ -131,7 +143,7 @@ const HeaderComponent = () => {
     "PHỤ KIỆN",
   ];
   return (
-    <div style={{ position: "sticky", top: "0", zIndex: "999" }}>
+    <div >
       <WrapperHeader>
         <Row gutter={16}>
           <Col span={7}>
@@ -175,7 +187,7 @@ const HeaderComponent = () => {
                   }}
                 />
               ) : (
-                <UserOutlined style={{ fontSize: "30px" }} />
+                <UserOutlined style={{ fontSize: "30px" }} onClick={handleOpenProfile}/>
               )}
               {user?.access_token ? (
                 <>
@@ -210,6 +222,7 @@ const HeaderComponent = () => {
             span={3}
             style={{
               marginLeft: "-30px",
+              marginTop:"15px",
               display: "flex",
               gap: "20px",
               alignItems: "left",
@@ -239,6 +252,10 @@ const HeaderComponent = () => {
 
       <Modal open={openEmail} onCancel={handleCancelEmail} footer={false}>
         <Email />
+      </Modal>
+
+      <Modal open={openProfile} onCancel={handleCancelProfile} footer={false}>
+        <ProfileComponent />
       </Modal>
         
     </div>

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Form, Image, Input } from "antd";
 import jwt_decode from "jwt-decode";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,6 +18,8 @@ const SignInPage = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
   const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleOpenSignUp = () => {
     dispatch(modalState({ modalSignUp: true }));
@@ -33,6 +35,7 @@ const SignInPage = () => {
 
   useEffect(() => {
     if (isSuccess) {
+      dispatch(modalState({ modalSignIn: false }));
       if (location?.state) {
         navigate(location?.state);
       } else {
@@ -49,21 +52,39 @@ const SignInPage = () => {
     }
   }, [isSuccess]);
 
-  const handleLogin = async () => {
-    const data = {
-      email: form.getFieldValue("email"),
-      password: form.getFieldValue("password"),
-    };
-    const res = await UserService.loginUser(data);
-    if (res) {
-      console.log(res);
-    }
-  };
   const handleGetDetailsUser = async (id, token) => {
     const refreshToken = localStorage.getItem("refresh_token");
     const res = await UserService.getDetailsUser(id, token);
     dispatch(updateUser({ ...res?.data, access_token: token, refreshToken }));
   };
+
+  const handleOnchangeEmail = (e) => {
+    setEmail(e.target.value)
+  };
+
+  const handleOnchangePassword = (e) => {
+    setPassword(e.target.value);
+  };
+
+  const handleSignIn = (e) => {
+    mutation.mutate({
+      email,
+      password,
+    });
+  };
+
+  const handleLogin = async () => {
+    const data = {
+      email: email,
+      password: password,
+    };
+    const res = await UserService.loginUser(data);
+    if (res) {
+      console.log('bachbip')
+    }
+  };
+
+  
 
   return (
     <div className="flex gap-x-10 m-5">
@@ -75,7 +96,7 @@ const SignInPage = () => {
             name="normal_login"
             className="login-form"
             form={form}
-            onFinish={handleLogin}
+            onFinish={handleSignIn}
           >
             <Form.Item
               name="email"
@@ -93,6 +114,7 @@ const SignInPage = () => {
               <Input
                 prefix={<MailOutlined className="site-form-item-icon" />}
                 placeholder="Email"
+                onChange={handleOnchangeEmail}
               />
             </Form.Item>
             <Form.Item
@@ -105,11 +127,12 @@ const SignInPage = () => {
                 prefix={<LockOutlined className="site-form-item-icon" />}
                 type="password"
                 placeholder="Password"
+                onChange={handleOnchangePassword}
               />
             </Form.Item>
 
             <Form.Item>
-              <Button htmlType="submit" className="text-black">
+              <Button htmlType="submit" className="text-black" >
                 Đăng nhập
               </Button>
             </Form.Item>

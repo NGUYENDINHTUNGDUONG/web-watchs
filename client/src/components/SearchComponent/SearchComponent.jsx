@@ -10,7 +10,7 @@ const SearchComponent = (props) => {
     textbutton,
     bordered = false,
     backgroundColorInput = "#fff",
-    backgroundColorButton = "rgb(13, 92, 182)",
+    backgroundColorButton = "#000",
     colorButton = "#fff",
   } = props;
   return (
