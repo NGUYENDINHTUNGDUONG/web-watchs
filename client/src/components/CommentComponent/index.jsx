@@ -365,7 +365,7 @@ export default function Comment({ productId }) {
                                                     ""
                                                   ) : (
                                                     <span className="font-bold">
-                                                      @{val.receiver}
+                                                      @{val.receiver?.fullName}
                                                     </span>
                                                   )}
                                                   {" " + val.content}

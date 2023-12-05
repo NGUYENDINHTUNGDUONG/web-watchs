@@ -149,7 +149,9 @@ const MyOrderPage = () => {
               label:
                 item.label +
                 " " +
-                `( ${data?.filter((order) => order.status === item.key).length} )`,
+                `( ${
+                  data?.filter((order) => order.status === item.key).length
+                } )`,
               key: item.key,
               children: (
                 <WrapperListOrder>
@@ -212,6 +214,8 @@ const MyOrderPage = () => {
                             >
                               {order.status === "cancel" ? (
                                 <p className="text-red-500">Đơn hàng đã hủy</p>
+                              ) : order.status === "shipping" ? (
+                                "Đơn hàng đang giao"
                               ) : (
                                 <ButtonComponent
                                   onClick={() => handleCanceOrder(order)}

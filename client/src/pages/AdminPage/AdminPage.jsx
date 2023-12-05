@@ -6,6 +6,9 @@ import {
   TeamOutlined,
   AppstoreOutlined,
   ShoppingCartOutlined,
+  DollarOutlined,
+  PercentageOutlined,
+  TagOutlined,
 } from "@ant-design/icons";
 
 import { getItem } from "../../util/utils";
@@ -23,6 +26,7 @@ import { listUser } from "../../redux/slides/userSlide";
 import "./style.css";
 import { useNavigate } from "react-router-dom";
 import OrderAdmin from "../../components/OrderAdmin";
+import AdminCoupon from "../../components/AdminComponent/AdminCoupon";
 const AdminPage = () => {
   const [loading, setLoading] = useState(false);
   // const user = useSelector((state) => state?.user);
@@ -33,6 +37,7 @@ const AdminPage = () => {
     getItem("Đơn hàng", "orders", <ShoppingCartOutlined />),
     getItem("Sản phẩm", "products", <AppstoreOutlined />),
     getItem("Người dùng", "users", <TeamOutlined />),
+    getItem("Giảm giá", "coupons",<TagOutlined />),
   ];
 
   const [keySelected, setKeySelected] = useState("dashboard");
@@ -95,6 +100,8 @@ const AdminPage = () => {
         return <AdminProduct />;
       case "orders":
         return <OrderAdmin />;
+      case "coupons":
+        return <AdminCoupon />;
       default:
         return <></>;
     }

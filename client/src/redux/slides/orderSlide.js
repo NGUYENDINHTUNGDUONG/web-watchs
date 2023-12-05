@@ -4,6 +4,7 @@ const initialState = {
   orderItems: [],
   orderItemsSlected: [],
   shippingAddress: {},
+  addresses: "",
   paymentMethod: "",
   itemsPrice: 0,
   shippingPrice: 0,
@@ -15,6 +16,11 @@ const initialState = {
   isDelivered: false,
   deliveredAt: "",
   isSucessOrder: false,
+  listCity: [],
+  listDistrict: [],
+  listWard: [],
+  listCoupons: [],
+
 };
 
 export const orderSlide = createSlice({
@@ -100,6 +106,20 @@ export const orderSlide = createSlice({
       });
       state.orderItemsSlected = orderSelected;
     },
+    addAdresses: (state, action) => {
+      const { addresses } = action.payload;
+      state.addresses = addresses;
+    },
+    getListAddresses: (state, action) => {
+      const { listCity, listDistrict, listWard } = action.payload;
+      state.listCity = listCity;
+      state.listDistrict = listDistrict;
+      state.listWard = listWard;
+    },
+    getListCoupons: (state, action) => {
+      const { listCoupons = [] } = action.payload;
+      state.listCoupons = listCoupons;
+    },
   },
 });
 
@@ -111,6 +131,9 @@ export const {
   removeOrderProduct,
   removeAllOrderProduct,
   selectedOrder,
+  addAdresses,
+  getListAddresses,
+  getListCoupons,
   resetOrder,
 } = orderSlide.actions;
 

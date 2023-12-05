@@ -16,7 +16,6 @@ import {
 } from "@ant-design/icons";
 import { useSelector } from "react-redux";
 import { orderContant } from "../../contant";
-import PieChartComponent from "./PieChart";
 
 const OrderAdmin = () => {
   const user = useSelector((state) => state?.user);
@@ -65,7 +64,7 @@ const OrderAdmin = () => {
         />
         <Space>
           <Button
-          className="bg-blue-400 "
+            className="bg-blue-400 "
             type="primary"
             onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
             icon={<SearchOutlined />}
@@ -181,9 +180,6 @@ const OrderAdmin = () => {
   return (
     <div>
       <WrapperHeader>Quản lý đơn hàng</WrapperHeader>
-      <div style={{ height: 200, width: 200 }}>
-        <PieChartComponent data={orders?.data} />
-      </div>
       <div style={{ marginTop: "20px" }}>
         <TableComponent
           columns={columns}

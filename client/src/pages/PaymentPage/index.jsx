@@ -1,4 +1,4 @@
-import { Form, Radio } from "antd";
+import { Cascader, Form, Radio, Select } from "antd";
 import React, { useEffect, useState } from "react";
 import {
   Lable,
@@ -20,10 +20,14 @@ import * as OrderService from "../../services/OrderService";
 import * as message from "../../components/Message/Message";
 import { updateUser } from "../../redux/slides/userSlide";
 import { useNavigate } from "react-router-dom";
-import { removeAllOrderProduct } from "../../redux/slides/orderSlide";
+import {
+  getListAddresses,
+  removeAllOrderProduct,
+} from "../../redux/slides/orderSlide";
 import { PayPalButton } from "react-paypal-button-v2";
 import * as PaymentService from "../../services/PaymentService";
 import Loading from "../../components/LoadingComponent/LoadingComponent";
+import axios from "axios";
 
 const PaymentPage = () => {
   const order = useSelector((state) => state.order);
@@ -97,6 +101,8 @@ const PaymentPage = () => {
     );
   }, [priceMemo, priceDiscountMemo, diliveryPriceMemo]);
   const access_token = localStorage.getItem("access_token");
+  const addresses = useSelector((state) => state.order);
+  console.log(addresses, "addresses");
   const handleAddOrder = () => {
     if (
       access_token &&
@@ -166,6 +172,9 @@ const PaymentPage = () => {
     }
   }, [isSuccess, isError]);
 
+  const onChange = (value) => {
+    console.log(value);
+  };
   const handleCancleUpdate = () => {
     setStateUserDetails({
       fullName: "",
@@ -234,13 +243,24 @@ const PaymentPage = () => {
   //     document.body.appendChild(script)
   //   }
 
+  const res = async () => {
+    const res = await axios.get("https://provinces.open-api.vn/api/?depth=1");
+    if (res) {
+      dispatch(getListAddresses({ listCity: res.data }));
+    }
+  };
+  const listCity = useSelector((state) => state.order.listCity);
   useEffect(() => {
-    // if(!window.paypal) {
-    //   addPaypalScript()
-    // }else {
     setSdkReady(true);
-    // }
+    res();
   }, []);
+  console.log(
+    listCity?.map((value) => ({
+      value: value.name,
+      label: value.name,
+    })),
+    "listCity"
+  );
 
   return (
     <div style={{ background: "#f5f5fa", with: "100%", height: "100vh" }}>
@@ -414,6 +434,7 @@ const PaymentPage = () => {
             )}
           </WrapperRight>
         </div>
+        <button>tyetsts</button>
       </div>
       <ModalComponent
         title="Cập nhật thông tin giao hàng"
@@ -460,11 +481,12 @@ const PaymentPage = () => {
             name="address"
             rules={[{ required: true, message: "Please input your  address!" }]}
           >
-            <InputComponent
-              value={stateUserDetails.address}
-              onChange={handleOnchangeDetails}
-              name="address"
-            />
+            <Select
+              options={listCity?.map((city) => ({
+                value: city.code,
+                label: city.name,
+              }))}
+            ></Select>
           </Form.Item>
         </Form>
       </ModalComponent>

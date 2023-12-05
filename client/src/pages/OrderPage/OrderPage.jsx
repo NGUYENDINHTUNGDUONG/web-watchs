@@ -1,4 +1,4 @@
-import { Form } from "antd";
+import { Checkbox, Form } from "antd";
 import React, { useEffect, useState } from "react";
 import {
   CustomCheckbox,
@@ -19,6 +19,7 @@ import ButtonComponent from "../../components/ButtonComponent/ButtonComponent";
 import { useDispatch, useSelector } from "react-redux";
 import {
   decreaseAmount,
+  getListCoupons,
   increaseAmount,
   removeAllOrderProduct,
   removeOrderProduct,
@@ -29,6 +30,7 @@ import ModalComponent from "../../components/ModalComponent/ModalComponent";
 import InputComponent from "../../components/InputComponent/InputComponent";
 import { useMutationHooks } from "../../hooks/useMutationHook";
 import * as UserService from "../../services/UserService";
+import * as PaymentService from "../../services/PaymentService";
 import * as message from "../../components/Message/Message";
 import { updateUser } from "../../redux/slides/userSlide";
 import { useNavigate } from "react-router-dom";
@@ -40,6 +42,7 @@ const OrderPage = () => {
   const user = useSelector((state) => state.user);
 
   const [listChecked, setListChecked] = useState([]);
+  const [checkCoupon, setCheckCoupon] = useState([]);
   const [isOpenModalUpdateInfo, setIsOpenModalUpdateInfo] = useState(false);
   const [stateUserDetails, setStateUserDetails] = useState({
     name: "",
@@ -60,6 +63,14 @@ const OrderPage = () => {
       setListChecked([...listChecked, e.target.value]);
     }
   };
+  const onChangeCoupon = (e) => {
+    if (checkCoupon.includes(e.target.value)) {
+      setCheckCoupon([]);
+    } else {
+      setCheckCoupon((prevCheckCoupon) => [e.target.value]);
+    }
+  };
+  console.log(checkCoupon, "checkCoupon");
 
   const handleChangeCount = (type, idProduct, limited) => {
     if (type === "increase") {
@@ -72,7 +83,21 @@ const OrderPage = () => {
       }
     }
   };
-
+  const access_token = localStorage.getItem("access_token");
+  const getAllCoupons = async () => {
+    try {
+      const res = await PaymentService.getAllCoupons(access_token);
+      if (res) {
+        dispatch(getListCoupons({ listCoupons: res.coupons }));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const listCoupons = useSelector((state) => state.order.listCoupons);
+  useEffect(() => {
+    getAllCoupons();
+  }, []);
   const handleDeleteOrder = (idProduct) => {
     dispatch(removeOrderProduct({ idProduct }));
   };
@@ -179,6 +204,7 @@ const OrderPage = () => {
     form.resetFields();
     setIsOpenModalUpdateInfo(false);
   };
+
   const handleUpdateInforUser = () => {
     const { name, address, phone } = stateUserDetails;
     if (name && address && phone) {
@@ -203,15 +229,15 @@ const OrderPage = () => {
   const itemsDelivery = [
     {
       title: "20.000 VND",
-      description: "Dưới 200.000 VND",
+      description: "Dưới 5.000.000 VND",
     },
     {
       title: "10.000 VND",
-      description: "Từ 200.000 VND đến dưới 500.000 VND",
+      description: "Từ 5.000.000 VND đến dưới 15.000.000 VND",
     },
     {
       title: "Free ship",
-      description: "Trên 500.000 VND",
+      description: "Trên 15.000.000 VND",
     },
   ];
   return (
@@ -235,6 +261,26 @@ const OrderPage = () => {
                 }
               />
             </WrapperStyleHeaderDilivery>
+            <h4>Mã giảm giá</h4>
+            <div className="bg-white p-3 rounded mb-2 flex flex-col w-full">
+              <Checkbox.Group value={checkCoupon}>
+                {listCoupons?.map((coupon) => {
+                  return (
+                    <Checkbox
+                      key={coupon?._id}
+                      className="w-full"
+                      value={coupon?._id}
+                      onChange={onChangeCoupon}
+                    >
+                      <div className="flex items-center justify-between">
+                        <p>{coupon?.code}</p>
+                        <p>{coupon?.discountPercent}</p>
+                      </div>
+                    </Checkbox>
+                  );
+                })}
+              </Checkbox.Group>
+            </div>
             <WrapperStyleHeader>
               <span style={{ display: "inline-block", width: "390px" }}>
                 <CustomCheckbox

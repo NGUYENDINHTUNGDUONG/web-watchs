@@ -12,6 +12,7 @@ const TableComponent = (props) => {
     columns = [],
     createUser,
     createProduct,
+    createCoupon,
     keyselected,
   } = props;
   const newColumnExport = useMemo(() => {
@@ -39,11 +40,13 @@ const TableComponent = (props) => {
           marginBottom: "10px",
         }}
       >
-        <button onClick={exportExcel}>Export Excel</button>
+        <Button onClick={exportExcel}>Export Excel</Button>
         {keyselected === "users" ? (
           <Button onClick={createUser}>Thêm người dùng</Button>
         ) : keyselected === "product" ? (
           <Button onClick={createProduct}>Thêm sản phẩm</Button>
+        ) : keyselected === "coupon" ? (
+          <Button onClick={createCoupon}>Thêm mã giảm giá</Button>
         ) : null}
       </div>
       <Table

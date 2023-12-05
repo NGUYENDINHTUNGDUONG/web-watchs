@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-  WrapperAllPrice,
   WrapperContentInfo,
   WrapperHeaderUser,
   WrapperInfoUser,
@@ -11,13 +10,12 @@ import {
   WrapperProduct,
   WrapperStyleContent,
 } from "./style";
-import { useLocation, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import * as OrderService from "../../services/OrderService";
-import { useQuery } from "@tanstack/react-query";
 import { orderContant } from "../../contant";
 import { useMemo } from "react";
-import Loading from "../../components/LoadingComponent/LoadingComponent";
 import { UPLOAD_BASE_URL } from "../../config";
+import { mapColors, mapIcons, mapStatus } from "../../util/contant";
 
 const DetailsOrderPage = () => {
   const params = useParams();
@@ -44,136 +42,95 @@ const DetailsOrderPage = () => {
   }, [data]);
 
   return (
-    <div style={{ width: "100%", background: "#f5f5fa" }}>
-      <div style={{ width: "1270px", margin: "0 auto" }}>
-        <h4>Chi tiết đơn hàng</h4>
-        <WrapperHeaderUser>
-          <WrapperInfoUser>
-            <WrapperLabel>Địa chỉ người nhận</WrapperLabel>
-            <WrapperContentInfo>
-              <div className="name-info">{data?.shippingAddress?.fullName}</div>
-              <div className="address-info">
-                <span>Địa chỉ: </span> {`${data?.shippingAddress?.address}`}
-              </div>
-              <div className="phone-info">
-                <span>Điện thoại: </span> {data?.shippingAddress?.phone}
-              </div>
-            </WrapperContentInfo>
-          </WrapperInfoUser>
-          <WrapperInfoUser>
-            <WrapperLabel>Hình thức giao hàng</WrapperLabel>
-            <WrapperContentInfo>
-              <div className="delivery-info">
-                <span className="name-delivery">FAST </span>Giao hàng tiết kiệm
-              </div>
-              <div className="delivery-fee">
-                <span>Phí giao hàng: </span> {data?.shippingPrice}
-              </div>
-            </WrapperContentInfo>
-          </WrapperInfoUser>
-          <WrapperInfoUser>
-            <WrapperLabel>Hình thức thanh toán</WrapperLabel>
-            <WrapperContentInfo>
-              <div className="payment-info">
-                {orderContant.payment[data?.paymentMethod]}
-              </div>
-              <div className="status-payment">
-                {data?.isPaid ? "Đã thanh toán" : "Chưa thanh toán"}
-              </div>
-            </WrapperContentInfo>
-          </WrapperInfoUser>
-        </WrapperHeaderUser>
-        <WrapperStyleContent>
-          <div
-            style={{
-              flex: 1,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <div style={{ width: "670px" }}>Sản phẩm</div>
-            <WrapperItemLabel>Trạng thái </WrapperItemLabel>
-            <WrapperItemLabel>Giá </WrapperItemLabel>
-            <WrapperItemLabel>Số lượng</WrapperItemLabel>
-            <WrapperItemLabel>Tổng cộng</WrapperItemLabel>
-          </div>
-          {data?.orderItem?.map((order) => {
-            return (
-              <WrapperProduct>
-                <WrapperNameProduct>
-                  <img
-                    alt="#"
-                    src={UPLOAD_BASE_URL + "/" + order?.images[0]}
-                    style={{
-                      width: "70px",
-                      height: "70px",
-                      objectFit: "cover",
-                      border: "1px solid rgb(238, 238, 238)",
-                      padding: "2px",
-                    }}
-                  />
-                  <div
-                    style={{
-                      width: 260,
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                      marginLeft: "10px",
-                      height: "70px",
-                    }}
-                  >
-                    {order?.name}
+    <>
+      <div className=" bg-[#f5f5f5] h-full pt-6 ">
+        <div className="grid grid-cols-3 w-[1270px] mx-auto gap-4">
+          <div className="col-span-2 bg-white rounded-lg  border shadow-lg">
+            <div className="flex items-center p-5">
+              <p className="text-2xl font-bold mr-3"> Chi tiết đơn hàng </p>{" "}
+              <span
+                className={`text-xl ${
+                  mapColors[data?.status]
+                } rounded-full px-2 py-1`}
+              >
+                {mapIcons[data?.status]}
+                {mapStatus[data?.status]}
+              </span>
+            </div>
+            <hr />
+            <div className="p-5">
+              {data?.orderItem?.map((order) => (
+                <>
+                  <div className="grid grid-cols-8 gap-3 mb-5 items-center">
+                    <div className="col-span-1">
+                      <img
+                        alt="#"
+                        src={UPLOAD_BASE_URL + "/" + order?.images[0]}
+                        style={{
+                          width: "90px",
+                          height: "90px",
+                          objectFit: "cover",
+                          border: "1px solid rgb(238, 238, 238)",
+                          padding: "2px",
+                        }}
+                      />
+                    </div>
+                    <div className="col-span-3"> {order?.name}</div>
+                    <div className="col-span-2 flex justify-around">
+                      <p>
+                        {Number(order?.price).toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })}
+                      </p>
+                      x<p>{order?.amount}</p>
+                    </div>
+                    <div className="col-span-2 flex justify-end">
+                      {Number(order?.price * order?.amount).toLocaleString(
+                        "vi-VN",
+                        { style: "currency", currency: "VND" }
+                      )}
+                    </div>
                   </div>
-                </WrapperNameProduct>
-                <WrapperItem>{data?.status}</WrapperItem>
-                <WrapperItem>{Number(order?.price).toLocaleString("vi-VN", {
-          style: "currency",
-          currency: "VND",
-        })}</WrapperItem>
-                <WrapperItem>{order?.amount}</WrapperItem>
-                {/* <WrapperItem>
-                  {order?.discount
-                    ? Number((priceMemo * order?.discount) / 100).toLocaleString("vi-VN", {
-          style: "currency",
-          currency: "VND",
-        })
-                    : "0 VND"}
-                </WrapperItem> */}
-                <WrapperItem>{Number(data?.totalPrice).toLocaleString("vi-VN", {
-          style: "currency",
-          currency: "VND",
-        })}</WrapperItem>
-              </WrapperProduct>
-            );
-          })}
-
-          {/* <WrapperAllPrice>
-            <WrapperItemLabel>Tạm tính</WrapperItemLabel>
-            <WrapperItem>{Number(priceMemo).toLocaleString("vi-VN", {
-          style: "currency",
-          currency: "VND",
-        })}</WrapperItem>
-          </WrapperAllPrice>
-          <WrapperAllPrice>
-            <WrapperItemLabel>Phí vận chuyển</WrapperItemLabel>
-            <WrapperItem>{Number(data?.shippingPrice).toLocaleString("vi-VN", {
-          style: "currency",
-          currency: "VND",
-        })}</WrapperItem>
-          </WrapperAllPrice> */}
-          {/* <WrapperAllPrice>
-            <WrapperItemLabel>Tổng cộng</WrapperItemLabel>
-            <WrapperItem>
-              <WrapperItem>{Number(data?.totalPrice).toLocaleString("vi-VN", {
-          style: "currency",
-          currency: "VND",
-        })}</WrapperItem>
-            </WrapperItem>
-          </WrapperAllPrice> */}
-        </WrapperStyleContent>
+                </>
+              ))}
+              <hr />
+              <div className="grid grid-cols-8 gap-3 mt-5 items-center">
+                <div className="col-span-1"></div>
+                <div className="col-span-3"></div>
+                <div className="col-span-2 ">
+                  <p className="text-xl font-bold">Tổng tiền:</p>
+                </div>
+                <div className="col-span-2 flex text-xl font-bold justify-end">
+                  {Number(data?.totalPrice).toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="col-span-1 bg-white rounded-lg border shadow-lg">
+            <div className="p-5">
+              <p className="text-xl my-5 font-bold">Khách hàng</p>
+              <p className="">{data?.shippingAddress?.fullName}</p>
+            </div>
+            <hr />
+            <div className="p-5">
+              <p className="text-xl my-5 font-bold">Liên hệ</p>
+              <p className="">{data?.shippingAddress?.phone}</p>
+            </div>
+            <hr />
+            <div className="p-5">
+              <p className="text-xl my-5 font-bold">Địa chi giao hàng</p>
+              <p className="">{data?.shippingAddress?.fullName}</p>
+              <p className="">{data?.shippingAddress?.phone}</p>
+              <p className="">{data?.shippingAddress?.address}</p>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
