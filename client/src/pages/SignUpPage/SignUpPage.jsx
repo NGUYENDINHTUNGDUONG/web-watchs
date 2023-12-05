@@ -1,207 +1,148 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Image } from 'antd';
-import { EyeFilled, EyeInvisibleFilled } from '@ant-design/icons';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Form, Image, Input } from "antd";
+import { EyeFilled, EyeInvisibleFilled } from "@ant-design/icons";
+import { Button } from "antd";
 
-import * as UserService from '../../services/UserService';
-import * as message from '../../components/Message/Message';
-import imageLogoLogin from '../../assets/images/logo-login.png';
+import * as UserService from "../../services/UserService";
+import * as message from "../../components/Message/Message";
+import imageLogoLogin from "../../assets/images/logo-login.png";
 // import Loading from "../../components/LoadingComponent/LoadingComponent";
-import ButtonComponent from '../../components/ButtonComponent/ButtonComponent';
-import InputFormComponent from '../../components/InputFormComponent/InputFormComponent';
-import { useMutationHooks } from '../../hooks/useMutationHook';
+import ButtonComponent from "../../components/ButtonComponent/ButtonComponent";
+import InputFormComponent from "../../components/InputFormComponent/InputFormComponent";
+import { useMutationHooks } from "../../hooks/useMutationHook";
 import {
   WrapperContainerLeft,
   WrapperContainerRight,
   WrapperTextLight,
-} from '../SignInPage/style';
+} from "../SignInPage/style";
+import { useDispatch } from "react-redux";
+import { modalState } from "../../redux/slides/userSlide";
 
 const SignUpPage = () => {
-  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  const [isShowPassword, setIsShowPassword] = useState(false);
-  const [isShowConfirmPassword, setIsShowConfirmPassword] = useState(false);
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [phone, setPhone] = useState('');
-  const [address, setAddress] = useState('');
-
-  const mutation = useMutationHooks((data) => UserService.registerUser(data));
-
-  const { data, isSuccess, isError } = mutation;
-
-  useEffect(() => {
-    if (isSuccess) {
-      message.success();
-      handleNavigateSignIn();
-    } else if (isError) {
-      message.error();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccess, isError]);
-  const handleOnchangeEmail = (value) => {
-    setEmail(value);
-  };
-  const handleOnchangeFullname = (value) => {
-    setFullName(value);
-  };
-
-  const handleOnchangePassword = (value) => {
-    setPassword(value);
-  };
-
-  const handleOnchangeConfirmPassword = (value) => {
-    setConfirmPassword(value);
-  };
-  const handleOnchangePhone = (value) => {
-    setPhone(value);
-  };
-  const handleOnchangeAddress = (value) => {
-    setAddress(value);
-  };
-
-  const handleNavigateSignIn = () => {
-    navigate('/sign-in');
-  };
-
-  const handleSignUp = () => {
-    mutation.mutate({
-      fullName,
-      email,
-      password,
-      confirmPassword,
-      phone,
-      address,
-    });
+  const handleOpenSignIn = () => {
+    dispatch(modalState({ modalSignIn: true }));
   };
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'rgba(0, 0, 0, 0.53)',
-        height: '100vh',
-      }}>
-      <div
-        style={{
-          width: '800px',
-          height: '545px',
-          borderRadius: '6px',
-          background: '#fff',
-          display: 'flex',
-        }}>
-        <WrapperContainerLeft>
-          <h1 className="font-bold text-3xl">Xin chào</h1>
-          <p>Đăng nhập vào tạo tài khoản</p>
-          <InputFormComponent
-            style={{ marginBottom: '10px' }}
-            placeholder='Full Name'
-            value={fullName}
-            onChange={handleOnchangeFullname}
-          />
-          <InputFormComponent
-            style={{ marginBottom: '10px' }}
-            placeholder='abc@gmail.com'
-            value={email}
-            onChange={handleOnchangeEmail}
-          />
-          <div style={{ position: 'relative' }}>
-            <span
-              onClick={() => setIsShowPassword(!isShowPassword)}
-              style={{
-                zIndex: 10,
-                position: 'absolute',
-                top: '4px',
-                right: '8px',
-              }}>
-              {isShowPassword ? <EyeFilled /> : <EyeInvisibleFilled />}
-            </span>
-            <InputFormComponent
-              placeholder='password'
-              style={{ marginBottom: '10px' }}
-              type={isShowPassword ? 'text' : 'password'}
-              value={password}
-              onChange={handleOnchangePassword}
-            />
-          </div>
-          <div style={{ position: 'relative' }}>
-            <span
-              onClick={() => setIsShowConfirmPassword(!isShowConfirmPassword)}
-              style={{
-                zIndex: 10,
-                position: 'absolute',
-                top: '4px',
-                right: '8px',
-              }}>
-              {isShowConfirmPassword ? <EyeFilled /> : <EyeInvisibleFilled />}
-            </span>
-            <InputFormComponent
-              placeholder='comfirm password'
-              type={isShowConfirmPassword ? 'text' : 'password'}
-              value={confirmPassword}
-              onChange={handleOnchangeConfirmPassword}
-            />
-          </div>
-          <InputFormComponent
-            style={{ marginBottom: '10px' }}
-            placeholder='phone number'
-            value={phone}
-            onChange={handleOnchangePhone}
-          />
-          <InputFormComponent
-            style={{ marginBottom: '10px' }}
-            placeholder='Address'
-            value={address}
-            onChange={handleOnchangeAddress}
-          />
-          {data?.status === 'ERR' && (
-            <span style={{ color: 'red' }}>{data?.message}</span>
-          )}
-          {/* <Loading isLoading={isLoading}> */}
-          <ButtonComponent
-            htmlType='submit'
-            disabled={
-              !email.length || !password.length || !confirmPassword.length
-            }
-            onClick={handleSignUp}
-            size={40}
-            styleButton={{
-              background: 'rgb(255, 57, 69)',
-              height: '48px',
-              width: '100%',
-              border: 'none',
-              borderRadius: '4px',
-              margin: '26px 0 10px',
-            }}
-            textbutton={'Đăng ký'}
-            styleTextButton={{
-              color: '#fff',
-              fontSize: '15px',
-              fontWeight: '700',
-            }}></ButtonComponent>
+    <div>
+      <div className="flex gap-x-10 m-2">
+        <div>
+          <p className="text-3xl font-bold text-orange-600 mb-5">Xin chào</p>
+          <p>Tạo tài khoản</p>
+          <div className="mt-5">
+          <Form>
+          <Form.Item
+              name="fullname"
+              rules={[
+                { required: true, message: "Please input your Name!" },
+              ]}
+            >
+              <Input
+                placeholder="Full Name"
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="email"
+              rules={[
+                { required: true, message: "Please input your Username!" },
+                {
+                  pattern: emailRegex,
+                  message: "Vui lòng nhập địa chỉ email hợp lệ!",
+                },
+                // {validator: (_, value)=>{
+
+                // }}
+              ]}
+            >
+              <Input
+                placeholder="Email"
+              />
+            </Form.Item>
+            
+
+            <Form.Item
+              name="password"
+              rules={[
+                { required: true, message: "Please input your Password!" },
+              ]}
+            >
+              <Input
+                type="password"
+                placeholder="Password"
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="comfirm password"
+              rules={[
+                { required: true, message: "Please input your Password!" },
+              ]}
+            >
+              <Input
+                type="password"
+                placeholder="Comfirm password"
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="phone number"
+              rules={[
+                { required: true, message: "Please input your Phone number!" },
+              ]}
+            >
+              <Input
+                placeholder="Phone number"
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="Address"
+              rules={[
+                { required: true, message: "Please input your Address!" },
+              ]}
+            >
+              <Input
+                type="password"
+                placeholder="Address"
+              />
+            </Form.Item>
+
+            
+
+            <Form.Item>
+              <Button htmlType="submit" className="text-black">
+                Đăng ký
+              </Button>
+            </Form.Item>
+          </Form>
+        </div>
+      
           {/* </Loading> */}
           <p>
-            Bạn đã có tài khoản?{' '}
-            <WrapperTextLight onClick={handleNavigateSignIn}>
-              {' '}
+            Bạn đã có tài khoản?{" "}
+            <WrapperTextLight onClick={handleOpenSignIn}>
+              {" "}
               Đăng nhập
             </WrapperTextLight>
           </p>
-        </WrapperContainerLeft>
-        <WrapperContainerRight>
-          <Image
-            src={imageLogoLogin}
-            preview={false}
-            alt='iamge-logo'
-            height='203px'
-            width='203px'
-          />
-          <h4 className='font-bold'>Mua sắm tại LTTD</h4>
-        </WrapperContainerRight>
+        </div>
+        <div>
+        <Image
+          src={imageLogoLogin}
+          preview={false}
+          alt="image-logo"
+          height="203px"
+          width="203px"
+        />
+        <p className="text-xl font-bold mt-10 text-center">
+          Mua sắm tại Dwatch
+        </p>
+        </div>
       </div>
     </div>
   );

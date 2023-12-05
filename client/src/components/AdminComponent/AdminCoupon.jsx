@@ -27,8 +27,6 @@ export default function AdminCoupon() {
       console.log(res);
       form.resetFields();
     }
-    console.log(data);
-    console.log(typeof values.date?.[0]);
     setIsOpen(false);
   };
   return (

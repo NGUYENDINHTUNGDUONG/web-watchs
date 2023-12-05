@@ -121,7 +121,7 @@ const AdminPage = () => {
               <img
                 alt="logo"
                 onClick={() => navigate("/")}
-                src={require("../../assets/images/Logo-DWatch.png")}
+                src={require("../../assets/images/Logo-DWatch.svg")}
               />
             </div>
             <Menu

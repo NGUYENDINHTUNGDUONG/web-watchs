@@ -1,4 +1,4 @@
-import { Checkbox, Form } from "antd";
+import { Button, Checkbox, Form, Modal } from "antd";
 import React, { useEffect, useState } from "react";
 import {
   CustomCheckbox,
@@ -18,6 +18,7 @@ import { WrapperInputNumber } from "../../components/ProductDetailsComponent/sty
 import ButtonComponent from "../../components/ButtonComponent/ButtonComponent";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  addDiscount,
   decreaseAmount,
   getListCoupons,
   increaseAmount,
@@ -43,6 +44,7 @@ const OrderPage = () => {
 
   const [listChecked, setListChecked] = useState([]);
   const [checkCoupon, setCheckCoupon] = useState([]);
+  const [isCouponOpen, setIsCouponOpen] = useState(false);
   const [isOpenModalUpdateInfo, setIsOpenModalUpdateInfo] = useState(false);
   const [stateUserDetails, setStateUserDetails] = useState({
     name: "",
@@ -70,8 +72,9 @@ const OrderPage = () => {
       setCheckCoupon((prevCheckCoupon) => [e.target.value]);
     }
   };
-  console.log(checkCoupon, "checkCoupon");
-
+  const onCancelCoupon = () => {
+    setIsCouponOpen(false);
+  };
   const handleChangeCount = (type, idProduct, limited) => {
     if (type === "increase") {
       if (!limited) {
@@ -83,21 +86,22 @@ const OrderPage = () => {
       }
     }
   };
-  const access_token = localStorage.getItem("access_token");
-  const getAllCoupons = async () => {
-    try {
-      const res = await PaymentService.getAllCoupons(access_token);
-      if (res) {
-        dispatch(getListCoupons({ listCoupons: res.coupons }));
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  const listCoupons = useSelector((state) => state.order.listCoupons);
+
   useEffect(() => {
-    getAllCoupons();
+    const access_token = localStorage.getItem("access_token");
+    (async () => {
+      try {
+        const res = await PaymentService.getAllCoupons(access_token);
+        if (res) {
+          dispatch(getListCoupons({ listCoupons: res.coupons }));
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  const listCoupons = useSelector((state) => state.order.listCoupons);
   const handleDeleteOrder = (idProduct) => {
     dispatch(removeOrderProduct({ idProduct }));
   };
@@ -132,6 +136,15 @@ const OrderPage = () => {
     }
   }, [isOpenModalUpdateInfo]);
 
+  useEffect(() => {
+    const res = listCoupons?.filter((coupon) => coupon._id === checkCoupon[0]);
+    const discount = res[0]?.discountPercent;
+    if (discount) {
+      dispatch(addDiscount({ discount: discount / 100 }));
+    }
+  }, [checkCoupon]);
+  const result = useSelector((state) => state.order.discount);
+  console.log("result", result);
   const handleChangeAddress = () => {
     setIsOpenModalUpdateInfo(true);
   };
@@ -144,16 +157,14 @@ const OrderPage = () => {
   }, [order]);
 
   const priceDiscountMemo = useMemo(() => {
-    const result = order?.orderItemsSlected?.reduce((total, cur) => {
-      const totalDiscount = cur.discount ? cur.discount : 0;
-      return total + (priceMemo * (totalDiscount * cur.amount)) / 100;
-    }, 0);
-    if (Number(result)) {
-      return result;
+    const total = result * priceMemo;
+    if (Number(total)) {
+      return total;
     }
     return 0;
   }, [order]);
 
+  console.log(priceDiscountMemo, "priceDiscountMemo");
   const diliveryPriceMemo = useMemo(() => {
     if (priceMemo >= 200000 && priceMemo < 500000) {
       return 10000;
@@ -261,26 +272,6 @@ const OrderPage = () => {
                 }
               />
             </WrapperStyleHeaderDilivery>
-            <h4>Mã giảm giá</h4>
-            <div className="bg-white p-3 rounded mb-2 flex flex-col w-full">
-              <Checkbox.Group value={checkCoupon}>
-                {listCoupons?.map((coupon) => {
-                  return (
-                    <Checkbox
-                      key={coupon?._id}
-                      className="w-full"
-                      value={coupon?._id}
-                      onChange={onChangeCoupon}
-                    >
-                      <div className="flex items-center justify-between">
-                        <p>{coupon?.code}</p>
-                        <p>{coupon?.discountPercent}</p>
-                      </div>
-                    </Checkbox>
-                  );
-                })}
-              </Checkbox.Group>
-            </div>
             <WrapperStyleHeader>
               <span style={{ display: "inline-block", width: "390px" }}>
                 <CustomCheckbox
@@ -477,7 +468,17 @@ const OrderPage = () => {
                     justifyContent: "space-between",
                   }}
                 >
-                  <span>Giảm giá</span>
+                  <div className="flex">
+                    <span className="mr-2">Mã giảm giá</span>
+                    <span
+                      className="cursor-pointer text-[#eb0000] font-bold"
+                      onClick={() => {
+                        setIsCouponOpen(true);
+                      }}
+                    >
+                      Chọn
+                    </span>
+                  </div>
                   <span
                     style={{
                       color: "#000",
@@ -604,6 +605,46 @@ const OrderPage = () => {
           </Form.Item>
         </Form>
       </ModalComponent>
+      <Modal
+        open={isCouponOpen}
+        onCancel={() => setIsCouponOpen(false)}
+        title="Chọn mã giảm giá"
+        width={350}
+        footer={null}
+      >
+        <Checkbox.Group value={checkCoupon}>
+          {listCoupons?.filter(
+            (coupon) => coupon.minimumPurchaseAmount < priceMemo
+          ).length === 0
+            ? "Chưa đủ điều kiện hoặc chưa chọn sản phẩm"
+            : listCoupons
+                ?.filter((coupon) => coupon.minimumPurchaseAmount < priceMemo)
+                .map((coupon) => {
+                  return (
+                    <Checkbox
+                      key={coupon?._id}
+                      className="w-full mb-2"
+                      value={coupon?._id}
+                      onChange={onChangeCoupon}
+                    >
+                      <div className="flex items-center justify-between">
+                        Mã giảm giá {coupon?.discountPercent}% ( tối đa{" "}
+                        <span>
+                          {Number(coupon?.maximumDiscountAmount).toLocaleString(
+                            "vi-VN",
+                            { style: "currency", currency: "VND" }
+                          )}
+                        </span>
+                        )
+                      </div>
+                    </Checkbox>
+                  );
+                })}
+        </Checkbox.Group>
+        <div className="text-right">
+          <Button className="mt-3" onClick={() => setIsCouponOpen(false)}>Ok</Button>
+        </div>
+      </Modal>
     </div>
   );
 };

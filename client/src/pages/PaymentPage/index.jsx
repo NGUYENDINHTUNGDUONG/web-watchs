@@ -73,14 +73,12 @@ const PaymentPage = () => {
     }, 0);
     return result;
   }, [order]);
-
+  const result = useSelector((state) => state.order.discount);
   const priceDiscountMemo = useMemo(() => {
-    const result = order?.orderItemsSlected?.reduce((total, cur) => {
-      const totalDiscount = cur.discount ? cur.discount : 0;
-      return total + (priceMemo * (totalDiscount * cur.amount)) / 100;
-    }, 0);
-    if (Number(result)) {
-      return result;
+    const total = result * priceMemo;
+
+    if (Number(total)) {
+      return total;
     }
     return 0;
   }, [order]);

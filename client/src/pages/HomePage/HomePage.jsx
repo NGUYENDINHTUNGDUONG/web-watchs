@@ -5,6 +5,8 @@ import { WrapperButtonMore, WrapperProducts } from "./style";
 
 import CardComponent from "../../components/CardComponent/CardComponent";
 import SliderComponent from "../../components/SliderComponent/SliderComponent";
+import { Button } from "antd";
+import FooterComponent from "../../components/FooterComponent/FooterComponent";
 import { useNavigate } from "react-router-dom";
 
 const HomePage = () => {
@@ -32,6 +34,21 @@ const HomePage = () => {
       >
         <SliderComponent />
       </div>
+      <div className="text-4xl items-center justify-between font-medium my-10 flex">
+        <hr className="w-full ml-32" />
+        <div className="w-full text-center">Sản phẩm nổi bật</div>
+        <hr className="w-full mr-32" />
+      </div>
+
+      {/* <div className="flex justify-center gap-x-10 mb-10">
+        <Button size={"large"} className="!bg-gray-300">
+          Đồng hồ nam
+        </Button>
+        <Button size={"large"} className="!bg-gray-300">
+          Đồng hồ nữ
+        </Button>
+      </div> */}
+
       <WrapperProducts>
         {product.slice(0, 8).map((value, index) => (
           <CardComponent
@@ -45,6 +62,48 @@ const HomePage = () => {
             id={value?._id}
           />
         ))}
+      </WrapperProducts>
+
+      <div className="text-4xl items-center justify-between font-medium my-10 flex">
+        <hr className="w-full ml-32" />
+        <div className="w-full text-center">
+          Khách hàng nói về <br />
+          chúng tôi
+        </div>
+        <hr className="w-full mr-32" />
+      </div>
+      <WrapperProducts>
+        <CardComponent />
+        <CardComponent />
+        <CardComponent />
+        <CardComponent />
+      </WrapperProducts>
+
+      <div className="text-4xl items-center justify-between font-medium my-10 flex">
+        <hr className="w-full ml-32" />
+        <div className="w-full text-center">Thẩm định đồng hồ</div>
+        <hr className="w-full mr-32" />
+      </div>
+      <WrapperProducts>
+        <CardComponent />
+        <CardComponent />
+        <CardComponent />
+        <CardComponent />
+      </WrapperProducts>
+
+      <div className="text-4xl items-center justify-between font-medium my-10 flex">
+        <hr className="w-full ml-32" />
+        <div className="w-full text-center mx-10">
+          Dwatch_Tin tức và <br />
+          sự kiện
+        </div>
+        <hr className="w-full mr-32" />
+      </div>
+      <WrapperProducts>
+        <CardComponent />
+        <CardComponent />
+        <CardComponent />
+        <CardComponent />
       </WrapperProducts>
       <div
         style={{
@@ -69,6 +128,9 @@ const HomePage = () => {
           }}
           styleTextButton={{ fontWeight: 500 }}
         />
+      </div>
+      <div className="mt-10">
+        <FooterComponent />
       </div>
     </>
   );

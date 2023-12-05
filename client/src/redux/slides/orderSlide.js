@@ -20,7 +20,7 @@ const initialState = {
   listDistrict: [],
   listWard: [],
   listCoupons: [],
-
+  discount: 0,
 };
 
 export const orderSlide = createSlice({
@@ -120,6 +120,10 @@ export const orderSlide = createSlice({
       const { listCoupons = [] } = action.payload;
       state.listCoupons = listCoupons;
     },
+    addDiscount: (state, action) => {
+      const { discount } = action.payload;
+      state.discount = discount;
+    },
   },
 });
 
@@ -133,6 +137,7 @@ export const {
   selectedOrder,
   addAdresses,
   getListAddresses,
+  addDiscount,
   getListCoupons,
   resetOrder,
 } = orderSlide.actions;

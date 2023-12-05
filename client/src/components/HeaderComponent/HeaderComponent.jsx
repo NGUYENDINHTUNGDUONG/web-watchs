@@ -1,9 +1,9 @@
 import React from "react";
-import { Badge, Col, Popover, Row } from "antd";
+import { Badge, Col, Modal, Popover, Row } from "antd";
 import { HomeOutlined } from "@ant-design/icons";
 
 import SearchComponent from "../SearchComponent/SearchComponent";
-import logo from "../../assets/images/Logo-DWatch.png";
+import logo from "../../assets/images/Logo-DWatch.svg";
 import TypeComponent from "../TypeComponent/TypeComponent";
 import {
   UserOutlined,
@@ -22,10 +22,14 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import * as UserService from "../../services/UserService";
-import { resetUser } from "../../redux/slides/userSlide";
+import { modalState, resetUser } from "../../redux/slides/userSlide";
 import { useState } from "react";
 import { useEffect } from "react";
 import { searchProduct } from "../../redux/slides/productSlide";
+import SignInPage from "../../pages/SignInPage/SignInPage";
+import SignUpPage from "../../pages/SignUpPage/SignUpPage";
+import Email from "../../pages/ForgotPassword/Email";
+import ProfileComponent from "../ProfileComponet/ProfileComponent";
 
 const HeaderComponent = () => {
   const navigate = useNavigate();
@@ -37,17 +41,46 @@ const HeaderComponent = () => {
   const [isOpenPopup, setIsOpenPopup] = useState(false);
   const order = useSelector((state) => state.order);
   const [loading, setLoading] = useState(false);
-  const handleNavigateLogin = () => {
-    navigate("/sign-in");
+
+  const handleOpenSignIn = () => {
+    dispatch(modalState({ modalSignIn: true }));
   };
+
+  const handleCancelSignIn = () => {
+    dispatch(modalState({ modalSignIn: false }));
+  };
+
+  const handleCancelSignUp = () => {
+    dispatch(modalState({ modalSignUp: false }));
+  };
+
+  const handleCancelEmail = () => {
+    dispatch(modalState({ modalEmail: false }));
+  };
+
+  const handleCancelProfile = () => {
+    dispatch(modalState({ modalProfile: false }));
+  };
+
+  const openSignIn = useSelector((state) => state.user.modalSignIn);
+
+  const openSignUp = useSelector((state) => state.user.modalSignUp);
+
+  const openEmail = useSelector((state) => state.user.modalEmail);
 
   const handleLogout = async () => {
     setLoading(true);
     await UserService.logoutUser();
     dispatch(resetUser());
     setLoading(false);
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
   };
 
+  const handleOpenProfile = () => {
+    dispatch(modalState({ modalProfile: true }));
+  };
+  const openProfile = useSelector((state) => state.user.modalProfile);
   useEffect(() => {
     setLoading(true);
     setUserName(user?.fullName);
@@ -109,10 +142,10 @@ const HeaderComponent = () => {
     { title: "PHỤ KIỆN", url: "/products" },
   ];
   return (
-    <div style={{ position: "sticky", top: "0", zIndex: "999" }}>
+    <div>
       <WrapperHeader>
-        <Row gutter={16}>
-          <Col span={7}>
+        <Row gutter={16} className="items-center justify-between">
+          <Col span={5}>
             <WrapperHeaderText>
               <img
                 onClick={() => navigate("/")}
@@ -125,7 +158,7 @@ const HeaderComponent = () => {
               />
             </WrapperHeaderText>
           </Col>
-          <Col span={10}>
+          <Col span={12}>
             <SearchComponent
               size="large"
               placeholder="Tìm kiếm sản phẩm"
@@ -140,6 +173,7 @@ const HeaderComponent = () => {
               display: "flex",
               gap: "20px",
               alignItems: "center",
+              justifyContent: "flex-end",
             }}
           >
             <WrapperHeaderAccount>
@@ -155,7 +189,10 @@ const HeaderComponent = () => {
                   }}
                 />
               ) : (
-                <UserOutlined style={{ fontSize: "30px" }} />
+                <UserOutlined
+                  style={{ fontSize: "30px" }}
+                  onClick={handleOpenProfile}
+                />
               )}
               {user?.access_token ? (
                 <>
@@ -174,10 +211,7 @@ const HeaderComponent = () => {
                   </Popover>
                 </>
               ) : (
-                <div
-                  onClick={handleNavigateLogin}
-                  style={{ cursor: "pointer" }}
-                >
+                <div onClick={handleOpenSignIn} style={{ cursor: "pointer" }}>
                   <WrapperHeaderTextSmall>
                     Đăng nhập/Đăng ký
                   </WrapperHeaderTextSmall>
@@ -192,17 +226,21 @@ const HeaderComponent = () => {
           <Col
             span={3}
             style={{
-              marginLeft: "-30px",
               display: "flex",
               gap: "20px",
-              alignItems: "left",
             }}
+            className="justify-end"
           >
-            <div onClick={() => navigate("/order")}>
+            <div
+              onClick={() => navigate("/order")}
+              className="flex items-center cursor-pointer"
+            >
               <Badge count={order?.orderItems?.length} size="small">
-                <ShoppingOutlined style={{ fontSize: "30px", color: "#fff" }} />
+                <ShoppingOutlined style={{ fontSize: "34px", color: "#fff" }} />
               </Badge>
-              <WrapperHeaderTextSmall>Giỏ hàng</WrapperHeaderTextSmall>
+              <WrapperHeaderTextSmall className="ml-2">
+                Giỏ hàng
+              </WrapperHeaderTextSmall>
             </div>
           </Col>
         </Row>
@@ -214,6 +252,21 @@ const HeaderComponent = () => {
           );
         })}
       </WrapperType>
+      <Modal open={openSignIn} onCancel={handleCancelSignIn} footer={false}>
+        <SignInPage />
+      </Modal>
+
+      <Modal open={openSignUp} onCancel={handleCancelSignUp} footer={false}>
+        <SignUpPage />
+      </Modal>
+
+      <Modal open={openEmail} onCancel={handleCancelEmail} footer={false}>
+        <Email />
+      </Modal>
+
+      <Modal open={openProfile} onCancel={handleCancelProfile} footer={false}>
+        <ProfileComponent />
+      </Modal>
     </div>
   );
 };
