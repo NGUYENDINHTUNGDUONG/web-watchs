@@ -5,7 +5,7 @@ import {
   EditOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
-import React, { useRef } from "react";
+import React, { useCallback, useMemo, useRef } from "react";
 import { WrapperHeader, WrapperUploadFile } from "./style";
 import TableComponent from "../TableComponent/TableComponent";
 import { useState } from "react";
@@ -132,14 +132,15 @@ const AdminProduct = () => {
     }
     setIsLoadingUpdate(false);
   };
-  const convertImages = (imagePaths = []) => {
+
+  const convertImages = useCallback((imagePaths = []) => {
     return imagePaths.map((path) => {
       return {
         name: path,
         url: `${UPLOAD_BASE_URL}/${path}`,
       };
     });
-  };
+  }, []);
 
   useEffect(() => {
     if (!isModalOpen) {
