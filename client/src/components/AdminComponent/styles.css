@@ -1,5 +1,6 @@
 .modal1 {
   width: 800px !important;
+  top: 55px !important
 }
 .form1 {
   display: grid;
@@ -10,34 +11,34 @@
   grid-column: span 1;
 }
 .form1-2 {
-      grid-column: span 1;
+  grid-column: span 1;
 }
-.form1-submit{
-    margin: 0 !important;
-    text-align: center;
+.form1-submit {
+  margin: 0 !important;
+  text-align: center;
 }
 .form1-submit div div {
-    max-width: 100% !important;
+  max-width: 100% !important;
 }
-.upload-image{
-    cursor: pointer;
-    border: rgb(207, 207, 207);
-    border-style: solid;
-    border-radius: 5px;
-    border-width: 1px;
-    padding: 4px;
+.upload-image {
+  cursor: pointer;
+  border: rgb(207, 207, 207);
+  border-style: solid;
+  border-radius: 5px;
+  border-width: 1px;
+  padding: 4px;
 }
-.images{
-    display: grid;
-    margin: auto;
-    padding-left: 30px;
-    width: 240px;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 5px;
-    grid-template-rows: 80px 80px;
-    justify-content: center;
+.images {
+  display: grid;
+  margin: auto;
+  padding-left: 30px;
+  width: 240px;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 5px;
+  grid-template-rows: 80px 80px;
+  justify-content: center;
 }
-.image-preview{
-    width: 75px;
-    margin: 0 2.5px;
+.image-preview {
+  width: 75px;
+  margin: 0 2.5px;
 }

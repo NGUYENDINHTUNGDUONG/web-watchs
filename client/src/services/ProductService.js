@@ -8,7 +8,15 @@ export const getAllProduct = async (data) => {
   );
   return res.data;
 };
-
+export const getAllSupplier = async () => {
+  const access_token = localStorage.getItem("access_token");
+  const res = await axios.get(`${process.env.REACT_APP_API_URL}/supplier`, {
+    headers: {
+      authorization: `Bearer ${access_token}`,
+    },
+  });
+  return res.data;
+};
 export const getProductType = async (type, page, limit) => {
   if (type) {
     const res = await axios.get(
@@ -75,10 +83,17 @@ export const getAllCaliberProduct = async () => {
   return res.data;
 };
 
-export const getAllBrandsProduct = async () => {
-  const res = await axiosJWT.get(
-    `${process.env.REACT_APP_API_URL}/product/brand`
-  );
+export const getAllBrandsProduct = async (data, access_token) => {
+  const res = await axios.get(`${process.env.REACT_APP_API_URL}/supplier`, {
+    params: data,
+    headers: {
+      authorization: `Bearer ${access_token}`,
+    },
+  });
+  return res.data;
+};
+export const getAllBrands = async () => {
+  const res = await axios.get(`${process.env.REACT_APP_API_URL}/brand`);
   return res.data;
 };
 export const uploadFile = async (data, access_token) => {

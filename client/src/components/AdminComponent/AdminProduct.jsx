@@ -36,7 +36,9 @@ const AdminProduct = () => {
   const [isLoadingUpdate, setIsLoadingUpdate] = useState(false);
   const [isModalOpenDelete, setIsModalOpenDelete] = useState(false);
   const [types, setTypes] = useState([""]);
-  const [brands, setBrands] = useState([""]);
+  const [brands, setBrands] = useState([]);
+  const [suppliers, setSuppliers] = useState([""]);
+  const [brandShow, setBrandShow] = useState([]);
   const [calibers, setCalibers] = useState([""]);
   const user = useSelector((state) => state?.user);
   const searchInput = useRef(null);
@@ -49,12 +51,15 @@ const AdminProduct = () => {
     type: "",
     quantity: "",
     newType: "",
-    newBrand: "",
     newCaliber: "",
     discount: "",
     category: "",
     description: "",
     caliber: "",
+    waterResistant: "",
+    size: "",
+    glass: "",
+    supplier: "",
   });
   const access_token = localStorage.getItem("access_token");
   const [stateProduct, setStateProduct] = useState(inittial());
@@ -112,7 +117,15 @@ const AdminProduct = () => {
     const res = await ProductService.getAllProduct();
     return res;
   };
-
+  const getAllBrands = async () => {
+    const res = await ProductService.getAllBrands();
+    if (res) {
+      setBrandShow(res);
+    }
+  };
+  useEffect(() => {
+    getAllBrands();
+  }, []);
   const fetchGetDetailsProduct = async (rowSelected) => {
     const res = await ProductService.getDetailsProduct(rowSelected);
     if (res?.data) {
@@ -128,19 +141,23 @@ const AdminProduct = () => {
         category: res?.data?.category,
         description: res?.data?.description,
         caliber: res?.data?.caliber,
+        waterResistant: res?.data?.waterResistant,
+        size: res?.data?.size,
+        glass: res?.data?.glass,
       });
+      console.log(res?.data);
     }
     setIsLoadingUpdate(false);
   };
 
-  const convertImages = useCallback((imagePaths = []) => {
-    return imagePaths.map((path) => {
+  const convertImages = useMemo(() => {
+    return stateProductDetails?.images.map((path) => {
       return {
         name: path,
         url: `${UPLOAD_BASE_URL}/${path}`,
       };
     });
-  }, []);
+  }, [stateProductDetails?.images]);
 
   useEffect(() => {
     if (!isModalOpen) {
@@ -195,19 +212,37 @@ const AdminProduct = () => {
     }
   };
   const getAllBrandProduct = async () => {
+    const data = {
+      supplierId: stateProduct.supplier,
+    };
     try {
-      const res = await ProductService.getAllBrandsProduct();
+      const res = await ProductService.getAllBrandsProduct(data, access_token);
       if (res) {
-        setBrands(res);
+        setBrands(res[0].brands);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const getAllSupplier = async () => {
+    try {
+      const res = await ProductService.getAllSupplier();
+      if (res) {
+        setSuppliers(res);
       }
     } catch (error) {
       console.log(error);
     }
   };
   useEffect(() => {
-    getAllBrandProduct();
+    if (stateProduct.supplier) {
+      getAllBrandProduct();
+    }
+  }, [stateProduct.supplier]);
+  useEffect(() => {
     getAllTypeProduct();
     getAllCaliberProduct();
+    getAllSupplier();
   }, [isModalOpen, isOpenDrawer]);
   const { data, isSuccess, isError } = mutation;
   const {
@@ -410,9 +445,14 @@ const AdminProduct = () => {
   const dataTable =
     products?.data?.length &&
     products?.data?.map((product) => {
-      return { ...product, key: product._id };
+      return {
+        ...product,
+        key: product._id,
+        brand: brandShow.filter((item) => item._id === product.brand)[0]?.name,
+      };
     });
-
+ 
+  console.log(brands);
   useEffect(() => {
     if (isSuccess && data?.status === "OK") {
       message.success();
@@ -444,6 +484,10 @@ const AdminProduct = () => {
       category: "",
       description: "",
       caliber: "",
+      waterResistant: "",
+      size: "",
+      glass: "",
+      supplier: "",
     });
     form1.resetFields();
   };
@@ -490,6 +534,10 @@ const AdminProduct = () => {
       category: "",
       description: "",
       caliber: "",
+      waterResistant: "",
+      size: "",
+      glass: "",
+      supplier: "",
     });
     form.resetFields();
   };
@@ -504,17 +552,20 @@ const AdminProduct = () => {
         ? stateProduct.newType
         : stateProduct.type
     );
-    data.append(
-      "brand",
-      stateProduct.brand === "add_brand"
-        ? stateProduct.newBrand
-        : stateProduct.brand
-    );
+    data.append("brand", stateProduct.brand);
     data.append("quantity", stateProduct.quantity);
-    data.append("discount", stateProduct.discount);
+    data.append("waterResistant", stateProduct.waterResistant);
+    data.append("size", stateProduct.size);
+    data.append("glass", stateProduct.glass);
+    data.append("supplier", stateProduct.supplier);
     data.append("category", stateProduct.category);
     data.append("description", stateProduct.description);
-    data.append("caliber", stateProduct.caliber);
+    data.append(
+      "caliber",
+      stateProduct.caliber === "add_caliber"
+        ? stateProduct.newCaliber
+        : stateProduct.caliber
+    );
     stateProduct.images.map((image) => data.append("images", image));
     try {
       const res = await ProductService.createProduct(data, access_token);
@@ -570,16 +621,20 @@ const AdminProduct = () => {
         ? stateProductDetails.newType
         : stateProductDetails.type
     );
-    data.append(
-      "brand",
-      stateProductDetails.brand === "add_brand"
-        ? stateProductDetails.newBrand
-        : stateProductDetails.brand
-    );
+    data.append("brand", stateProductDetails.brand);
     data.append("quantity", stateProductDetails.quantity);
     data.append("category", stateProductDetails.category);
     data.append("description", stateProductDetails.description);
-    data.append("caliber", stateProductDetails.caliber);
+    data.append(
+      "caliber",
+      stateProductDetails.caliber === "add_caliber"
+        ? stateProductDetails.newCaliber
+        : stateProductDetails.caliber
+    );
+    data.append("waterResistant", stateProductDetails.waterResistant);
+    data.append("size", stateProductDetails.size);
+    data.append("glass", stateProductDetails.glass);
+    data.append("supplier", stateProductDetails.supplier);
     stateProductDetails.images.map((image) => data.append("images", image));
     try {
       const res = await ProductService.updateProduct(
@@ -615,7 +670,6 @@ const AdminProduct = () => {
       images: newList,
     });
   };
-
   const onRemove = (file) => {
     const newFileList = stateProduct.images.filter(
       (item) => item.uid !== file.uid
@@ -664,12 +718,91 @@ const AdminProduct = () => {
       brand: value,
     });
   };
+  const handleChangeSelectSupplier = (value) => {
+    setStateProduct({
+      ...stateProduct,
+      supplier: value,
+    });
+  };
+  const handleChangeSelectWaterResistant = (value) => {
+    setStateProduct({
+      ...stateProduct,
+      waterResistant: value,
+    });
+  };
+  const handleChangeSelectSize = (value) => {
+    setStateProduct({
+      ...stateProduct,
+      size: value,
+    });
+  };
+  const handleChangeSelectGlass = (value) => {
+    setStateProduct({
+      ...stateProduct,
+      glass: value,
+    });
+  };
+  const handleChangeSelectSupplierDetails = (value) => {
+    setStateProductDetails({
+      ...stateProductDetails,
+      supplier: value,
+    });
+  };
+  const handleChangeSelectWaterResistantDetails = (value) => {
+    setStateProductDetails({
+      ...stateProductDetails,
+      waterResistant: value,
+    });
+  };
+  const handleChangeSelectSizeDetails = (value) => {
+    setStateProductDetails({
+      ...stateProductDetails,
+      size: value,
+    });
+  };
+  const handleChangeSelectGlassDetails = (value) => {
+    setStateProductDetails({
+      ...stateProductDetails,
+      glass: value,
+    });
+  };
   const handleChangeSelectCaliber = (value) => {
     setStateProduct({
       ...stateProduct,
       caliber: value,
     });
   };
+  const waterResistant = [
+    { value: "3", label: "3ATM (30m)" },
+    { value: "5", label: "5ATM (50m)" },
+    { value: "10", label: "10ATM (100m)" },
+    { value: "20", label: "20ATM (200m)" },
+  ];
+  const brandSelect = brands?.map((brand) => ({
+    value: brand._id,
+    label: brand.name,
+  }));
+  const supplierSelect =
+    suppliers?.map((supplier) => ({
+      value: supplier._id,
+      label: supplier.name,
+    })) || [];
+  const size = [
+    { value: "38", label: "38mm" },
+    { value: "39", label: "39mm" },
+    { value: "40", label: "40mm" },
+    { value: "41", label: "41mm" },
+    { value: "42", label: "42mm" },
+    { value: "43", label: "43mm" },
+    { value: "44", label: "44mm" },
+    { value: "45", label: "45mm" },
+  ];
+  const glass = [
+    { value: "acrylic", label: "Acrylic Crystal" },
+    { value: "mineral", label: "Mineral Crystal" },
+    { value: "hardlex", label: "Hardlex Crystal" },
+    { value: "sapphire", label: "Sapphire Crystal" },
+  ];
 
   return (
     <div>
@@ -698,14 +831,7 @@ const AdminProduct = () => {
         footer={null}
         className="modal1"
       >
-        <Form
-          name="basic"
-          labelCol={{ span: 6 }}
-          wrapperCol={{ span: 18 }}
-          onFinish={onFinish}
-          autoComplete="on"
-          form={form}
-        >
+        <Form name="basic" onFinish={onFinish} autoComplete="on" form={form}>
           <div className="form1">
             <div className="form1-1">
               <Form.Item
@@ -730,6 +856,7 @@ const AdminProduct = () => {
                   value={stateProduct.type}
                   onChange={handleChangeSelect2}
                   options={renderOptions(types?.types)}
+                  placeholder="Select type"
                 />
               </Form.Item>
               {stateProduct.type === "add_type" && (
@@ -744,6 +871,7 @@ const AdminProduct = () => {
                     value={stateProduct.newType}
                     onChange={handleOnchange}
                     name="newType"
+                    placeholder={"New type"}
                   />
                 </Form.Item>
               )}
@@ -782,35 +910,22 @@ const AdminProduct = () => {
                   name="price"
                 />
               </Form.Item>
+
               <Form.Item
-                label="Brand"
-                name="brand"
+                label="Category"
+                name="category"
                 rules={[
-                  { required: true, message: "Please input your brand!" },
+                  {
+                    required: true,
+                    message: "Please input your count category!",
+                  },
                 ]}
               >
-                <Select
-                  name="brand"
-                  value={stateProduct.brand}
-                  onChange={handleChangeSelect1}
-                  options={renderOptions1(brands?.brands)}
-                />
+                <Radio.Group name="category" onChange={handleOnchange}>
+                  <Radio value={"Nữ"}>Nữ</Radio>
+                  <Radio value={"Nam"}>Nam</Radio>
+                </Radio.Group>
               </Form.Item>
-              {stateProduct.brand === "add_brand" && (
-                <Form.Item
-                  label="New Brand"
-                  name="newBrand"
-                  rules={[
-                    { required: true, message: "Please input your brand!" },
-                  ]}
-                >
-                  <InputComponent
-                    value={stateProduct.newBrand}
-                    onChange={handleOnchange}
-                    name="newBrand"
-                  />
-                </Form.Item>
-              )}
               <Form.Item
                 label="Description"
                 name="description"
@@ -826,21 +941,6 @@ const AdminProduct = () => {
                   onChange={handleOnchange}
                   name="description"
                 />
-              </Form.Item>
-              <Form.Item
-                label="Category"
-                name="category"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your count category!",
-                  },
-                ]}
-              >
-                <Radio.Group name="category" onChange={handleOnchange}>
-                  <Radio value={"Nữ"}>Nữ</Radio>
-                  <Radio value={"Nam"}>Nam</Radio>
-                </Radio.Group>
               </Form.Item>
             </div>
             <div className="form1-2">
@@ -859,6 +959,7 @@ const AdminProduct = () => {
                   value={stateProduct.caliber}
                   onChange={handleChangeSelectCaliber}
                   options={renderOptions3(calibers?.calibers)}
+                  placeholder="Caliber"
                 />
               </Form.Item>
               {stateProduct.caliber === "add_caliber" && (
@@ -873,37 +974,123 @@ const AdminProduct = () => {
                     value={stateProduct.newCaliber}
                     onChange={handleOnchange}
                     name="newCaliber"
+                    placeholder={"New Caliber"}
                   />
                 </Form.Item>
               )}
               <Form.Item
-                label="Image"
-                name="image"
+                label="Supplier"
+                name="supplier"
+                rules={[
+                  { required: true, message: "Please input your supplier!" },
+                ]}
+              >
+                <Select
+                  name="supplier"
+                  value={stateProduct.supplier}
+                  onChange={handleChangeSelectSupplier}
+                  options={supplierSelect}
+                  placeholder="Supplier"
+                />
+              </Form.Item>
+              <Form.Item
+                label="Brand"
+                name="brand"
+                rules={[
+                  { required: true, message: "Please input your brand!" },
+                ]}
+              >
+                <Select
+                  name="brand"
+                  value={stateProduct.brand}
+                  onChange={handleChangeSelect1}
+                  options={brandSelect}
+                  placeholder="Brand"
+                />
+              </Form.Item>
+              <Form.Item
+                label="Water Resistant"
+                name="waterResistant"
                 rules={[
                   {
                     required: true,
-                    message: "Please input your count image!",
+                    message: "Please input your Water Resistant!",
                   },
                 ]}
               >
-                <WrapperUploadFile
-                  beforeUpload={() => false}
-                  listType="picture-card"
-                  onRemove={onRemove}
-                  onChange={handleFileChange}
-                  maxCount={6}
-                  fileList={previewImage}
-                >
-                  {stateProduct.images?.length >= 6 ? null : (
-                    <div>
-                      <PlusOutlined />
-                      <div style={{ marginTop: 8 }}>Upload</div>
-                    </div>
-                  )}
-                </WrapperUploadFile>
+                <Select
+                  name="waterResistant"
+                  value={stateProduct.waterResistant}
+                  onChange={handleChangeSelectWaterResistant}
+                  options={waterResistant}
+                  placeholder="Water Resistant"
+                />
+              </Form.Item>
+              <Form.Item
+                label="Size"
+                name="size"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input your Size",
+                  },
+                ]}
+              >
+                <Select
+                  name="size"
+                  value={stateProduct.size}
+                  onChange={handleChangeSelectSize}
+                  options={size}
+                  placeholder="Size"
+                />
+              </Form.Item>
+              <Form.Item
+                label="Glass"
+                name="glass"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input your Glass",
+                  },
+                ]}
+              >
+                <Select
+                  name="glass"
+                  value={stateProduct.glass}
+                  onChange={handleChangeSelectGlass}
+                  options={glass}
+                  placeholder="Glass"
+                />
               </Form.Item>
             </div>
           </div>
+          <Form.Item
+            label="Image"
+            name="image"
+            rules={[
+              {
+                required: true,
+                message: "Please input your count image!",
+              },
+            ]}
+          >
+            <WrapperUploadFile
+              beforeUpload={() => false}
+              listType="picture-card"
+              onRemove={onRemove}
+              onChange={handleFileChange}
+              maxCount={6}
+              fileList={previewImage}
+            >
+              {stateProduct.images?.length >= 6 ? null : (
+                <div>
+                  <PlusOutlined />
+                  <div style={{ marginTop: 8 }}>Upload</div>
+                </div>
+              )}
+            </WrapperUploadFile>
+          </Form.Item>
+
           <Form.Item className="form1-submit">
             <Button type="primary" htmlType="submit">
               Submit
@@ -989,33 +1176,7 @@ const AdminProduct = () => {
                 name="price"
               />
             </Form.Item>
-            <Form.Item
-              label="Brand"
-              name="brand"
-              rules={[{ required: true, message: "Please input your brand!" }]}
-            >
-              <Select
-                name="brand"
-                value={stateProductDetails.brand}
-                onChange={handleChangeSelect3}
-                options={renderOptions1(brands?.brands)}
-              />
-            </Form.Item>
-            {stateProductDetails.brand === "add_brand" && (
-              <Form.Item
-                label="New Brand"
-                name="newBrand"
-                rules={[
-                  { required: true, message: "Please input your brand!" },
-                ]}
-              >
-                <InputComponent
-                  value={stateProductDetails.newBrand}
-                  onChange={handleOnchangeDetails}
-                  name="newBrand"
-                />
-              </Form.Item>
-            )}
+
             <Form.Item
               label="Caliber"
               name="caliber"
@@ -1045,6 +1206,61 @@ const AdminProduct = () => {
                 />
               </Form.Item>
             )}
+
+            <Form.Item
+              label="Water Resistant"
+              name="waterResistant"
+              rules={[
+                {
+                  required: true,
+                  message: "Please input your Water Resistant!",
+                },
+              ]}
+            >
+              <Select
+                name="waterResistant"
+                value={stateProductDetails.waterResistant}
+                onChange={handleChangeSelectWaterResistantDetails}
+                options={waterResistant}
+                placeholder="Water Resistant"
+              />
+            </Form.Item>
+            <Form.Item
+              label="Size"
+              name="size"
+              rules={[
+                {
+                  required: true,
+                  message: "Please input your Size",
+                },
+              ]}
+            >
+              <Select
+                name="size"
+                value={stateProductDetails.size}
+                onChange={handleChangeSelectSizeDetails}
+                options={size}
+                placeholder="Size"
+              />
+            </Form.Item>
+            <Form.Item
+              label="Glass"
+              name="glass"
+              rules={[
+                {
+                  required: true,
+                  message: "Please input your Glass",
+                },
+              ]}
+            >
+              <Select
+                name="glass"
+                value={stateProductDetails.glass}
+                onChange={handleChangeSelectGlassDetails}
+                options={glass}
+                placeholder="Glass"
+              />
+            </Form.Item>
             <Form.Item
               label="Image"
               name="image"
@@ -1067,7 +1283,7 @@ const AdminProduct = () => {
                 onRemove={onRemoveDetails}
                 onChange={handleOnchangeAvatarDetails}
                 maxCount={6}
-                fileList={convertImages(stateProductDetails?.images)}
+                fileList={convertImages}
               >
                 {stateProductDetails.images?.length >= 6 ? null : (
                   <div>

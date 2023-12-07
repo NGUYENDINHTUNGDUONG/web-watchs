@@ -4,8 +4,9 @@ import styled from "styled-components";
 export const WrapperStyleImageSmall = styled(Image)`
   height: 75px !important;
   cursor: pointer;
-  width: 75px;
+  width: 75px !important;
   border: 1px solid #d9d9d9;
+  object-fit: cover;
   border-radius: 4px;
 `;
 

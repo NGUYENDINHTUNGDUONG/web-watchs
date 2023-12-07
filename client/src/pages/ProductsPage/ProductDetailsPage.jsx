@@ -5,10 +5,13 @@ import * as ProductService from "../../services/ProductService";
 import { Carousel } from "antd";
 import CardComponent from "../../components/CardComponent/CardComponent";
 import Comment from "../../components/CommentComponent";
+import { glass, size, waterResistant } from "../../constant/constant";
 
 const ProductDetailsPage = () => {
   const [product, setProduct] = useState();
   const [products, setProducts] = useState();
+  const [brandShow, setBrandShow] = useState([]);
+  const [suppliers, setSuppliers] = useState([]);
   const location = useLocation();
   const pathname = location.pathname;
   const parts = pathname.split("/");
@@ -19,6 +22,14 @@ const ProductDetailsPage = () => {
       setProduct(res?.data);
     }
   };
+  const getAllBrands = async () => {
+    const res = await ProductService.getAllBrands();
+    setBrandShow(res);
+  };
+  const getAllSuppliers = async () => {
+    const res = await ProductService.getAllSupplier();
+    setSuppliers(res);
+  };
   const getAllProducts = async () => {
     const data = {
       brand: product?.brand,
@@ -28,8 +39,11 @@ const ProductDetailsPage = () => {
       setProducts(res?.data);
     }
   };
+  console.log(products, "products");
   useEffect(() => {
     getDetailsProduct();
+    getAllBrands();
+    getAllSuppliers();
   }, []);
   useEffect(() => {
     getAllProducts();
@@ -42,11 +56,22 @@ const ProductDetailsPage = () => {
           description={product?.description}
           rate={product?.rating}
           idProduct={product?._id}
-          brand={product?.brand}
+          brand={
+            brandShow.filter((item) => item._id === product?.brand)[0]?.name
+          }
           name={product?.name}
           images={product?.images}
           price={product?.price}
           quantity={product?.quantity}
+          type={product?.type}
+          category={product?.category}
+          caliber={product?.caliber}
+          waterResistant={waterResistant[product?.waterResistant]}
+          size={size[product?.size]}
+          glass={glass[product?.glass]}
+          supplier={
+            suppliers.filter((item) => item._id === product?.supplier)[0]?.name
+          }
         />
         <div
           style={{
@@ -77,7 +102,10 @@ const ProductDetailsPage = () => {
                   <CardComponent
                     key={index}
                     type={value?.type}
-                    brand={typeof value?.brand === 'object' ? value?.brand.name : value?.brand}
+                    brand={
+                      brandShow.filter((item) => item._id === value.brand)[0]
+                        ?.name
+                    }
                     src={value?.images[0]}
                     name={value?.name}
                     price={value?.price}
@@ -99,7 +127,10 @@ const ProductDetailsPage = () => {
                   <CardComponent
                     key={index}
                     type={value?.type}
-                    brand={value?.brand}
+                    brand={
+                      brandShow.filter((item) => item._id === value?.brand)[0]
+                        ?.name
+                    }
                     src={value?.images[0]}
                     name={value?.name}
                     price={value?.price}

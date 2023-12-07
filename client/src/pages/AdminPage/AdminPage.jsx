@@ -27,6 +27,7 @@ import "./style.css";
 import { useNavigate } from "react-router-dom";
 import OrderAdmin from "../../components/OrderAdmin";
 import AdminCoupon from "../../components/AdminComponent/AdminCoupon";
+import logo from "../../assets/images/Logo-DWatch.svg";
 const AdminPage = () => {
   const [loading, setLoading] = useState(false);
   // const user = useSelector((state) => state?.user);
@@ -121,7 +122,7 @@ const AdminPage = () => {
               <img
                 alt="logo"
                 onClick={() => navigate("/")}
-                src={require("../../assets/images/Logo-DWatch.svg")}
+                src={logo}
               />
             </div>
             <Menu

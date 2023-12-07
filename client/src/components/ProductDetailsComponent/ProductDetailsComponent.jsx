@@ -107,12 +107,17 @@ const ProductDetailsComponent = (props) => {
       >
         <Col
           span={10}
-          style={{ borderRight: "1px solid #e5e5e5", paddingRight: "8px" }}
+          style={{
+            borderRight: "1px solid #e5e5e5",
+            paddingRight: "8px",
+            textAlign: "center",
+          }}
         >
           <Image
             src={`http://localhost:3001/static/${props.images?.[index]}`}
             alt="image product"
             preview={false}
+            className=" !h-[500px] object-cover"
           />
           <Row style={{ paddingTop: "10px", justifyContent: "space-between" }}>
             {props.images?.map((value, index) => (
@@ -127,7 +132,13 @@ const ProductDetailsComponent = (props) => {
             ))}
           </Row>
         </Col>
-        <Col span={14} style={{ paddingLeft: "20px" }}>
+        <Col
+          span={7}
+          style={{
+            borderRight: "1px solid #e5e5e5",
+            padding: "20px",
+          }}
+        >
           <p style={{ display: "flex", alignItems: "center" }}>
             <img
               alt="#"
@@ -236,6 +247,25 @@ const ProductDetailsComponent = (props) => {
                 <div style={{ color: "red" }}>Sản phẩm hết hng</div>
               )}
             </div>
+          </div>
+        </Col>
+        <Col span={7} style={{ paddingLeft: "20px" }}>
+          <div>
+            <p className="font-bold text-2xl">Chi tiết sản phẩm</p>
+            <p className="font-bold text-lg">Loại đồng hồ:</p>
+            <span>{props.category}</span>
+            <p className="font-bold text-lg">Kiểu máy:</p>
+            <span>{props.caliber}</span>
+            <p className="font-bold text-lg">Kiểu dây:</p>
+            <span>{props.type}</span>
+            <p className="font-bold text-lg">Size:</p>
+            <span>{props.size}</span>
+            <p className="font-bold text-lg">Loại kính:</p>
+            <span>{props.glass}</span>
+            <p className="font-bold text-lg">Chống nước:</p>
+            <span>{props.waterResistant}</span>
+            <p className="font-bold text-lg">Nhà phân phối:</p>
+            <span>{props.supplier}</span>
           </div>
         </Col>
       </Row>
