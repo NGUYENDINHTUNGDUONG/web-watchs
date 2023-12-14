@@ -11,6 +11,8 @@ import CardComponent from "../../components/CardComponent/CardComponent";
 import SliderComponent from "../../components/SliderComponent/SliderComponent";
 import { Button } from "antd";
 import FooterComponent from "../../components/FooterComponent/FooterComponent";
+import EventComponent from "../../components/EventComponent/EventComponent";
+import { events } from "./config";
 
 const HomePage = () => {
   return (
@@ -56,21 +58,6 @@ const HomePage = () => {
 
       <div className="text-4xl items-center justify-between font-medium my-10 flex">
         <hr className="w-full ml-32" />
-        <div className="w-full text-center">
-          Khách hàng nói về <br />
-          chúng tôi
-        </div>
-        <hr className="w-full mr-32" />
-      </div>
-      <WrapperProducts>
-        <CardComponent />
-        <CardComponent />
-        <CardComponent />
-        <CardComponent />
-      </WrapperProducts>
-
-      <div className="text-4xl items-center justify-between font-medium my-10 flex">
-        <hr className="w-full ml-32" />
         <div className="w-full text-center">Thẩm định đồng hồ</div>
         <hr className="w-full mr-32" />
       </div>
@@ -81,20 +68,30 @@ const HomePage = () => {
         <CardComponent />
       </WrapperProducts>
 
-      <div className="text-4xl items-center justify-between font-medium my-10 flex">
-        <hr className="w-full ml-32" />
-        <div className="w-full text-center mx-10">
-          Dwatch_Tin tức và <br />
-          sự kiện
+      <div className="grid grid-cols-2 mx-24 gap-5">
+        <div>
+          <div className="text-4xl items-center justify-between font-medium my-10">
+            <div className="w-full text-center mx-10">
+              Dwatch_Tin tức và <br />
+              sự kiện
+            </div>
+            <div className="grid grid-cols-2 gap-5">
+              { events.map((event, index) => (
+                <EventComponent 
+                  key={index}
+                  title={event.title}
+                  content={event.content}
+                  image={event.image}
+                />
+              ))}
+            </div>
+          </div>
+          <div></div>
+
         </div>
-        <hr className="w-full mr-32" />
+        <div></div>
       </div>
-      <WrapperProducts>
-        <CardComponent />
-        <CardComponent />
-        <CardComponent />
-        <CardComponent />
-      </WrapperProducts>
+
       <div
         style={{
           width: "100%",
