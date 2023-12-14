@@ -15,7 +15,6 @@ router.post(
 router.get(
   "/",
   verify.verifyUser,
-  verify.verifyAdmin,
   supplierController.getAllSuppliers
 );
 

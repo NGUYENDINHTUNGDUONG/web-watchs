@@ -1,4 +1,4 @@
-import { Button, Checkbox, Form, Modal } from "antd";
+import { Button, Checkbox, Form, Input, Modal, Select } from "antd";
 import React, { useEffect, useState } from "react";
 import {
   CustomCheckbox,
@@ -19,7 +19,9 @@ import ButtonComponent from "../../components/ButtonComponent/ButtonComponent";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addDiscount,
+  addShippingAddresses,
   decreaseAmount,
+  getListAddresses,
   getListCoupons,
   increaseAmount,
   removeAllOrderProduct,
@@ -37,24 +39,37 @@ import { updateUser } from "../../redux/slides/userSlide";
 import { useNavigate } from "react-router-dom";
 import StepComponent from "../../components/StepComponet/StepComponent";
 import { UPLOAD_BASE_URL } from "../../config";
+import axios from "axios";
 
 const OrderPage = () => {
   const order = useSelector((state) => state.order);
   const user = useSelector((state) => state.user);
 
   const [listChecked, setListChecked] = useState([]);
+  const [updated, setUpdated] = useState(false);
   const [checkCoupon, setCheckCoupon] = useState([]);
   const [isCouponOpen, setIsCouponOpen] = useState(false);
   const [isOpenModalUpdateInfo, setIsOpenModalUpdateInfo] = useState(false);
+  const [maximumDiscountAmount, setMaximumDiscountAmount] = useState();
   const [stateUserDetails, setStateUserDetails] = useState({
     name: "",
     phone: "",
     address: "",
+    email: "",
   });
   const navigate = useNavigate();
   const [form] = Form.useForm();
-
+  const [city, setCity] = useState("");
+  const [address, setAddress] = useState("");
+  const [districts, setDistricts] = useState();
+  const [district, setDistrict] = useState();
+  const [ward, setWard] = useState();
+  const [wards, setWards] = useState();
   const dispatch = useDispatch();
+  const addresses = useSelector((state) => state.order.address);
+  const phone = useSelector((state) => state.order.phone);
+  const email = useSelector((state) => state.order.email);
+  const names = useSelector((state) => state.order.name);
   const onChange = (e) => {
     if (listChecked.includes(e.target.value)) {
       const newListChecked = listChecked.filter(
@@ -65,6 +80,15 @@ const OrderPage = () => {
       setListChecked([...listChecked, e.target.value]);
     }
   };
+  const res = async () => {
+    const res = await axios.get("https://provinces.open-api.vn/api/?depth=3");
+    if (res) {
+      dispatch(getListAddresses({ listCity: res.data }));
+    }
+  };
+  useEffect(() => {
+    res();
+  }, []);
   const onChangeCoupon = (e) => {
     if (checkCoupon.includes(e.target.value)) {
       setCheckCoupon([]);
@@ -75,6 +99,20 @@ const OrderPage = () => {
   const onCancelCoupon = () => {
     setIsCouponOpen(false);
   };
+  useEffect(() => {
+    if (city) {
+      setDistricts(
+        listCity.filter((element) => element.code === city)[0]?.districts
+      );
+    }
+  }, [city]);
+  useEffect(() => {
+    if (district) {
+      setWards(
+        districts.filter((element) => element.code === district)[0]?.wards
+      );
+    }
+  }, [district]);
   const handleChangeCount = (type, idProduct, limited) => {
     if (type === "increase") {
       if (!limited) {
@@ -117,21 +155,17 @@ const OrderPage = () => {
       setListChecked([]);
     }
   };
-
   useEffect(() => {
     dispatch(selectedOrder({ listChecked }));
   }, [listChecked]);
 
   useEffect(() => {
-    form.setFieldsValue(stateUserDetails);
-  }, [form, stateUserDetails]);
-
-  useEffect(() => {
     if (isOpenModalUpdateInfo) {
       setStateUserDetails({
-        fullName: user?.fullName,
-        address: user?.address,
-        phone: user?.phone,
+        name: names,
+        address: addresses,
+        phone: phone,
+        email: email,
       });
     }
   }, [isOpenModalUpdateInfo]);
@@ -139,12 +173,12 @@ const OrderPage = () => {
   useEffect(() => {
     const res = listCoupons?.filter((coupon) => coupon._id === checkCoupon[0]);
     const discount = res[0]?.discountPercent;
+    setMaximumDiscountAmount(res[0]?.maximumDiscountAmount);
     if (discount) {
       dispatch(addDiscount({ discount: discount / 100 }));
     }
   }, [checkCoupon]);
   const result = useSelector((state) => state.order.discount);
-  console.log("result", result);
   const handleChangeAddress = () => {
     setIsOpenModalUpdateInfo(true);
   };
@@ -154,17 +188,18 @@ const OrderPage = () => {
       return total + cur.price * cur.amount;
     }, 0);
     return result;
-  }, [order]);
+  }, [order,checkCoupon]);
 
   const priceDiscountMemo = useMemo(() => {
     const total = result * priceMemo;
-    if (Number(total)) {
+    if (Number(total) && Number(total) < Number(maximumDiscountAmount)) {
       return total;
+    } else if (Number(total) > Number(maximumDiscountAmount)) {
+      return maximumDiscountAmount;
     }
     return 0;
-  }, [order]);
-
-  console.log(priceDiscountMemo, "priceDiscountMemo");
+  }, [order,checkCoupon]);
+  const listCity = useSelector((state) => state.order.listCity);
   const diliveryPriceMemo = useMemo(() => {
     if (priceMemo >= 200000 && priceMemo < 500000) {
       return 10000;
@@ -190,7 +225,7 @@ const OrderPage = () => {
   const handleAddCard = () => {
     if (!order?.orderItemsSlected?.length) {
       message.error("Vui lòng chọn sản phẩm");
-    } else if (!user?.phone || !user.address || !user.fullName) {
+    } else if (!phone || !addresses || !names || !email) {
       setIsOpenModalUpdateInfo(true);
     } else {
       navigate("/payment");
@@ -210,27 +245,43 @@ const OrderPage = () => {
       name: "",
       email: "",
       phone: "",
-      isAdmin: false,
+      address: "",
     });
     form.resetFields();
+    setUpdated(false);
     setIsOpenModalUpdateInfo(false);
   };
 
-  const handleUpdateInforUser = () => {
-    const { name, address, phone } = stateUserDetails;
-    if (name && address && phone) {
-      mutationUpdate.mutate(
-        { id: user?.id, token: user?.access_token, ...stateUserDetails },
-        {
-          onSuccess: () => {
-            dispatch(updateUser({ name, address, phone }));
-            setIsOpenModalUpdateInfo(false);
-          },
-        }
+  const handleAddress = () => {
+    if (city && district && ward) {
+      dispatch(
+        addShippingAddresses({
+          address: [city, district, ward, address],
+          name: user?.fullName,
+          email: user?.email,
+          phone: user?.phone,
+        })
       );
+
+      setIsOpenModalUpdateInfo(false);
     }
   };
-
+  const handleUpdateInforUser = () => {
+    const { name, address, phone, email } = stateUserDetails;
+    if (name && phone && address && email) {
+      dispatch(
+        addShippingAddresses({
+          address: address,
+          name: name,
+          email: email,
+          phone: phone,
+        })
+      );
+      setIsOpenModalUpdateInfo(false);
+      setUpdated(true);
+      form.resetFields();
+    }
+  };
   const handleOnchangeDetails = (e) => {
     setStateUserDetails({
       ...stateUserDetails,
@@ -426,17 +477,41 @@ const OrderPage = () => {
           <WrapperRight>
             <div style={{ width: "100%" }}>
               <WrapperInfo>
-                <div>
-                  <span>Địa chỉ: </span>
-                  <span style={{ fontWeight: "bold" }}>
-                    {`${user?.address} `}{" "}
+                <div className="flex flex-col">
+                  <span>
+                    Địa chỉ:{" "}
+                    <span
+                      onClick={handleChangeAddress}
+                      style={{ color: "#9255FD", cursor: "pointer" }}
+                    >
+                      Chọn
+                    </span>
                   </span>
-                  <span
-                    onClick={handleChangeAddress}
-                    style={{ color: "#9255FD", cursor: "pointer" }}
-                  >
-                    Thay đổi
-                  </span>
+
+                  {addresses.length > 0 ? (
+                    <span style={{ fontWeight: "bold" }}>
+                      {`${
+                        listCity.filter(
+                          (item) => item?.code === addresses[0]
+                        )[0]?.name
+                      } - ${
+                        listCity
+                          ?.filter((item) => item?.code === addresses[0])?.[0]
+                          ?.districts.filter(
+                            (item) => item?.code === addresses[1]
+                          )?.[0]?.name
+                      } - ${
+                        listCity
+                          ?.filter((item) => item?.code === addresses[0])?.[0]
+                          ?.districts.filter(
+                            (item) => item?.code === addresses[1]
+                          )?.[0]
+                          ?.wards.filter(
+                            (item) => item?.code === addresses[2]
+                          )?.[0]?.name
+                      } - ${addresses[3]}`}
+                    </span>
+                  ) : null}
                 </div>
               </WrapperInfo>
               <WrapperInfo>
@@ -559,48 +634,75 @@ const OrderPage = () => {
         title="Cập nhật thông tin giao hàng"
         open={isOpenModalUpdateInfo}
         onCancel={handleCancleUpdate}
-        onOk={handleUpdateInforUser}
+        onOk={handleAddress}
       >
         <Form
           name="basic"
-          labelCol={{ span: 4 }}
-          wrapperCol={{ span: 20 }}
-          // onFinish={onUpdateUser}
+          layout="vertical"
+          //   onFinish={onUpdateUser}
           autoComplete="on"
           form={form}
         >
           <Form.Item
-            label="Name"
-            name="name"
-            rules={[{ required: true, message: "Please input your name!" }]}
+            label="Tỉnh/Thành phố"
+            name="city"
+            rules={[{ required: true, message: "Please input your  city!" }]}
           >
-            <InputComponent
-              value={stateUserDetails["name"]}
-              onChange={handleOnchangeDetails}
-              name="name"
-            />
+            <Select
+              placeholder="Tình/Thành phố"
+              options={listCity?.map((city) => ({
+                value: city.code,
+                label: city.name,
+              }))}
+              onChange={(value) => {
+                setCity(value);
+              }}
+              value={city}
+            ></Select>
           </Form.Item>
           <Form.Item
-            label="Phone"
-            name="phone"
-            rules={[{ required: true, message: "Please input your  phone!" }]}
-          >
-            <InputComponent
-              value={stateUserDetails.phone}
-              onChange={handleOnchangeDetails}
-              name="phone"
-            />
-          </Form.Item>
-
-          <Form.Item
-            label="Adress"
-            name="address"
+            label="Quận/Huyện"
+            name="district"
             rules={[{ required: true, message: "Please input your  address!" }]}
           >
-            <InputComponent
-              value={stateUserDetails.address}
-              onChange={handleOnchangeDetails}
-              name="address"
+            <Select
+              placeholder="Quận/Huyện"
+              options={districts?.map((city) => ({
+                value: city.code,
+                label: city.name,
+              }))}
+              onChange={(value) => {
+                setDistrict(value);
+              }}
+              value={district}
+            ></Select>
+          </Form.Item>
+          <Form.Item
+            label="Xã/Phường"
+            name="ward"
+            rules={[{ required: true, message: "Please input your ward!" }]}
+          >
+            <Select
+              placeholder="Xã/Phường"
+              options={wards?.map((city) => ({
+                value: city.code,
+                label: city.name,
+              }))}
+              onChange={(value) => {
+                setWard(value);
+              }}
+              value={ward}
+            ></Select>
+          </Form.Item>
+          <Form.Item
+            label="Số nhà"
+            name="address"
+            rules={[{ required: true, message: "Please input your address!" }]}
+          >
+            <Input
+              placeholder="Số nhà"
+              onChange={(e) => setAddress(e.target.value)}
+              value={address}
             />
           </Form.Item>
         </Form>
@@ -642,7 +744,9 @@ const OrderPage = () => {
                 })}
         </Checkbox.Group>
         <div className="text-right">
-          <Button className="mt-3" onClick={() => setIsCouponOpen(false)}>Ok</Button>
+          <Button className="mt-3" onClick={() => setIsCouponOpen(false)}>
+            Ok
+          </Button>
         </div>
       </Modal>
     </div>

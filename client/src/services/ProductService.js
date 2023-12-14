@@ -8,8 +8,7 @@ export const getAllProduct = async (data) => {
   );
   return res.data;
 };
-export const getAllSupplier = async () => {
-  const access_token = localStorage.getItem("access_token");
+export const getAllSupplier = async (access_token) => {
   const res = await axios.get(`${process.env.REACT_APP_API_URL}/supplier`, {
     headers: {
       authorization: `Bearer ${access_token}`,

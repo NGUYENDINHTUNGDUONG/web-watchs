@@ -1,4 +1,4 @@
-import { Cascader, Form, Radio, Select } from "antd";
+import { Cascader, Form, Input, Radio, Select } from "antd";
 import React, { useEffect, useState } from "react";
 import {
   Lable,
@@ -21,6 +21,7 @@ import * as message from "../../components/Message/Message";
 import { updateUser } from "../../redux/slides/userSlide";
 import { useNavigate } from "react-router-dom";
 import {
+  addShippingAddresses,
   getListAddresses,
   removeAllOrderProduct,
 } from "../../redux/slides/orderSlide";
@@ -34,6 +35,12 @@ const PaymentPage = () => {
   const user = useSelector((state) => state.user);
 
   const [delivery, setDelivery] = useState("fast");
+  const [city, setCity] = useState("");
+  const [address, setAddress] = useState("");
+  const [districts, setDistricts] = useState();
+  const [district, setDistrict] = useState();
+  const [ward, setWard] = useState();
+  const [wards, setWards] = useState();
   const [payment, setPayment] = useState("later_money");
   const navigate = useNavigate();
   const [sdkReady, setSdkReady] = useState(false);
@@ -49,10 +56,6 @@ const PaymentPage = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    form.setFieldsValue(stateUserDetails);
-  }, [form, stateUserDetails]);
-
-  useEffect(() => {
     if (isOpenModalUpdateInfo) {
       setStateUserDetails({
         fullName: user?.fullName,
@@ -62,7 +65,6 @@ const PaymentPage = () => {
     }
   }, [isOpenModalUpdateInfo]);
 
-  console.log(order, "order");
   const handleChangeAddress = () => {
     setIsOpenModalUpdateInfo(true);
   };
@@ -99,16 +101,19 @@ const PaymentPage = () => {
     );
   }, [priceMemo, priceDiscountMemo, diliveryPriceMemo]);
   const access_token = localStorage.getItem("access_token");
-  const addresses = useSelector((state) => state.order);
-  console.log(addresses, "addresses");
+  const addresses = useSelector((state) => state.order.address);
+  const name = useSelector((state) => state.order.name);
+  const phone = useSelector((state) => state.order.phone);
+  const email = useSelector((state) => state.order.email);
+  console.log(email, name, addresses);
   const handleAddOrder = () => {
     if (
       access_token &&
       order?.orderItemsSlected &&
-      user?.fullName &&
-      user?.address &&
-      user?.phone &&
-      user?.id
+      name &&
+      addresses &&
+      phone &&
+      email
     ) {
       // eslint-disable-next-line no-unused-expressions
       mutationAddOrder.mutate({
@@ -116,10 +121,10 @@ const PaymentPage = () => {
         orderItem: order?.orderItemsSlected,
 
         shippingAddress: {
-          fullName: user?.fullName,
-          address: user?.address,
-          country: "vntest",
-          phone: user?.phone,
+          fullName: name,
+          address: addresses,
+          phone: phone,
+          email: email,
         },
 
         paymentMethod: payment,
@@ -128,13 +133,11 @@ const PaymentPage = () => {
       });
     }
   };
-
   const mutationUpdate = useMutationHooks((data) => {
     const { id, ...rests } = data;
     const res = UserService.updateUser(id, { ...rests });
     return res;
   });
-
   const mutationAddOrder = useMutationHooks((data) => {
     const { token, ...rests } = data;
     const res = OrderService.createOrder({ ...rests }, token);
@@ -148,7 +151,20 @@ const PaymentPage = () => {
     isSuccess,
     isError,
   } = mutationAddOrder;
-
+  useEffect(() => {
+    if (city) {
+      setDistricts(
+        listCity.filter((element) => element.code === city)[0]?.districts
+      );
+    }
+  }, [city]);
+  useEffect(() => {
+    if (district) {
+      setWards(
+        districts.filter((element) => element.code === district)[0]?.wards
+      );
+    }
+  }, [district]);
   useEffect(() => {
     if (isSuccess && dataAdd?.message === "Order success") {
       const arrayOrdered = [];
@@ -170,9 +186,6 @@ const PaymentPage = () => {
     }
   }, [isSuccess, isError]);
 
-  const onChange = (value) => {
-    console.log(value);
-  };
   const handleCancleUpdate = () => {
     setStateUserDetails({
       fullName: "",
@@ -183,7 +196,7 @@ const PaymentPage = () => {
     form.resetFields();
     setIsOpenModalUpdateInfo(false);
   };
-
+  const listCity = useSelector((state) => state.order.listCity);
   const onSuccessPaypal = () => {
     mutationAddOrder.mutate({
       token: access_token,
@@ -214,7 +227,20 @@ const PaymentPage = () => {
       );
     }
   };
+  const handleAddress = () => {
+    if (city && district && ward) {
+      dispatch(
+        addShippingAddresses({
+          address: [city, district, ward, address],
+          name: user?.fullName,
+          email: user?.email,
+          phone: user?.phone,
+        })
+      );
 
+      setIsOpenModalUpdateInfo(false);
+    }
+  };
   const handleOnchangeDetails = (e) => {
     setStateUserDetails({
       ...stateUserDetails,
@@ -229,36 +255,16 @@ const PaymentPage = () => {
     setPayment(e.target.value);
   };
 
-  //   const addPaypalScript = async () => {
-  //     const { data } = await PaymentService.getConfig()
-  //     const script = document.createElement('script')
-  //     script.type = 'text/javascript'
-  //     script.src = `https://www.paypal.com/sdk/js?client-id=${data}`
-  //     script.async = true;
-  //     script.onload = () => {
-  //       setSdkReady(true)
-  //     }
-  //     document.body.appendChild(script)
-  //   }
-
   const res = async () => {
-    const res = await axios.get("https://provinces.open-api.vn/api/?depth=1");
+    const res = await axios.get("https://provinces.open-api.vn/api/?depth=3");
     if (res) {
       dispatch(getListAddresses({ listCity: res.data }));
     }
   };
-  const listCity = useSelector((state) => state.order.listCity);
   useEffect(() => {
     setSdkReady(true);
     res();
   }, []);
-  console.log(
-    listCity?.map((value) => ({
-      value: value.name,
-      label: value.name,
-    })),
-    "listCity"
-  );
 
   return (
     <div style={{ background: "#f5f5fa", with: "100%", height: "100vh" }}>
@@ -302,17 +308,79 @@ const PaymentPage = () => {
           <WrapperRight>
             <div style={{ width: "100%" }}>
               <WrapperInfo>
-                <div>
-                  <span>Địa chỉ: </span>
-                  <span style={{ fontWeight: "bold" }}>
-                    {`${user?.address} `}{" "}
-                  </span>
+                <div className="flex flex-col">
+                  <span>Tên người:</span>
                   <span
-                    onClick={handleChangeAddress}
-                    style={{ color: "#9255FD", cursor: "pointer" }}
+                    style={{
+                      color: "#000",
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                    }}
                   >
-                    Thay đổi
+                    {user?.fullName}
                   </span>
+                </div>
+                <div className="flex flex-col">
+                  <span>Địện thoại:</span>
+                  <span
+                    style={{
+                      color: "#000",
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    0{user?.phone}
+                  </span>
+                </div>
+                <div className="flex flex-col">
+                  <span>Email:</span>
+                  <span
+                    style={{
+                      color: "#000",
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {user?.email}
+                  </span>
+                </div>
+                <div className="flex flex-col">
+                  <span>
+                    Địa chỉ:{" "}
+                    <span
+                      onClick={handleChangeAddress}
+                      style={{
+                        color: "#ff3945",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Thay đổi
+                    </span>{" "}
+                  </span>
+                  {addresses.length > 0 ? (
+                    <span style={{ fontWeight: "bold" }}>
+                      {`${
+                        listCity.filter(
+                          (item) => item?.code === addresses[0]
+                        )[0]?.name
+                      } - ${
+                        listCity
+                          ?.filter((item) => item?.code === addresses[0])?.[0]
+                          ?.districts.filter(
+                            (item) => item?.code === addresses[1]
+                          )?.[0]?.name
+                      } - ${
+                        listCity
+                          ?.filter((item) => item?.code === addresses[0])?.[0]
+                          ?.districts.filter(
+                            (item) => item?.code === addresses[1]
+                          )?.[0]
+                          ?.wards.filter(
+                            (item) => item?.code === addresses[2]
+                          )?.[0]?.name
+                      } - ${addresses[3]}`}
+                    </span>
+                  ) : null}
                 </div>
               </WrapperInfo>
               <WrapperInfo>
@@ -432,63 +500,84 @@ const PaymentPage = () => {
             )}
           </WrapperRight>
         </div>
-        <button>tyetsts</button>
       </div>
       <ModalComponent
         title="Cập nhật thông tin giao hàng"
         open={isOpenModalUpdateInfo}
         onCancel={handleCancleUpdate}
-        onOk={handleUpdateInforUser}
+        onOk={handleAddress}
       >
         <Form
           name="basic"
-          labelCol={{ span: 4 }}
-          wrapperCol={{ span: 20 }}
+          layout="vertical"
           //   onFinish={onUpdateUser}
           autoComplete="on"
           form={form}
         >
           <Form.Item
-            label="Name"
-            name="fullName"
-            rules={[
-              { required: true, message: "Please input your full name!" },
-            ]}
-          >
-            <InputComponent
-              value={stateUserDetails["fullName"]}
-              onChange={handleOnchangeDetails}
-              name="fullName"
-            />
-          </Form.Item>
-
-          <Form.Item
-            label="Phone"
-            name="phone"
-            rules={[{ required: true, message: "Please input your  phone!" }]}
-          >
-            <InputComponent
-              value={stateUserDetails.phone}
-              onChange={handleOnchangeDetails}
-              name="phone"
-            />
-          </Form.Item>
-
-          <Form.Item
-            label="Adress"
-            name="address"
-            rules={[{ required: true, message: "Please input your  address!" }]}
+            label="Tỉnh/Thành phố"
+            name="city"
+            rules={[{ required: true, message: "Please input your  city!" }]}
           >
             <Select
+              placeholder="Tình/Thành phố"
               options={listCity?.map((city) => ({
                 value: city.code,
                 label: city.name,
               }))}
+              onChange={(value) => {
+                setCity(value);
+              }}
+              value={city}
             ></Select>
+          </Form.Item>
+          <Form.Item
+            label="Quận/Huyện"
+            name="district"
+            rules={[{ required: true, message: "Please input your  address!" }]}
+          >
+            <Select
+              placeholder="Quận/Huyện"
+              options={districts?.map((city) => ({
+                value: city.code,
+                label: city.name,
+              }))}
+              onChange={(value) => {
+                setDistrict(value);
+              }}
+              value={district}
+            ></Select>
+          </Form.Item>
+          <Form.Item
+            label="Xã/Phường"
+            name="ward"
+            rules={[{ required: true, message: "Please input your ward!" }]}
+          >
+            <Select
+              placeholder="Xã/Phường"
+              options={wards?.map((city) => ({
+                value: city.code,
+                label: city.name,
+              }))}
+              onChange={(value) => {
+                setWard(value);
+              }}
+              value={ward}
+            ></Select>
+          </Form.Item>
+          <Form.Item
+            label="Số nhà"
+            name="address"
+            rules={[{ required: true, message: "Please input your address!" }]}
+          >
+            <Input
+              placeholder="Số nhà"
+              onChange={(e) => setAddress(e.target.value)}
+              value={address}
+            />
           </Form.Item>
         </Form>
       </ModalComponent>
-      {/* </Loading> */}
     </div>
   );
 };

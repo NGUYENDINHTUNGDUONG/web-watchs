@@ -16,18 +16,21 @@ const ProductDetailsPage = () => {
   const pathname = location.pathname;
   const parts = pathname.split("/");
   const id = parts.pop();
+  const access_token = localStorage.getItem("access_token");
+
   const getDetailsProduct = async () => {
     const res = await ProductService.getDetailsProduct(id);
     if (res?.data) {
       setProduct(res?.data);
     }
   };
+  console.log(suppliers);
   const getAllBrands = async () => {
     const res = await ProductService.getAllBrands();
     setBrandShow(res);
   };
   const getAllSuppliers = async () => {
-    const res = await ProductService.getAllSupplier();
+    const res = await ProductService.getAllSupplier(access_token);
     setSuppliers(res);
   };
   const getAllProducts = async () => {
@@ -39,7 +42,6 @@ const ProductDetailsPage = () => {
       setProducts(res?.data);
     }
   };
-  console.log(products, "products");
   useEffect(() => {
     getDetailsProduct();
     getAllBrands();
@@ -48,7 +50,6 @@ const ProductDetailsPage = () => {
   useEffect(() => {
     getAllProducts();
   }, [product?.brand]);
-  console.log(product, "rrrrr");
   return (
     <div style={{ width: "100%" }}>
       <div style={{ width: "85%", margin: "0 auto" }}>
@@ -70,7 +71,7 @@ const ProductDetailsPage = () => {
           size={size[product?.size]}
           glass={glass[product?.glass]}
           supplier={
-            suppliers.filter((item) => item._id === product?.supplier)[0]?.name
+            suppliers?.filter((item) => item._id === product?.supplier)[0]?.name
           }
         />
         <div

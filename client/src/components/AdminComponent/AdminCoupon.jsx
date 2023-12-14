@@ -26,16 +26,16 @@ export default function AdminCoupon() {
   const onFinish = async (values) => {
     const data = {
       code: values.code,
-      startDate: moment(values.date?.[0]).toDate(),
-      expiredDate: moment(values.date?.[1]).toDate(),
+      startDate: values.date?.[0],
+      expiredDate: values.date?.[1],
       discountPercent: values.discountPercent,
       minimumPurchaseAmount: values.minimumPurchaseAmount,
       maximumDiscountAmount: values.maximumDiscountAmount,
     };
     const res = await PaymentService.createCoupon(data, access_token);
     if (res) {
-      console.log(res);
       form.resetFields();
+      getAllCoupons();
     }
     setIsOpen(false);
   };
@@ -166,7 +166,8 @@ export default function AdminCoupon() {
       title: "Expired Date",
       dataIndex: "expiredDate",
       render: (text) => moment(text).format("DD/MM/YYYY"),
-      sorter: (a, b) => moment(a.expiredDate).unix() - moment(b.expiredDate).unix(),
+      sorter: (a, b) =>
+        moment(a.expiredDate).unix() - moment(b.expiredDate).unix(),
     },
     {
       title: "Discount Percent (%)",
@@ -197,6 +198,7 @@ export default function AdminCoupon() {
         key: coupon._id,
       };
     });
+
   return (
     <div>
       <WrapperHeader>Quản lý mã giảm giá</WrapperHeader>

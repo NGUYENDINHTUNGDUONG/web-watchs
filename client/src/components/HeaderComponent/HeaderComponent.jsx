@@ -67,7 +67,7 @@ const HeaderComponent = () => {
   const openSignUp = useSelector((state) => state.user.modalSignUp);
 
   const openEmail = useSelector((state) => state.user.modalEmail);
-
+console.log(user)
   const handleLogout = async () => {
     setLoading(true);
     await UserService.logoutUser();
@@ -75,6 +75,7 @@ const HeaderComponent = () => {
     setLoading(false);
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
+    navigate("/");
   };
 
   const handleOpenProfile = () => {
@@ -169,7 +170,6 @@ const HeaderComponent = () => {
           <Col
             span={4}
             style={{
-              padding: "0 50px",
               display: "flex",
               gap: "20px",
               alignItems: "center",

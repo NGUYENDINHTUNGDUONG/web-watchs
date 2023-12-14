@@ -34,9 +34,9 @@ const NavBarComponent = () => {
     }
   };
   const getAllBrandProduct = async () => {
-    const res = await ProductService.getAllBrandsProduct();
+    const res = await ProductService.getAllBrands();
     if (res) {
-      setBrands(res.brands);
+      setBrands(res);
     }
   };
 
@@ -174,8 +174,8 @@ const NavBarComponent = () => {
           >
             {options.map((option,index) => {
               return (
-                <Checkbox key={index} style={{ marginLeft: 0 }} value={option}>
-                  {option}
+                <Checkbox key={index} style={{ marginLeft: 0 }} value={option.name}>
+                  {option.name}
                 </Checkbox>
               );
             })}
