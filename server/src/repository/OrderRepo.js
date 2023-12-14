@@ -8,9 +8,9 @@ const getAllOrders = async (filters) => {
 	return await Order.find(filters);
 };
 
-const createOrder = async (order) => {
+const createOrder = async (order, session) => {
 	const newOrder = new Order(order);
-	return await newOrder.save();
+	return await newOrder.save({session});
 };
 
 const updateOrder = async (orderId, status) => {

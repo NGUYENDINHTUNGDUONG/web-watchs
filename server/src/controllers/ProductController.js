@@ -135,29 +135,46 @@ const deleteProduct = async (req, res, next) => {
 };
 const createReview = async (req, res, next) => {
 	try {
+		const {_id: userId, fullName} = req.payload;
 		const productId = req.params.id;
+		const {comment, star, orderId} = req.body;
 		const product = await ProductRepo.findProduct({_id: productId});
 		if (!product) {
 			return res.status(400).json({message: 'Product not found'});
 		}
-		if (product.reviews.find((review) => review.userId === req.payload.id)) {
-			return res
-				.status(400)
-				.json({message: 'You have already reviewed this product'});
-		}
+		product.reviews = product.reviews.filter(
+			(review) => review.userId.toString() !== userId.toString()
+		);
+		const review = {
+			userId,
+			fullName,
+			comment,
+			star,
+		};
+		product.reviews.push(review);
 
-		const review = await ProductRepo.createReview({
-			productId,
-			userId: req.payload.id,
-			fullName: req.payload.fullName,
-			...req.body,
-		});
-		const newProduct = await ProductRepo.findProduct({_id: productId});
-		newProduct.numReviews += 1;
-		newProduct.rating =
-			newProduct.reviews.reduce((total, review) => total + review.star, 0) /
-			newProduct.numReviews;
-		await newProduct.save();
+		product.numReviews = product.reviews.length;
+		product.rating =
+			product.reviews.reduce((total, review) => total + review.star, 0) /
+			product.numReviews;
+		await product.save();
+		console.log({orderId});
+		const a = await Order.findOneAndUpdate(
+			{_id: orderId},
+			{
+				$set: {
+					'orderItem.$[element].isReview': true,
+				},
+			},
+			{
+				arrayFilters: [
+					{
+						'element._id': productId,
+					},
+				],
+			}
+		);
+
 		return res.status(200).json({message: 'Review created', data: review});
 	} catch (error) {
 		next(error);
@@ -174,24 +191,25 @@ const getAllTypes = async (req, res, next) => {
 	}
 };
 
-const getTopSoldLastMonth = async (req, res, next) => {
+const statistic = async (req, res, next) => {
 	try {
-		const today = new Date();
-		const endDate = new Date(
-			today.getFullYear(),
-			today.getMonth(),
-			today.getDate()
-		);
+		const {month} = req.params;
+		const startDate =
+			month === 'current'
+				? getStartDateOfCurrentMonth()
+				: getStartDateOfLasttMonth();
+		const endDate =
+			month === 'current' ? new Date() : getStartDateOfCurrentMonth();
 
-		const startDate = new Date(endDate.getTime()).setMonth(today.getMonth() - 1);
-
-		const lastMonthOrders = await Order.find({
+		const orders = await Order.find({
 			createdAt: {$gte: startDate, $lte: endDate},
 		});
 
 		const productSales = {};
-		lastMonthOrders.forEach((order) => {
+		let revenue = 0;
+		orders.forEach((order) => {
 			order.orderItem.forEach((item) => {
+				revenue += item.totalPrice;
 				const productId = item._id;
 				if (productSales[productId]) {
 					productSales[productId] += item.amount;
@@ -201,17 +219,21 @@ const getTopSoldLastMonth = async (req, res, next) => {
 			});
 		});
 
-		const sortedProductIds = Object.keys(productSales).sort(
-			(a, b) => productSales[b] - productSales[a]
-		);
+		const productIds = Object.keys(productSales);
+		console.log(productIds);
+		let products = await ProductModel.find({_id: {$in: productIds}}).lean();
 
-		const sortedProducts = await ProductModel.aggregate([
-			{
-				$match: {
-					_id: {$in: sortedProductIds},
-				},
-			},
-		]);
+		products = products.map((product) => ({
+			...product,
+			soldLastMonth: productSales[product._id],
+		}));
+		products.sort((a, b) => {
+			return b.soldLastMonth - a.soldLastMonth;
+		});
+		res.status(200).json({
+			products,
+			revenue,
+		});
 	} catch (error) {
 		next(error);
 	}
@@ -227,4 +249,21 @@ module.exports = {
 	updateProduct,
 	deleteProduct,
 	getAllTypes,
+	statistic,
+};
+
+const getStartDateOfCurrentMonth = () => {
+	const a = new Date();
+	const year = a.getUTCFullYear();
+	const month = a.getUTCMonth();
+	const startMonth = new Date(Date.UTC(year, month, 0));
+	return startMonth;
+};
+
+const getStartDateOfLasttMonth = () => {
+	const a = new Date();
+	const year = a.getUTCFullYear();
+	const month = a.getUTCMonth() - 1;
+	const startMonth = new Date(Date.UTC(year, month, 0));
+	return startMonth;
 };

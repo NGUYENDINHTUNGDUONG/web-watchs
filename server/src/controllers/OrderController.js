@@ -1,3 +1,5 @@
+const mongoose = require('mongoose');
+
 const OrderRepo = require('../repository/OrderRepo');
 const ProductRepo = require('../repository/ProductRepo');
 const UserRepo = require('../repository/userRepo');
@@ -41,30 +43,51 @@ const updateOrder = async (req, res, next) => {
 
 // --User
 const createOrder = async (req, res, next) => {
+	const session = await mongoose.startSession();
+
 	try {
-		const order = await OrderRepo.createOrder({
-			...req.body,
-			userId: req.payload._id,
-			fullName: req.payload.fullName,
-		});
+		session.startTransaction();
+
+		const order = await OrderRepo.createOrder(
+			{
+				...req.body,
+				userId: req.payload._id,
+				fullName: req.payload.fullName,
+			},
+			session
+		);
 		if (!order) {
 			return res.status(400).json({message: 'Order not found'});
 		}
-		await UserRepo.increseOrderNumber(req.payload._id);
+		await UserRepo.increseOrderNumber(req.payload._id, 1, session);
+
 		const listProductNames = order.orderItem.map((item) => item.name);
-		order.orderItem.forEach(async (item) => {
-			await ProductRepo.updateAmountProduct(item.id, item.amount);
-		});
+		// order.orderItem.forEach(async (item) => {
+		// 	await ProductRepo.updateAmountProduct(item.id, item.amount, session);
+		// });
+
+		for (let item of order.orderItem) {
+			await ProductRepo.updateAmountProduct(item.id, -item.amount, session);
+			await ProductRepo.updateSoldProduct(item.id, item.amount, session);
+		}
+
+		await session.commitTransaction();
+
 		void Mail.sendEmailCreateOrderProduct({
 			fullName: req.payload.fullName,
 			email: req.payload.email,
 			orderId: order.id,
 			listProductNames,
-			amount,
-		});
+			// amount,
+		}).catch((err) => console.log(err));
+
 		return res.status(200).json({message: 'Order success', data: order});
 	} catch (error) {
+		await session.abortTransaction();
+		res.statusCode = 400;
 		next(error);
+	} finally {
+		await session.endSession();
 	}
 };
 

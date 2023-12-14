@@ -10,11 +10,13 @@ const orderSchema = new mongoose.Schema(
 				image: {type: String, required: true},
 				price: {type: Number, required: true},
 				product: {
+					type: String,
 					// join bảng Product
-					type: mongoose.Schema.Types.ObjectId,
-					ref: 'Product',
-					required: true,
+					// type: mongoose.Schema.Types.ObjectId,
+					// ref: 'Product',
+					// required: true,
 				},
+				isReview: {type: Boolean, default: false},
 			},
 		],
 		shippingAddress: {

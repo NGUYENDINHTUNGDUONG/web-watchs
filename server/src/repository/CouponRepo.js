@@ -5,12 +5,12 @@ const createCoupon = async (data) => {
 	return await newCoupon.save();
 };
 const getAllCoupons = async (userId) => {
-	const coupons = await Coupon.findAll({
+	const coupons = await Coupon.find({
 		startDate: {
-			$gte: new Date(),
+			$lte: new Date(),
 		},
 		expiredDate: {
-			$lte: new Date(),
+			$gte: new Date(),
 		},
 		used: {$ne: userId},
 	});

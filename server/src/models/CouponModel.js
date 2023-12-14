@@ -8,8 +8,8 @@ const couponSchema = new mongoose.Schema(
 			required: true,
 		},
 		expiredDate: {
-			type: Date,
-			required: true,
+			type: Number,
+			default: 0,
 		},
 		discountPercent: {
 			type: Number,
@@ -17,7 +17,7 @@ const couponSchema = new mongoose.Schema(
 		},
 		minimumPurchaseAmount: Number,
 		maximumDiscountAmount: Number,
-		used: [mongoose.ObjectId],
+		used: [mongoose.Schema.Types.ObjectId],
 	},
 	{
 		versionKey: false,

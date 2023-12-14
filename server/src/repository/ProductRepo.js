@@ -34,8 +34,8 @@ const createReview = async (data) => {
 	);
 };
 
-const updateAmountProduct = async (productId, amount) => {
-	await Product.findOneAndUpdate(
+const updateAmountProduct = async (productId, amount, session) => {
+	const updatedProduct = await Product.findOneAndUpdate(
 		{
 			_id: productId,
 		},
@@ -43,10 +43,32 @@ const updateAmountProduct = async (productId, amount) => {
 			$inc: {
 				quantity: amount,
 			},
+		},
+		{
+			session,
+			returnOriginal: false,
+		}
+	);
+	if (updatedProduct.quantity < 0)
+		throw new Error('Product quantity is not enough');
+};
+
+const updateSoldProduct = async (productId, amount, session) => {
+	const updatedProduct = await Product.findOneAndUpdate(
+		{
+			_id: productId,
+		},
+		{
+			$inc: {
+				sold: amount,
+			},
+		},
+		{
+			session,
+			returnOriginal: false,
 		}
 	);
 };
-
 const getAllTypes = async () => {
 	return Product.distinct('type');
 };
@@ -60,4 +82,5 @@ module.exports = {
 	createReview,
 	updateAmountProduct,
 	getAllTypes,
+	updateSoldProduct,
 };

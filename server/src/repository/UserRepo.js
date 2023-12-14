@@ -30,12 +30,13 @@ const updateUser = async (data) => {
 	return updatedUser;
 };
 
-const increseOrderNumber = async (userId, amount) => {
+const increseOrderNumber = async (userId, amount, session) => {
 	await User.findOneAndUpdate(
 		{_id: userId},
 		{
 			$inc: {orderNumber: amount},
-		}
+		},
+		{session}
 	);
 };
 

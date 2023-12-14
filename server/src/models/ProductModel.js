@@ -27,6 +27,7 @@ const productSchema = new mongoose.Schema(
 		numReviews: {type: Number, default: 0},
 		blog: {type: String},
 		reviews: [reviewProduct],
+		sold: {type: Number, default: 0},
 	},
 	{
 		versionKey: false,

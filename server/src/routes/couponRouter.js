@@ -10,6 +10,6 @@ router.post(
 	verify.verifyAdmin,
 	couponController.createCoupon
 );
-router.get('/', couponController.getCoupons);
-router.post('/used', couponController.useCoupons);
+router.get('/', verify.verifyUser, couponController.getCoupons);
+router.post('/used', verify.verifyUser, couponController.useCoupons);
 module.exports = router;
