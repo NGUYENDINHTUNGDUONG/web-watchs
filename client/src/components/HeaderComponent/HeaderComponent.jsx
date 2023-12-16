@@ -67,7 +67,6 @@ const HeaderComponent = () => {
   const openSignUp = useSelector((state) => state.user.modalSignUp);
 
   const openEmail = useSelector((state) => state.user.modalEmail);
-console.log(user)
   const handleLogout = async () => {
     setLoading(true);
     await UserService.logoutUser();

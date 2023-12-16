@@ -19,7 +19,7 @@ function App() {
       setIsLoading(true);
       const { storageData, decoded } = handleDecoded();
       if (decoded?.id) {
-        await handleGetDetailsUser(decoded.id, storageData);
+        await handleGetDetailsUser( storageData);
       }
       setIsLoading(false);
     })();
@@ -59,24 +59,9 @@ function App() {
     }
   );
 
-  UserService.axiosJWT.interceptors.response.use(
-    (response) => {
-      if (response && response.data) {
-        return response.data;
-      }
-      return response;
-    },
-    (error) => {
-      if (!error.response) {
-        console.error("Unknown error:", error.message);
-        return;
-      }
-      console.log(error);
-    }
-  );
-  const handleGetDetailsUser = async (id, access_token) => {
+  const handleGetDetailsUser = async ( access_token) => {
     const refreshToken = localStorage.getItem("refresh_token");
-    const res = await UserService.getDetailsUser(id, access_token);
+    const res = await UserService.getDetailsUser( access_token);
     dispatch(
       updateUser({
         ...res?.data,

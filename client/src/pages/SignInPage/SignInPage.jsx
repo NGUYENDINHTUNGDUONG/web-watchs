@@ -18,8 +18,8 @@ const SignInPage = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleOpenSignUp = () => {
     dispatch(modalState({ modalSignUp: true }));
@@ -28,7 +28,6 @@ const SignInPage = () => {
   const handleOpenEmail = () => {
     dispatch(modalState({ modalEmail: true }));
   };
-
 
   const mutation = useMutationHooks((data) => UserService.loginUser(data));
   const { data, isSuccess } = mutation;
@@ -44,22 +43,20 @@ const SignInPage = () => {
       localStorage.setItem("access_token", `${data?.access_token}`);
       localStorage.setItem("refresh_token", `${data?.refresh_token}`);
       if (data?.access_token) {
-        const decoded = jwt_decode(data?.access_token);
-        if (decoded?.id) {
-          handleGetDetailsUser(decoded?.id, data?.access_token);
-        }
+        handleGetDetailsUser(data?.access_token);
       }
     }
   }, [isSuccess]);
 
-  const handleGetDetailsUser = async (id, token) => {
+  const handleGetDetailsUser = async (token) => {
     const refreshToken = localStorage.getItem("refresh_token");
-    const res = await UserService.getDetailsUser(id, token);
+    const res = await UserService.getDetailsUser(token);
     dispatch(updateUser({ ...res?.data, access_token: token, refreshToken }));
+    console.log(res);
   };
 
   const handleOnchangeEmail = (e) => {
-    setEmail(e.target.value)
+    setEmail(e.target.value);
   };
 
   const handleOnchangePassword = (e) => {
@@ -80,11 +77,9 @@ const SignInPage = () => {
     };
     const res = await UserService.loginUser(data);
     if (res) {
-      console.log('bachbip')
+      console.log("bachbip");
     }
   };
-
-  
 
   return (
     <div className="flex gap-x-10 m-5">
@@ -132,7 +127,7 @@ const SignInPage = () => {
             </Form.Item>
 
             <Form.Item>
-              <Button htmlType="submit" className="text-black" >
+              <Button htmlType="submit" className="text-black">
                 Đăng nhập
               </Button>
             </Form.Item>
@@ -140,7 +135,9 @@ const SignInPage = () => {
         </div>
         {/* </LoadingComponent> */}
         <p>
-          <WrapperTextLight onClick={handleOpenEmail}>Quên mật khẩu?</WrapperTextLight>
+          <WrapperTextLight onClick={handleOpenEmail}>
+            Quên mật khẩu?
+          </WrapperTextLight>
         </p>
         <p>
           Chưa có tài khoản?{" "}
@@ -162,7 +159,6 @@ const SignInPage = () => {
           Mua sắm tại Dwatch
         </p>
       </div>
-      
     </div>
   );
 };
