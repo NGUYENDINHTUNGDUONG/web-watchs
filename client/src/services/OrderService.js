@@ -49,3 +49,11 @@ export const getAllOrder = async (access_token) => {
   })
   return res.data
 }
+export const updateStatusOrder = async (id, status, access_token) => {
+  const res = await axiosJWT.patch(`${process.env.REACT_APP_API_URL}/order/${id}/status`,status, {
+      headers: {
+          authorization: `Bearer ${access_token}`,
+      }
+  })
+  return res.data
+}

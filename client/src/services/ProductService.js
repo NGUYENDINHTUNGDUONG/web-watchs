@@ -8,11 +8,12 @@ export const getAllProduct = async (data) => {
   );
   return res.data;
 };
-export const getAllSupplier = async (access_token) => {
+export const getAllSupplier = async (supplierID, access_token) => {
   const res = await axios.get(`${process.env.REACT_APP_API_URL}/supplier`, {
     headers: {
       authorization: `Bearer ${access_token}`,
     },
+    params: { supplierID: supplierID },
   });
   return res.data;
 };
@@ -98,6 +99,31 @@ export const getAllBrands = async () => {
 export const uploadFile = async (data, access_token) => {
   const res = await axiosJWT.post(
     `${process.env.REACT_APP_API_URL}/file`,
+    data,
+    {
+      headers: {
+        authorization: `Bearer ${access_token}`,
+      },
+    }
+  );
+  return res.data;
+};
+
+export const createBrand = async (data, access_token) => {
+  const res = await axiosJWT.post(
+    `${process.env.REACT_APP_API_URL}/brand`,
+    data,
+    {
+      headers: {
+        authorization: `Bearer ${access_token}`,
+      },
+    }
+  );
+  return res.data;
+};
+export const createSupplier = async (data, access_token) => {
+  const res = await axiosJWT.post(
+    `${process.env.REACT_APP_API_URL}/supplier`,
     data,
     {
       headers: {

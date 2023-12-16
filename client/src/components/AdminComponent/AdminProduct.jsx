@@ -318,7 +318,7 @@ const AdminProduct = () => {
         />
         <Space>
           <Button
-            type="primary"
+            
             onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
             icon={<SearchOutlined />}
             size="small"
@@ -1092,7 +1092,7 @@ const AdminProduct = () => {
           </Form.Item>
 
           <Form.Item className="form1-submit">
-            <Button type="primary" htmlType="submit">
+            <Button htmlType="submit">
               Submit
             </Button>
           </Form.Item>
@@ -1294,7 +1294,7 @@ const AdminProduct = () => {
               </WrapperUploadFile>
             </Form.Item>
             <Form.Item wrapperCol={{ offset: 20, span: 16 }}>
-              <Button type="primary" htmlType="submit">
+              <Button  htmlType="submit">
                 Apply
               </Button>
             </Form.Item>

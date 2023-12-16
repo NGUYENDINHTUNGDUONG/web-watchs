@@ -59,6 +59,21 @@ function App() {
     }
   );
 
+  UserService.axiosJWT.interceptors.response.use(
+    (response) => {
+      if (response && response.data) {
+        return response.data;
+      }
+      return response;
+    },
+    (error) => {
+      if (!error.response) {
+        console.error("Unknown error:", error.message);
+        return;
+      }
+      console.log(error);
+    }
+  );
   const handleGetDetailsUser = async (id, access_token) => {
     const refreshToken = localStorage.getItem("refresh_token");
     const res = await UserService.getDetailsUser(id, access_token);
@@ -72,7 +87,7 @@ function App() {
   };
 
   return (
-    <div >
+    <div>
       <Loading isLoading={isLoading}>
         <Router>
           <Routes>

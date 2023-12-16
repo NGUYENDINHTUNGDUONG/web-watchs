@@ -28,17 +28,20 @@ import { useNavigate } from "react-router-dom";
 import OrderAdmin from "../../components/OrderAdmin";
 import AdminCoupon from "../../components/AdminComponent/AdminCoupon";
 import logo from "../../assets/images/Logo-DWatch.svg";
+import AdminSupplier from "../../components/AdminComponent/AdminSupplier";
+import Dashboard from "./Dashboard";
 const AdminPage = () => {
   const [loading, setLoading] = useState(false);
   // const user = useSelector((state) => state?.user);
   const access_token = localStorage.getItem("access_token");
   const dispatch = useDispatch();
   const items = [
-    getItem("Bảng điều khiển", "dashboard", <LineChartOutlined />),
+    getItem("Thống kê", "dashboard", <LineChartOutlined />),
     getItem("Đơn hàng", "orders", <ShoppingCartOutlined />),
+    getItem("Nhà cung cấp", "supplier", <DollarOutlined />),
     getItem("Sản phẩm", "products", <AppstoreOutlined />),
     getItem("Người dùng", "users", <TeamOutlined />),
-    getItem("Giảm giá", "coupons",<TagOutlined />),
+    getItem("Giảm giá", "coupons", <TagOutlined />),
   ];
 
   const [keySelected, setKeySelected] = useState("dashboard");
@@ -94,7 +97,7 @@ const AdminPage = () => {
   const renderPage = (key) => {
     switch (key) {
       case "dashboard":
-        return "dashboard";
+        return <Dashboard />;
       case "users":
         return <AdminUser />;
       case "products":
@@ -103,6 +106,8 @@ const AdminPage = () => {
         return <OrderAdmin />;
       case "coupons":
         return <AdminCoupon />;
+      case "supplier":
+        return <AdminSupplier />;
       default:
         return <></>;
     }
@@ -119,11 +124,7 @@ const AdminPage = () => {
         <div style={{ display: "flex", overflowX: "hidden" }}>
           <div className="sidebar">
             <div className="img-sidebar">
-              <img
-                alt="logo"
-                onClick={() => navigate("/")}
-                src={logo}
-              />
+              <img alt="logo" onClick={() => navigate("/")} src={logo} />
             </div>
             <Menu
               mode="inline"
@@ -156,7 +157,7 @@ const AdminPage = () => {
             <Button
               className="bg-blue-400"
               onClick={() => navigate("/")}
-              type="primary"
+              
             >
               Back Home
             </Button>

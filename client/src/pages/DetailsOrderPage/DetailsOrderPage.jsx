@@ -16,30 +16,35 @@ import { orderContant } from "../../contant";
 import { useMemo } from "react";
 import { UPLOAD_BASE_URL } from "../../config";
 import { mapColors, mapIcons, mapStatus } from "../../util/contant";
+import { getListAddresses } from "../../redux/slides/orderSlide";
+import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
 
 const DetailsOrderPage = () => {
+  const dispatch = useDispatch();
   const params = useParams();
   const { id } = params;
   const access_token = localStorage.getItem("access_token");
   const [data, setData] = useState([]);
-
+  const listCity = useSelector((state) => state.order.listCity);
   const fetchDetailsOrder = async () => {
     const res = await OrderService.getDetailsOrder(id, access_token);
     if (res) {
       setData(res.data);
-      console.log(res.data);
     }
     return res.data;
   };
+  const res = async () => {
+    const res = await axios.get("https://provinces.open-api.vn/api/?depth=3");
+    if (res) {
+      dispatch(getListAddresses({ listCity: res.data }));
+    }
+  };
+
   useEffect(() => {
     fetchDetailsOrder();
+    res();
   }, []);
-  const priceMemo = useMemo(() => {
-    const result = data?.orderItems?.reduce((total, cur) => {
-      return total + cur.price * cur.amount;
-    }, 0);
-    return result;
-  }, [data]);
 
   return (
     <>
@@ -112,20 +117,44 @@ const DetailsOrderPage = () => {
           </div>
           <div className="col-span-1 bg-white rounded-lg border shadow-lg">
             <div className="p-5">
-              <p className="text-xl my-5 font-bold">Khách hàng</p>
+              <p className="text-xl mb-3 font-bold">Khách hàng</p>
               <p className="">{data?.shippingAddress?.fullName}</p>
             </div>
             <hr />
             <div className="p-5">
-              <p className="text-xl my-5 font-bold">Liên hệ</p>
-              <p className="">{data?.shippingAddress?.phone}</p>
+              <p className="text-xl mb-3 font-bold">Liên hệ</p>
+              <p className="">0{data?.shippingAddress?.phone}</p>
             </div>
             <hr />
             <div className="p-5">
-              <p className="text-xl my-5 font-bold">Địa chi giao hàng</p>
-              <p className="">{data?.shippingAddress?.fullName}</p>
-              <p className="">{data?.shippingAddress?.phone}</p>
-              <p className="">{data?.shippingAddress?.address}</p>
+              <p className="text-xl mb-3 font-bold">Địa chi giao hàng</p>
+              <p className="">
+                {}
+                {`${
+                  listCity.filter(
+                    (item) => item?.code === data?.shippingAddress?.address[0]
+                  )[0]?.name
+                } - ${
+                  listCity
+                    ?.filter(
+                      (item) => item?.code === data?.shippingAddress?.address[0]
+                    )?.[0]
+                    ?.districts.filter(
+                      (item) => item?.code === data?.shippingAddress?.address[1]
+                    )?.[0]?.name
+                } - ${
+                  listCity
+                    ?.filter(
+                      (item) => item?.code === data?.shippingAddress?.address[0]
+                    )?.[0]
+                    ?.districts.filter(
+                      (item) => item?.code === data?.shippingAddress?.address[1]
+                    )?.[0]
+                    ?.wards.filter(
+                      (item) => item?.code === data?.shippingAddress?.address[2]
+                    )?.[0]?.name
+                } - ${data?.shippingAddress?.address[3]}`}
+              </p>
             </div>
           </div>
         </div>

@@ -83,7 +83,6 @@ const AdminUser = () => {
   } = mutationUpdate;
 
   const queryClient = useQueryClient();
-  const users = queryClient.getQueryData(["users"]);
   const isFetchingUser = useIsFetching(["users"]);
   const renderAction = () => {
     return (
@@ -138,7 +137,7 @@ const AdminUser = () => {
         />
         <Space>
           <Button
-            type="primary"
+            
             onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
             icon={<SearchOutlined />}
             size="small"
@@ -466,7 +465,7 @@ const AdminUser = () => {
               </WrapperUploadFile>
             </Form.Item> */}
           <Form.Item wrapperCol={{ offset: 20, span: 16 }}>
-            <Button type="primary" htmlType="submit">
+            <Button htmlType="submit">
               Apply
             </Button>
           </Form.Item>

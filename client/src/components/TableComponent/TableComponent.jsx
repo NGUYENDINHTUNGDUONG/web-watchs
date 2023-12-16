@@ -13,6 +13,8 @@ const TableComponent = (props) => {
     createUser,
     createProduct,
     createCoupon,
+    createSupplier,
+    createBrand,
     keyselected,
   } = props;
   const newColumnExport = useMemo(() => {
@@ -47,6 +49,11 @@ const TableComponent = (props) => {
           <Button onClick={createProduct}>Thêm sản phẩm</Button>
         ) : keyselected === "coupon" ? (
           <Button onClick={createCoupon}>Thêm mã giảm giá</Button>
+        ) : keyselected === "suppliers" ? (
+          <div>
+            <Button onClick={createBrand} className="mr-3">Thêm Brands</Button>
+            <Button onClick={createSupplier}>Thêm nhà cung cấp</Button>
+          </div>
         ) : null}
       </div>
       <Table

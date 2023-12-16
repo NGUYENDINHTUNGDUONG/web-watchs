@@ -83,7 +83,7 @@ export default function AdminCoupon() {
         />
         <Space>
           <Button
-            type="primary"
+            
             onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
             icon={<SearchOutlined />}
             size="small"
@@ -271,7 +271,7 @@ export default function AdminCoupon() {
             <Input />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit">
+            <Button  htmlType="submit">
               Submit
             </Button>
           </Form.Item>

@@ -9,8 +9,7 @@ export const size = {
   "41": "41mm",
   "42": "42mm",
   '43': "43mm",
-  "44": "44mm",
-  '45': "45mm",
+
 };
 export const glass = {
   acrylic: "Acrylic Crystal",
