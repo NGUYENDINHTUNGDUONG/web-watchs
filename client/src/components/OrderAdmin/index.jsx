@@ -246,10 +246,7 @@ const OrderAdmin = () => {
       value: "done",
       label: "Đã giao hàng",
     },
-    {
-      value: "cancel",
-      label: "Đã huỷ đơn hàng",
-    },
+
   ];
   const handleCancel = () => {
     setIsOpenStatus(false);

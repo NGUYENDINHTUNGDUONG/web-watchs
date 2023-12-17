@@ -144,6 +144,7 @@ const AdminProduct = () => {
         waterResistant: res?.data?.waterResistant,
         size: res?.data?.size,
         glass: res?.data?.glass,
+        supplier: res?.data?.supplier,
       });
       console.log(res?.data);
     }
@@ -226,9 +227,10 @@ const AdminProduct = () => {
   };
   const getAllSupplier = async () => {
     try {
-      const res = await ProductService.getAllSupplier();
+      const res = await ProductService.getAllSupplier(null,access_token);
       if (res) {
         setSuppliers(res);
+        console.log(res);
       }
     } catch (error) {
       console.log(error);
@@ -318,7 +320,6 @@ const AdminProduct = () => {
         />
         <Space>
           <Button
-            
             onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
             icon={<SearchOutlined />}
             size="small"
@@ -451,8 +452,7 @@ const AdminProduct = () => {
         brand: brandShow.filter((item) => item._id === product.brand)[0]?.name,
       };
     });
- 
-  console.log(brands);
+
   useEffect(() => {
     if (isSuccess && data?.status === "OK") {
       message.success();
@@ -1092,9 +1092,7 @@ const AdminProduct = () => {
           </Form.Item>
 
           <Form.Item className="form1-submit">
-            <Button htmlType="submit">
-              Submit
-            </Button>
+            <Button htmlType="submit">Submit</Button>
           </Form.Item>
         </Form>
       </ModalComponent>
@@ -1294,9 +1292,7 @@ const AdminProduct = () => {
               </WrapperUploadFile>
             </Form.Item>
             <Form.Item wrapperCol={{ offset: 20, span: 16 }}>
-              <Button  htmlType="submit">
-                Apply
-              </Button>
+              <Button htmlType="submit">Apply</Button>
             </Form.Item>
           </Form>
         </Loading>
