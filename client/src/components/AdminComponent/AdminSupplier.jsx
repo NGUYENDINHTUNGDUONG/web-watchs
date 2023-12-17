@@ -6,165 +6,160 @@ import {
   Modal,
   Radio,
   Select,
-  Space,
-} from "antd";
-import React, { useEffect, useRef, useState } from "react";
-import TableComponent from "../TableComponent/TableComponent";
-import { WrapperHeader } from "./style";
-import * as ProductService from "../../services/ProductService";
-import ModalComponent from "../ModalComponent/ModalComponent";
-import InputComponent from "../InputComponent/InputComponent";
-import {
-  DeleteOutlined,
-  EditOutlined,
-  SearchOutlined,
-} from "@ant-design/icons";
-import axios from "axios";
-import { useDispatch, useSelector } from "react-redux";
-import { getListAddresses } from "../../redux/slides/orderSlide";
-import { UPLOAD_BASE_URL } from "../../config";
+  Space
+} from 'antd'
+import React, { useEffect, useRef, useState } from 'react'
+import TableComponent from '../TableComponent/TableComponent'
+import { WrapperHeader } from './style'
+import * as ProductService from '../../services/ProductService'
+import ModalComponent from '../ModalComponent/ModalComponent'
+import InputComponent from '../InputComponent/InputComponent'
+import { DeleteOutlined, EditOutlined, SearchOutlined } from '@ant-design/icons'
+import axios from 'axios'
+import { useDispatch, useSelector } from 'react-redux'
+import { getListAddresses } from '../../redux/slides/orderSlide'
+import { UPLOAD_BASE_URL } from '../../config'
 
-export default function AdminSupplier() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isOpenBrand, setIsOpenBrand] = useState(false);
-  const [form] = Form.useForm();
-  const [form1] = Form.useForm();
-  const [city, setCity] = useState("");
-  const [address, setAddress] = useState("");
-  const [districts, setDistricts] = useState();
-  const [district, setDistrict] = useState();
-  const [ward, setWard] = useState();
-  const [wards, setWards] = useState();
-  const [rowSelected, setRowSelected] = useState();
-  const [suppliers, setSuppliers] = useState([]);
-  const [imageFile, setImageFile] = useState();
-  const searchInput = useRef(null);
-  const dispatch = useDispatch();
+export default function AdminSupplier () {
+  const [isOpen, setIsOpen] = useState(false)
+  const [isOpenBrand, setIsOpenBrand] = useState(false)
+  const [form] = Form.useForm()
+  const [form1] = Form.useForm()
+  const [city, setCity] = useState('')
+  const [address, setAddress] = useState('')
+  const [districts, setDistricts] = useState()
+  const [district, setDistrict] = useState()
+  const [ward, setWard] = useState()
+  const [wards, setWards] = useState()
+  const [rowSelected, setRowSelected] = useState()
+  const [suppliers, setSuppliers] = useState([])
+  const [imageFile, setImageFile] = useState()
+  const searchInput = useRef(null)
+  const dispatch = useDispatch()
 
   const onCancel = () => {
-    setIsOpen(false);
-  };
+    setIsOpen(false)
+  }
   const onCancelBrand = () => {
-    setIsOpenBrand(false);
-  };
+    setIsOpenBrand(false)
+  }
   const res = async () => {
-    const res = await axios.get("https://provinces.open-api.vn/api/?depth=3");
+    const res = await axios.get('https://provinces.open-api.vn/api/?depth=3')
     if (res) {
-      dispatch(getListAddresses({ listCity: res.data }));
+      dispatch(getListAddresses({ listCity: res.data }))
     }
-  };
+  }
   useEffect(() => {
-    res();
-  }, []);
-  const { RangePicker } = DatePicker;
-  const access_token = localStorage.getItem("access_token");
-  const onFinish = async (values) => {
+    res()
+  }, [])
+  const { RangePicker } = DatePicker
+  const access_token = localStorage.getItem('access_token')
+  const onFinish = async values => {
     const data = {
       email: values.email,
       name: values.name,
       address: [city, district, ward, address],
       taxCode: values.taxCode,
-      phone: values.phone,
-    };
-    const res = await ProductService.createSupplier(data, access_token);
-    if (res) {
-      form.resetFields();
-      getAllSuppliers();
+      phone: values.phone
     }
-    setIsOpen(false);
-  };
-  const onFinishBrand = async (values) => {
-    const data = new FormData();
-    data.append("image", imageFile);
-    data.append("name", values.name);
-    data.append("supplier", values.supplier);
+    const res = await ProductService.createSupplier(data, access_token)
+    if (res) {
+      form.resetFields()
+      getAllSuppliers()
+    }
+    setIsOpen(false)
+  }
+  const onFinishBrand = async values => {
+    const data = new FormData()
+    data.append('image', imageFile)
+    data.append('name', values.name)
+    data.append('supplier', values.supplier)
 
-    const res = await ProductService.createBrand(data, access_token);
+    const res = await ProductService.createBrand(data, access_token)
     if (res) {
-      form1.resetFields();
-      getAllSuppliers();
-      setIsOpenBrand(false);
+      form1.resetFields()
+      getAllSuppliers()
+      setIsOpenBrand(false)
     }
-  };
-  const listCity = useSelector((state) => state.order.listCity);
+  }
+  const listCity = useSelector(state => state.order.listCity)
 
   const getAllSuppliers = async () => {
-    const res = await ProductService.getAllSupplier(null, access_token);
-    setSuppliers(res);
-  };
-  const [image, setImage] = useState(null);
+    const res = await ProductService.getAllSupplier(null, access_token)
+    setSuppliers(res)
+  }
+  const [image, setImage] = useState(null)
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
+  const handleImageChange = e => {
+    const file = e.target.files[0]
 
     if (file) {
-      const reader = new FileReader();
+      const reader = new FileReader()
 
       reader.onload = () => {
-        setImage(reader.result);
-      };
-      setImageFile(file);
-      reader.readAsDataURL(file);
+        setImage(reader.result)
+      }
+      setImageFile(file)
+      reader.readAsDataURL(file)
     } else {
       // Clear the image if no file is selected
-      setImage(null);
+      setImage(null)
     }
-  };
+  }
   useEffect(() => {
-    getAllSuppliers();
-  }, []);
+    getAllSuppliers()
+  }, [])
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
-    confirm();
+    confirm()
     // setSearchText(selectedKeys[0]);
     // setSearchedColumn(dataIndex);
-  };
-  const handleReset = (clearFilters) => {
-    clearFilters();
+  }
+  const handleReset = clearFilters => {
+    clearFilters()
     // setSearchText('');
-  };
-  const getColumnSearchProps = (dataIndex) => ({
+  }
+  const getColumnSearchProps = dataIndex => ({
     filterDropdown: ({
       setSelectedKeys,
       selectedKeys,
       confirm,
-      clearFilters,
+      clearFilters
     }) => (
       <div
         style={{
-          padding: 8,
+          padding: 8
         }}
-        onKeyDown={(e) => e.stopPropagation()}
+        onKeyDown={e => e.stopPropagation()}
       >
         <InputComponent
           ref={searchInput}
           placeholder={`Search ${dataIndex}`}
           value={selectedKeys[0]}
-          onChange={(e) =>
+          onChange={e =>
             setSelectedKeys(e.target.value ? [e.target.value] : [])
           }
           onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
           style={{
             marginBottom: 8,
-            display: "block",
+            display: 'block'
           }}
         />
         <Space>
           <Button
-            
             onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
             icon={<SearchOutlined />}
-            size="small"
+            size='small'
             style={{
-              width: 90,
+              width: 90
             }}
           >
             Search
           </Button>
           <Button
             onClick={() => clearFilters && handleReset(clearFilters)}
-            size="small"
+            size='small'
             style={{
-              width: 90,
+              width: 90
             }}
           >
             Reset
@@ -172,20 +167,20 @@ export default function AdminSupplier() {
         </Space>
       </div>
     ),
-    filterIcon: (filtered) => (
+    filterIcon: filtered => (
       <SearchOutlined
         style={{
-          color: filtered ? "#1890ff" : undefined,
+          color: filtered ? '#1890ff' : undefined
         }}
       />
     ),
     onFilter: (value, record) =>
       record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
-    onFilterDropdownOpenChange: (visible) => {
+    onFilterDropdownOpenChange: visible => {
       if (visible) {
-        setTimeout(() => searchInput.current?.select(), 100);
+        setTimeout(() => searchInput.current?.select(), 100)
       }
-    },
+    }
     // render: (text) =>
     //   searchedColumn === dataIndex ? (
     //     // <Highlighter
@@ -200,117 +195,117 @@ export default function AdminSupplier() {
     //   ) : (
     //     text
     //   ),
-  });
+  })
   const renderAction = () => {
     return (
       <div>
         <DeleteOutlined
-          style={{ color: "red", fontSize: "30px", cursor: "pointer" }}
+          style={{ color: 'red', fontSize: '30px', cursor: 'pointer' }}
           // onClick={() => setIsModalOpenDelete(true)}
         />
         <EditOutlined
-          style={{ color: "orange", fontSize: "30px", cursor: "pointer" }}
+          style={{ color: 'orange', fontSize: '30px', cursor: 'pointer' }}
           // onClick={handleDetailsProduct}
         />
       </div>
-    );
-  };
+    )
+  }
   const columns = [
     {
-      title: "Name",
-      dataIndex: "name",
+      title: 'Name',
+      dataIndex: 'name',
       sorter: (a, b) => a.name.length - b.name.length,
-      ...getColumnSearchProps("name"),
+      ...getColumnSearchProps('name')
     },
 
     {
-      title: "Brands",
-      dataIndex: "brands",
-      render: (brands) => {
-        return brands.map((brand) => brand.name).join(", ");
-      },
+      title: 'Brands',
+      dataIndex: 'brands',
+      render: brands => {
+        return brands.map(brand => brand.name).join(', ')
+      }
     },
     {
-      title: "Phone",
-      dataIndex: "phone",
-      render: (text) => "0" + text,
+      title: 'Phone',
+      dataIndex: 'phone',
+      render: text => '0' + text
     },
     {
-      title: "Email",
-      dataIndex: "email",
+      title: 'Email',
+      dataIndex: 'email',
       sorter: (a, b) => a.email.length - b.email.length,
-      ...getColumnSearchProps("email"),
+      ...getColumnSearchProps('email')
     },
     {
-      title: "Address",
-      dataIndex: "address",
-      render: (text) =>
-        listCity.filter((item) => item?.code === text[0])[0]?.name +
-        " - " +
-        listCity
-          ?.filter((item) => item?.code === text[0])?.[0]
-          ?.districts.filter((item) => item?.code === text[1])?.[0]?.name +
-        " - " +
-        listCity
-          ?.filter((item) => item?.code === text[0])?.[0]
-          ?.districts.filter((item) => item?.code === text[1])?.[0]
-          ?.wards.filter((item) => item?.code === text[2])?.[0]?.name +
-        " - " +
-        text[3],
+      title: 'Address',
+      dataIndex: 'address',
+      render: text =>
+        text &&
+        listCity.filter(item => item?.code === text && text[0] && text[0])[0]
+          ?.name +
+          ' - ' +
+          listCity
+            ?.filter(item => item?.code === text[0])?.[0]
+            ?.districts.filter(item => item?.code === text[1])?.[0]?.name +
+          ' - ' +
+          listCity
+            ?.filter(item => item?.code === text[0])?.[0]
+            ?.districts.filter(item => item?.code === text[1])?.[0]
+            ?.wards.filter(item => item?.code === text[2])?.[0]?.name +
+          ' - ' +
+          text[3],
 
-      sorter: (a, b) => a.address.length - b.address.length,
+      sorter: (a, b) => a.address.length - b.address.length
     },
     {
-      title: "TaxCode",
-      dataIndex: "taxCode",
-      sorter: (a, b) => a.taxCode - b.taxCode,
+      title: 'TaxCode',
+      dataIndex: 'taxCode',
+      sorter: (a, b) => a.taxCode - b.taxCode
     },
     {
-      title: "Action",
-      dataIndex: "action",
-      render: renderAction,
-    },
-  ];
-  const items = suppliers.map((val) => ({ value: val._id, label: val.name }));
+      title: 'Action',
+      dataIndex: 'action',
+      render: renderAction
+    }
+  ]
+  const items = suppliers.map(val => ({ value: val._id, label: val.name }))
   const dataTable =
     suppliers?.length &&
-    suppliers?.map((coupon) => {
+    suppliers?.map(coupon => {
       return {
         ...coupon,
-        key: coupon._id,
-      };
-    });
+        key: coupon._id
+      }
+    })
 
   useEffect(() => {
     if (city) {
       setDistricts(
-        listCity.filter((element) => element.code === city)[0]?.districts
-      );
+        listCity.filter(element => element.code === city)[0]?.districts
+      )
     }
-  }, [city]);
+  }, [city])
   useEffect(() => {
     if (district) {
-      setWards(
-        districts.filter((element) => element.code === district)[0]?.wards
-      );
+      setWards(districts.filter(element => element.code === district)[0]?.wards)
     }
-  }, [district]);
+  }, [district])
   return (
     <div>
       <WrapperHeader>Quản lý mã nhà cung cấp</WrapperHeader>
-      <div className="mt-6">
+      <div className='mt-6'>
         <TableComponent
-          keyselected="suppliers"
+          keyselected='suppliers'
           createSupplier={() => setIsOpen(true)}
           createBrand={() => setIsOpenBrand(true)}
           columns={columns}
           data={dataTable}
           onRow={(record, rowIndex) => {
             return {
-              onClick: (event) => {
-                setRowSelected(record._id);
-              },
-            };
+              onClick: event => {
+                setRowSelected(record._id)
+              }
+            }
           }}
         />
       </div>
@@ -318,49 +313,49 @@ export default function AdminSupplier() {
         open={isOpen}
         width={600}
         onCancel={onCancel}
-        title="Thêm nhà cung cấp"
+        title='Thêm nhà cung cấp'
         footer={null}
       >
         <Form
-          name="basic"
-          className="grid grid-cols-2 gap-5"
-          layout="vertical"
+          name='basic'
+          className='grid grid-cols-2 gap-5'
+          layout='vertical'
           onFinish={onFinish}
           form={form}
         >
           <div>
             <Form.Item
-              label="Tên nhà cung cấp"
-              name="name"
-              rules={[{ required: true, message: "Please input your name!" }]}
+              label='Tên nhà cung cấp'
+              name='name'
+              rules={[{ required: true, message: 'Please input your name!' }]}
             >
               <Input />
             </Form.Item>
             <Form.Item
-              label="Email"
-              name="email"
+              label='Email'
+              name='email'
               rules={[
                 {
                   required: true,
-                  message: "Please input your email!",
-                  type: "email",
-                },
+                  message: 'Please input your email!',
+                  type: 'email'
+                }
               ]}
             >
               <Input />
             </Form.Item>
             <Form.Item
-              label="Phone"
-              name="phone"
-              rules={[{ required: true, message: "Please input your phone!" }]}
+              label='Phone'
+              name='phone'
+              rules={[{ required: true, message: 'Please input your phone!' }]}
             >
               <Input />
             </Form.Item>
             <Form.Item
-              label="TaxCode"
-              name="taxCode"
+              label='TaxCode'
+              name='taxCode'
               rules={[
-                { required: true, message: "Please input your taxCode!" },
+                { required: true, message: 'Please input your taxCode!' }
               ]}
             >
               <Input />
@@ -368,148 +363,148 @@ export default function AdminSupplier() {
           </div>
           <div>
             <Form.Item
-              label="Tỉnh/Thành phố"
-              name="city"
-              rules={[{ required: true, message: "Please input your  city!" }]}
+              label='Tỉnh/Thành phố'
+              name='city'
+              rules={[{ required: true, message: 'Please input your  city!' }]}
             >
               <Select
-                placeholder="Tình/Thành phố"
-                options={listCity?.map((city) => ({
+                placeholder='Tình/Thành phố'
+                options={listCity?.map(city => ({
                   value: city.code,
-                  label: city.name,
+                  label: city.name
                 }))}
-                onChange={(value) => {
-                  setCity(value);
+                onChange={value => {
+                  setCity(value)
                 }}
                 value={city}
               ></Select>
             </Form.Item>
             <Form.Item
-              label="Quận/Huyện"
-              name="district"
+              label='Quận/Huyện'
+              name='district'
               rules={[
-                { required: true, message: "Please input your  address!" },
+                { required: true, message: 'Please input your  address!' }
               ]}
             >
               <Select
-                placeholder="Quận/Huyện"
-                options={districts?.map((city) => ({
+                placeholder='Quận/Huyện'
+                options={districts?.map(city => ({
                   value: city.code,
-                  label: city.name,
+                  label: city.name
                 }))}
-                onChange={(value) => {
-                  setDistrict(value);
+                onChange={value => {
+                  setDistrict(value)
                 }}
                 value={district}
               ></Select>
             </Form.Item>
             <Form.Item
-              label="Xã/Phường"
-              name="ward"
-              rules={[{ required: true, message: "Please input your ward!" }]}
+              label='Xã/Phường'
+              name='ward'
+              rules={[{ required: true, message: 'Please input your ward!' }]}
             >
               <Select
-                placeholder="Xã/Phường"
-                options={wards?.map((city) => ({
+                placeholder='Xã/Phường'
+                options={wards?.map(city => ({
                   value: city.code,
-                  label: city.name,
+                  label: city.name
                 }))}
-                onChange={(value) => {
-                  setWard(value);
+                onChange={value => {
+                  setWard(value)
                 }}
                 value={ward}
               ></Select>
             </Form.Item>
             <Form.Item
-              label="Số nhà"
-              name="address"
+              label='Số nhà'
+              name='address'
               rules={[
-                { required: true, message: "Please input your address!" },
+                { required: true, message: 'Please input your address!' }
               ]}
             >
               <Input
-                placeholder="Số nhà"
-                onChange={(e) => setAddress(e.target.value)}
+                placeholder='Số nhà'
+                onChange={e => setAddress(e.target.value)}
                 value={address}
               />
             </Form.Item>
           </div>
           <Form.Item>
-            <Button htmlType="submit">Submit</Button>
+            <Button htmlType='submit'>Submit</Button>
           </Form.Item>
         </Form>
       </Modal>
       <ModalComponent open={isOpenBrand} onCancel={onCancelBrand} footer={null}>
         <Form
-          name="basic"
-          className="grid grid-cols-2 gap-5"
-          layout="vertical"
+          name='basic'
+          className='grid grid-cols-2 gap-5'
+          layout='vertical'
           onFinish={onFinishBrand}
           form={form1}
         >
           <div>
             <Form.Item
-              label="Tên nhà cung cấp"
-              name={"supplier"}
+              label='Tên nhà cung cấp'
+              name={'supplier'}
               rules={[
-                { required: true, message: "Please input your supplier!" },
+                { required: true, message: 'Please input your supplier!' }
               ]}
             >
-              <Select options={items} placeholder="Chọn nhà cung cấp" />
+              <Select options={items} placeholder='Chọn nhà cung cấp' />
             </Form.Item>
             <Form.Item
-              className="mb-0"
-              label="Tên thương hiệu"
-              name="name"
-              rules={[{ required: true, message: "Please input your name!" }]}
+              className='mb-0'
+              label='Tên thương hiệu'
+              name='name'
+              rules={[{ required: true, message: 'Please input your name!' }]}
             >
-              <Input placeholder="Tên thương hiệu" />
+              <Input placeholder='Tên thương hiệu' />
             </Form.Item>
           </div>
           <Form.Item
-            className="mb-0"
-            label="Logo"
-            name="logo"
+            className='mb-0'
+            label='Logo'
+            name='logo'
             rules={[
               {
                 validator: (_, value) => {
                   if (image === null) {
-                    return Promise.reject("Please input your logo!");
+                    return Promise.reject('Please input your logo!')
                   }
-                  return Promise.resolve();
-                },
-              },
+                  return Promise.resolve()
+                }
+              }
             ]}
           >
             <label
-              htmlFor="fileInput"
-              className="border rounded-lg p-2 cursor-pointer"
+              htmlFor='fileInput'
+              className='border rounded-lg p-2 cursor-pointer'
             >
               Choose File
             </label>
             <input
-              type="file"
-              id="fileInput"
-              style={{ display: "none" }}
+              type='file'
+              id='fileInput'
+              style={{ display: 'none' }}
               onChange={handleImageChange}
             />
             {image && (
               <img
                 src={image}
-                alt="Preview"
+                alt='Preview'
                 style={{
-                  maxWidth: "100%",
-                  maxHeight: "80px",
-                  marginTop: "20px",
+                  maxWidth: '100%',
+                  maxHeight: '80px',
+                  marginTop: '20px'
                 }}
               />
             )}
           </Form.Item>
-          <Form.Item className="mb-0">
-            <Button htmlType="submit">Submit</Button>
+          <Form.Item className='mb-0'>
+            <Button htmlType='submit'>Submit</Button>
           </Form.Item>
         </Form>
       </ModalComponent>
     </div>
-  );
+  )
 }
