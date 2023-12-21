@@ -5,9 +5,9 @@ import { PhoneOutlined, MessageOutlined, SettingOutlined } from "@ant-design/ico
 const FooterComponent = () => {
   return (
     <div>
-      <WrapperHeader>
+      <div className="px-[130px] py-5 bg-black">
         <div className="grid grid-cols-4">
-          <div className="text-white ml-14">
+          <div className="text-white">
             <div className="bg-red-600 p-2 pl-10 text-xl rounded-lg mb-4 flex gap-x-10">
               <PhoneOutlined className="text-[32px]" />
               <div>
@@ -44,7 +44,7 @@ const FooterComponent = () => {
             <div className="text-gray-500 mb-2">Giấy chứng nhận và giải thưởng</div>
             <div className="text-gray-500">Khách hàng nói gì về chúng tôi</div>
           </div>
-          <div className="text-white pl-10 text-[20px]">
+          <div className="text-white pl-10 text-[20px] ">
           <div className="mb-2">TIỆN ÍCH </div>
             <div className="text-gray-500 mb-2">Tin tức</div>
             <div className="text-gray-500 mb-2">Kiến thức đồng hồ</div>
@@ -52,7 +52,7 @@ const FooterComponent = () => {
             <div className="text-gray-500">Tuyển dụng</div>
           </div>
         </div>
-      </WrapperHeader>
+      </div>
     </div>
   );
 };

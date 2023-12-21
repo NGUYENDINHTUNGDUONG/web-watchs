@@ -62,7 +62,6 @@ function App() {
   const handleGetDetailsUser = async (id, access_token) => {
     const refreshToken = localStorage.getItem("refresh_token");
     const res = await UserService.getDetailsUser(id, access_token);
-    console.log(res);
     dispatch(
       updateUser({
         ...res?.data,
@@ -73,13 +72,13 @@ function App() {
   };
 
   return (
-    <div>
+    <div >
       <Loading isLoading={isLoading}>
         <Router>
           <Routes>
             {routes.map((route) => {
               // const{element: Page} = route
-              const Page = route.element;
+              const Page = route?.element;
               const Layout = route.isShowHeader ? DefaultComponent : Fragment;
               return (
                 <Route

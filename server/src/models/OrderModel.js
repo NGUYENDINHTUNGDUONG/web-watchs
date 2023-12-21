@@ -6,7 +6,7 @@ const orderSchema = new mongoose.Schema(
       {
         name: { type: String, required: true },
         amount: { type: Number, required: true },
-        image: { type: String, required: true },
+        images: [{ type: String, required: true }],
         price: { type: Number, required: true },
         product: {
           // join bảng Product
@@ -18,10 +18,9 @@ const orderSchema = new mongoose.Schema(
     ],
     shippingAddress: {
       fullName: { type: String, required: true },
-      address: { type: String, required: true },
-      city: { type: String, required: true },
-      country: { type: String, required: true },
+      address: { type: Array, required: true },
       phone: { type: Number, required: true },
+      email: { type: String, required: true },
     },
     paymentMethod: { type: String, required: true },
     userId: {

@@ -1,8 +1,7 @@
 import React from "react";
 import { StarFilled } from "@ant-design/icons";
 import { Image } from "antd";
-
-import official from "../../assets/images/official.png";
+import { useNavigate } from "react-router-dom";
 import {
   StyleNameProduct,
   WrapperCardStyle,
@@ -12,44 +11,72 @@ import {
   WrapperStyleTextSell,
 } from "./style";
 
-const CartComponent = () => {
+const CartComponent = (props) => {
+  const navigate = useNavigate();
   return (
     <WrapperCardStyle
+      onClick={() => navigate(`/product-details/${props.id}`)}
       hoverable
-      headStyle={{ width: "220px", height: "220px" }}
-      style={{ width: "220px", height: "320px" }}
+      headStyle={{ width: "220px", height: "300px" }}
+      style={{ width: "100%", height: "100%" }}
       bodyStyle={{ padding: "10px" }}
       cover={
         <img
+          style={{ height: "300px", objectFit: "cover" }}
           alt="example"
-          src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png"
+          src={`http://localhost:3001/static/${props.src}`}
         />
       }
     >
-      <Image
-        src={official}
+      <div
         style={{
-          width: "68px",
-          height: "14px",
-          position: "absolute",
-          bottom: 1,
-          borderTopLeftRadius: "3px",
+          display: "flex",
+          justifyContent: "space-between",
+          width: "100%",
         }}
-      />
-      <StyleNameProduct>ĐỒNG HỒ NAM</StyleNameProduct>
-      <WrapperReportText>
-        <span style={{ marginRight: "4px" }}>
-          <span>4.96 </span>{" "}
-          <StarFilled
-            style={{ fontSize: "12px", color: "rgb(253, 216, 54)" }}
-          />
-        </span>
-        <WrapperStyleTextSell> | Đã bán 1000+</WrapperStyleTextSell>
-      </WrapperReportText>
-      <WrapperPriceText>
-        <span style={{ marginRight: "8px" }}>10.000.000đ</span>
-        <WrapperDiscountText> - 5 %</WrapperDiscountText>
-      </WrapperPriceText>
+      >
+        <Image
+          src={"/images/chinhhang.png"}
+          style={{
+            width: "80px",
+            height: "20px",
+            position: "absolute",
+            bottom: 1,
+            borderTopLeftRadius: "3px",
+          }}
+        />
+        {props.rate > 0 ? (
+          <WrapperReportText>
+            <span style={{ marginRight: "4px" }}>
+              <span>{props.rate} </span>{" "}
+              <StarFilled
+                style={{ fontSize: "12px", color: "rgb(253, 216, 54)" }}
+              />
+            </span>
+          </WrapperReportText>
+        ) : (
+          <WrapperReportText>
+            <span style={{ marginRight: "4px", color: "white" }}>
+              <span>{props.rate} </span> ""
+            </span>
+          </WrapperReportText>
+        )}
+      </div>
+      <div style={{ textAlign: "center", marginTop: "10px" }}>
+        <StyleNameProduct>{props.name}</StyleNameProduct>
+        <p style={{ margin: "0", marginTop: "4px" }}>
+          {props.brand} - {props.type}
+        </p>
+
+        <WrapperPriceText>
+          <span style={{ marginRight: "8px" }}>
+            {Number(props.price).toLocaleString("vi-VN", {
+              style: "currency",
+              currency: "VND",
+            })}
+          </span>
+        </WrapperPriceText>
+      </div>
     </WrapperCardStyle>
   );
 };

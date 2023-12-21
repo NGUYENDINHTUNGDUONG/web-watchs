@@ -43,7 +43,38 @@ export const renderOptions = (arr) => {
     })
     return results
 }
-
+export const renderOptions1 = (arr) => {
+    let results = []
+    if(arr) {
+        results = arr?.map((opt) => {
+            return {
+                value: opt,
+                label: opt
+            }
+        })
+    }
+    results.push({
+        label: 'Thêm brand',
+        value: 'add_brand'
+    })
+    return results
+}
+export const renderOptions3 = (arr) => {
+    let results = []
+    if(arr) {
+        results = arr?.map((opt) => {
+            return {
+                value: opt,
+                label: opt
+            }
+        })
+    }
+    results.push({
+        label: 'Thêm caliber',
+        value: 'add_caliber'
+    })
+    return results
+}
 export const convertPrice = (price) => {
     try {
         const result  = price?.toLocaleString().replaceAll(',', '.')

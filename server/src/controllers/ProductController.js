@@ -1,7 +1,7 @@
-const express = require("express");
-
+const fs = require("fs");
 const ProductRepo = require("../repository/ProductRepo");
-
+const path = require("path");
+const { type } = require("os");
 const getAllProducts = async (req, res, next) => {
   try {
     const products = await ProductRepo.getAllProducts({});
@@ -9,6 +9,30 @@ const getAllProducts = async (req, res, next) => {
   } catch (error) {
     next(error);
     console.log(error);
+  }
+};
+const getAllTypes = async (req, res, next) => {
+  try {
+    const types = await ProductRepo.getAllTypes();
+    res.status(200).json({ types });
+  } catch (error) {
+    next(error);
+  }
+};
+const getAllCalibers = async (req, res, next) => {
+  try {
+    const calibers = await ProductRepo.getAllCalibers();
+    res.status(200).json({ calibers });
+  } catch (error) {
+    next(error);
+  }
+};
+const getAllBrands = async (req, res, next) => {
+  try {
+    const brands = await ProductRepo.getAllBrands();
+    res.status(200).json({ brands });
+  } catch (error) {
+    next(error);
   }
 };
 const getProduct = async (req, res, next) => {
@@ -39,8 +63,26 @@ const findProductName = async (req, res, next) => {
 };
 const findProductByFilter = async (req, res, next) => {
   try {
-    const filter = req.body;
-    console.log(filter);
+    const { type, brand, category, caliber, minPrice, maxPrice, minRating } =
+      req.query;
+    const filter = {
+      ...(type && { type }),
+      ...(brand && { brand }),
+      ...(category && { category }),
+      ...(caliber && { caliber }),
+      ...(minPrice && {
+        price: {
+          $gte: minPrice,
+        },
+      }),
+      ...(maxPrice && {
+        price: {
+          $lte: maxPrice,
+        },
+      }),
+      ...(minRating && { rating: { $gte: minRating } }),
+    };
+    console.log(req.body);
     const product = await ProductRepo.getAllProducts(filter);
     if (!product) {
       return res.status(400).json({ message: "Product not found" });
@@ -53,7 +95,7 @@ const findProductByFilter = async (req, res, next) => {
 };
 const createProduct = async (req, res, next) => {
   try {
-    const images = req.files.map((file) => file.originalname);
+    const images = req.files.map((file) => file.filename);
     const product = await ProductRepo.createProduct({
       images,
       ...req.body,
@@ -72,20 +114,31 @@ const updateProduct = async (req, res, next) => {
     if (!product) {
       return res.status(400).json({ message: "Product not found" });
     }
-    const images = req.files.map((file) => file.originalname);
+    if (req.body.images) {
+      const oldImages = product.images;
+      const newImages = req.body.images;
+      const deleteImages = oldImages.filter(
+        (image) => !newImages.includes(image)
+      );
+      deleteImages.forEach((image) => {
+        fs.unlink(path.join(__dirname, "../uploads", image), (err) => {
+          console.log(err);
+        });
+      });
+    }
     const updateProduct = await ProductRepo.updateProduct({
       productId,
       update: {
         ...req.body,
-        images,
       },
     });
+    console.log("test: " + req.body.images);
     return res
       .status(200)
       .json({ message: "Product updated", data: updateProduct });
   } catch (error) {
     next(error);
-    console.log(error);
+    console.log("test: " + error);
   }
 };
 const deleteProduct = async (req, res, next) => {
@@ -110,12 +163,14 @@ const deleteProduct = async (req, res, next) => {
 const createReview = async (req, res, next) => {
   try {
     const productId = req.params.id;
-    const product= await ProductRepo.findProduct({ _id: productId });
-    if(!product){
+    const product = await ProductRepo.findProduct({ _id: productId });
+    if (!product) {
       return res.status(400).json({ message: "Product not found" });
     }
-    if(product.reviews.find(review => review.userId === req.payload.id)){
-      return res.status(400).json({ message: "You have already reviewed this product" });
+    if (product.reviews.find((review) => review.userId === req.payload.id)) {
+      return res
+        .status(400)
+        .json({ message: "You have already reviewed this product" });
     }
 
     const review = await ProductRepo.createReview({
@@ -129,8 +184,7 @@ const createReview = async (req, res, next) => {
     next(error);
     console.log(error);
   }
-}
-
+};
 module.exports = {
   getProduct,
   getAllProducts,
@@ -138,6 +192,9 @@ module.exports = {
   findProductByFilter,
   createProduct,
   createReview,
+  getAllBrands,
   updateProduct,
   deleteProduct,
+  getAllTypes,
+  getAllCalibers,
 };

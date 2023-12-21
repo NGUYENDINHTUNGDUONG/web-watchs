@@ -1,68 +1,67 @@
-import { Table } from 'antd';
-import React, { useState } from 'react'
-import Loading from '../../components/LoadingComponent/LoadingComponent'
+import { Button, Table } from "antd";
+import React, { useState } from "react";
+import Loading from "../../components/LoadingComponent/LoadingComponent";
 import { Excel } from "antd-table-saveas-excel";
-import { useMemo } from 'react';
+import { useMemo } from "react";
+import "./styles.css";
 
 const TableComponent = (props) => {
-  const { selectionType = 'checkbox', data:dataSource = [], isLoading = false, columns = [], handleDelteMany } = props
-  const [rowSelectedKeys, setRowSelectedKeys] = useState([])
+  const {
+    data: dataSource = [],
+    isLoading = false,
+    columns = [],
+    createUser,
+    createProduct,
+    createCoupon,
+    keyselected,
+  } = props;
   const newColumnExport = useMemo(() => {
-    const arr = columns?.filter((col) => col.dataIndex !== 'action')
-    return arr
-  }, [columns])
+    const arr = columns?.filter((col) => col.dataIndex !== "action");
+    return arr;
+  }, [columns]);
 
-  const rowSelection = {
-    onChange: (selectedRowKeys, selectedRows) => {
-      setRowSelectedKeys(selectedRowKeys)
-    },
-    // getCheckboxProps: (record) => ({
-    //   disabled: record.name === 'Disabled User',
-    //   // Column configuration not to be checked
-    //   name: record.name,
-    // }),
-  };
-  const handleDeleteAll = () => {
-    handleDelteMany(rowSelectedKeys)
-  }
   const exportExcel = () => {
     const excel = new Excel();
     excel
       .addSheet("test")
       .addColumns(newColumnExport)
       .addDataSource(dataSource, {
-        str2Percent: true
+        str2Percent: true,
       })
       .saveAs("Excel.xlsx");
   };
 
   return (
     <Loading isLoading={isLoading}>
-      {!!rowSelectedKeys.length && (
-        <div style={{
-          background: '#1d1ddd',
-          color: '#fff',
-          fontWeight: 'bold',
-          padding: '10px',
-          cursor: 'pointer'
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: "10px",
         }}
-          onClick={handleDeleteAll}
-        >
-          Xóa tất cả
-        </div>
-      )}
-      <button onClick={exportExcel}>Export Excel</button>
+      >
+        <Button onClick={exportExcel}>Export Excel</Button>
+        {keyselected === "users" ? (
+          <Button onClick={createUser}>Thêm người dùng</Button>
+        ) : keyselected === "product" ? (
+          <Button onClick={createProduct}>Thêm sản phẩm</Button>
+        ) : keyselected === "coupon" ? (
+          <Button onClick={createCoupon}>Thêm mã giảm giá</Button>
+        ) : keyselected === "supplier" ? (
+          <Button onClick={createCoupon}>Thêm nhà cung cấp</Button>
+        ) : null}
+      </div>
       <Table
-        rowSelection={{
-          type: selectionType,
-          ...rowSelection,
+        className="table-custom"
+        pagination={{
+          pageSize: 7,
         }}
         columns={columns}
         dataSource={dataSource}
         {...props}
       />
     </Loading>
-  )
-}
+  );
+};
 
-export default TableComponent
+export default TableComponent;

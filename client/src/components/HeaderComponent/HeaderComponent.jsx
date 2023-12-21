@@ -60,27 +60,27 @@ const HeaderComponent = () => {
 
   const handleCancelProfile = () => {
     dispatch(modalState({ modalProfile: false }));
-  }
-  
+  };
+
   const openSignIn = useSelector((state) => state.user.modalSignIn);
 
   const openSignUp = useSelector((state) => state.user.modalSignUp);
-  
-  const openEmail = useSelector((state) => state.user.modalEmail);
 
+  const openEmail = useSelector((state) => state.user.modalEmail);
+console.log(user)
   const handleLogout = async () => {
     setLoading(true);
     await UserService.logoutUser();
     dispatch(resetUser());
     setLoading(false);
-    localStorage.removeItem('access_token')
-    localStorage.removeItem('refresh_token')
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    navigate("/");
   };
 
   const handleOpenProfile = () => {
-    dispatch(modalState({ modalProfile: true}))
-
-  }
+    dispatch(modalState({ modalProfile: true }));
+  };
   const openProfile = useSelector((state) => state.user.modalProfile);
   useEffect(() => {
     setLoading(true);
@@ -128,50 +128,52 @@ const HeaderComponent = () => {
     setIsOpenPopup(false);
   };
 
-  const onSearch = (e) => {
-    setSearch(e.target.value);
-    dispatch(searchProduct(e.target.value));
-  };
+  // const onSearch = (e) => {
+  //   setSearch(e.target.value);
+  //   dispatch(searchProduct(e.target.value));
+  // };
 
   const arr = [
-    <HomeOutlined />,
-    "THƯƠNG HIỆU",
-    "ĐỒNG HỒ NAM",
-    "ĐỒNG HỒ NỮ",
-    "SỬA CHỮA",
-    "KIẾN THỨC",
-    "PHỤ KIỆN",
+    { title: <HomeOutlined />, url: "/" },
+    { title: "THƯƠNG HIỆU", url: "/products" },
+    { title: "ĐỒNG HỒ NAM", url: "/products/donghonam" },
+    { title: "ĐỒNG HỒ NỮ", url: "/products/donghonu" },
+    { title: "SỬA CHỮA", url: "/products" },
+    { title: "KIẾN THỨC", url: "/products" },
+    { title: "PHỤ KIỆN", url: "/products" },
   ];
   return (
-    <div >
+    <div>
       <WrapperHeader>
-        <Row gutter={16}>
-          <Col span={7}>
+        <Row gutter={16} className="items-center justify-between">
+          <Col span={5}>
             <WrapperHeaderText>
               <img
+                onClick={() => navigate("/")}
                 src={logo}
                 alt="logo"
                 style={{
+                  cursor: "pointer",
                   width: "150px",
                 }}
               />
             </WrapperHeaderText>
           </Col>
-          <Col span={10}>
+          <Col span={12}>
             <SearchComponent
               size="large"
               placeholder="Tìm kiếm sản phẩm"
               textbutton="Tìm kiếm"
-              onSearch={onSearch}
+              // onSearch={onSearch}
             />
           </Col>
           <Col
             span={4}
             style={{
-              padding: "0 50px",
               display: "flex",
               gap: "20px",
               alignItems: "center",
+              justifyContent: "flex-end",
             }}
           >
             <WrapperHeaderAccount>
@@ -187,7 +189,10 @@ const HeaderComponent = () => {
                   }}
                 />
               ) : (
-                <UserOutlined style={{ fontSize: "30px" }} onClick={handleOpenProfile}/>
+                <UserOutlined
+                  style={{ fontSize: "30px" }}
+                  onClick={handleOpenProfile}
+                />
               )}
               {user?.access_token ? (
                 <>
@@ -221,25 +226,30 @@ const HeaderComponent = () => {
           <Col
             span={3}
             style={{
-              marginLeft: "-30px",
-              marginTop:"15px",
               display: "flex",
               gap: "20px",
-              alignItems: "left",
             }}
+            className="justify-end"
           >
-            <div>
-              <Badge count={0} size="small">
-                <ShoppingOutlined style={{ fontSize: "30px", color: "#fff" }} />
+            <div
+              onClick={() => navigate("/order")}
+              className="flex items-center cursor-pointer"
+            >
+              <Badge count={order?.orderItems?.length} size="small">
+                <ShoppingOutlined style={{ fontSize: "34px", color: "#fff" }} />
               </Badge>
-              <WrapperHeaderTextSmall>Giỏ hàng</WrapperHeaderTextSmall>
+              <WrapperHeaderTextSmall className="ml-2">
+                Giỏ hàng
+              </WrapperHeaderTextSmall>
             </div>
           </Col>
         </Row>
       </WrapperHeader>
       <WrapperType>
         {arr.map((item) => {
-          return <TypeComponent key={item} title={item} />;
+          return (
+            <TypeComponent key={item.title} title={item.title} url={item.url} />
+          );
         })}
       </WrapperType>
       <Modal open={openSignIn} onCancel={handleCancelSignIn} footer={false}>
@@ -257,7 +267,6 @@ const HeaderComponent = () => {
       <Modal open={openProfile} onCancel={handleCancelProfile} footer={false}>
         <ProfileComponent />
       </Modal>
-        
     </div>
   );
 };

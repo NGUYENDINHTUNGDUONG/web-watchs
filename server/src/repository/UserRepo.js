@@ -5,6 +5,10 @@ const findUser = async (filters) => {
   return await User.findOne(filters);
 };
 
+const findUsers = async (filters) => {
+  return await User.find(filters);
+};
+
 const getAllUsers = async (filters) => {
   return await User.find(filters);
 };
@@ -32,6 +36,7 @@ const updateUser = async (data) => {
 
 module.exports = {
   findUser,
+  findUsers,
   getAllUsers,
   comparePassword,
   deleteUser,

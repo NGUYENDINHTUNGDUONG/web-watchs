@@ -18,7 +18,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(cookieParser());
-
+app.use('/static', express.static('src/uploads'))
 app.use(errorHandler);
 
 routes(app);

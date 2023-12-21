@@ -106,7 +106,7 @@ const updatedUser = async (req, res, next) => {
 
 const deletedUser = async (req, res, next) => {
   try {
-    const deletedUser = await userRepo.deleteUser(req.params.id);
+    const deletedUser = await UserRepo.deleteUser(req.params.id);
     if (deletedUser == null) {
       res.status(400).json({ message: "User delete not found" });
     }

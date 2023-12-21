@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export const WrapperHeader = styled.header`
-  padding: 25px;
+  padding: 25px 130px;
   background-color: #000;
   flex-wrap: nowrap;
 `;
@@ -9,9 +9,6 @@ export const WrapperHeaderText = styled.span`
   font-size: 30px;
   color: white;
   font-weight: bold;
-  text-align: left;
-  display: flex;
-  justify-content: center;
 `;
 export const WrapperHeaderTextSmall = styled.span`
   font-size: 12px;

@@ -1,9 +1,7 @@
-import React from "react";
-import { Row, Col, Image } from "antd";
+import React, { useEffect, useState } from "react";
+import { Row, Col, Image, Rate, Carousel, message } from "antd";
 import { StarFilled, PlusOutlined, MinusOutlined } from "@ant-design/icons";
 
-import imageProduct from "../../assets/images/Slider_1.jpg";
-import imageProductSmall from "../../assets/images/Slider_1.jpg";
 import {
   WrapperAddressProduct,
   WrapperInputNumber,
@@ -16,8 +14,87 @@ import {
   WrapperStyleTextSell,
 } from "./style";
 import ButtonComponent from "../ButtonComponent/ButtonComponent";
+import { addOrderProduct, resetOrder } from "../../redux/slides/orderSlide";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
+import * as ProductService from "../../services/ProductService";
+const ProductDetailsComponent = (props) => {
+  const [index, setIndex] = React.useState(0);
+  const [numProduct, setNumProduct] = useState(1);
+  const user = useSelector((state) => state.user);
+  const order = useSelector((state) => state.order);
+  const [errorLimitOrder, setErrorLimitOrder] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const dispatch = useDispatch();
 
-const ProductDetailsComponent = () => {
+  const onChange = (value) => {
+    setNumProduct(Number(value));
+  };
+
+  useEffect(() => {
+    const orderRedux = order?.orderItems?.find(
+      (item) => item.product === props?.idProduct
+    );
+    if (
+      orderRedux?.amount + numProduct <= orderRedux?.quantity ||
+      (!orderRedux && props?.quantity > 0)
+    ) {
+      setErrorLimitOrder(false);
+    } else if (props?.quantity === 0) {
+      setErrorLimitOrder(true);
+    }
+  }, [numProduct]);
+
+  useEffect(() => {
+    if (order.isSucessOrder) {
+      message.success("Đã thêm vào giỏ hàng");
+    }
+    return () => {
+      dispatch(resetOrder());
+    };
+  }, [order.isSucessOrder]);
+
+  const handleChangeCount = (type, limited) => {
+    if (type === "increase") {
+      if (!limited) {
+        setNumProduct(numProduct + 1);
+      }
+    } else {
+      if (!limited) {
+        setNumProduct(numProduct - 1);
+      }
+    }
+  };
+  const handleAddOrderProduct = () => {
+    if (!user?.id) {
+      navigate("/sign-in", { state: location?.pathname });
+    } else {
+      const orderRedux = order?.orderItems?.find(
+        (item) => item.product === props?.idProduct
+      );
+      if (
+        orderRedux?.amount + numProduct <= orderRedux?.quantity ||
+        (!orderRedux && props?.quantity > 0)
+      ) {
+        dispatch(
+          addOrderProduct({
+            orderItem: {
+              name: props?.name,
+              amount: numProduct,
+              images: props?.images,
+              price: props?.price,
+              product: props?.idProduct,
+              quantity: props?.quantity,
+            },
+          })
+        );
+      } else {
+        setErrorLimitOrder(true);
+      }
+    }
+  };
+
   return (
     <div>
       <Row
@@ -30,75 +107,75 @@ const ProductDetailsComponent = () => {
       >
         <Col
           span={10}
-          style={{ borderRight: "1px solid #e5e5e5", paddingRight: "8px" }}
+          style={{
+            borderRight: "1px solid #e5e5e5",
+            paddingRight: "8px",
+            textAlign: "center",
+          }}
         >
-          <Image src={{ imageProduct }} alt="image product" preview={false} />
+          <Image
+            src={`http://localhost:3001/static/${props.images?.[index]}`}
+            alt="image product"
+            preview={false}
+            className=" !h-[500px] object-cover"
+          />
           <Row style={{ paddingTop: "10px", justifyContent: "space-between" }}>
-            <WrapperStyleColImage span={4}>
-              <WrapperStyleImageSmall
-                src={{ imageProductSmall }}
-                alt="image product"
-                preview={false}
-              />
-            </WrapperStyleColImage>
-            <WrapperStyleColImage span={4}>
-              <WrapperStyleImageSmall
-                src={{ imageProductSmall }}
-                alt="image product"
-                preview={false}
-              />
-            </WrapperStyleColImage>
-            <WrapperStyleColImage span={4}>
-              <WrapperStyleImageSmall
-                src={{ imageProductSmall }}
-                alt="image product"
-                preview={false}
-              />
-            </WrapperStyleColImage>
-            <WrapperStyleColImage span={4}>
-              <WrapperStyleImageSmall
-                src={{ imageProductSmall }}
-                alt="image product"
-                preview={false}
-              />
-            </WrapperStyleColImage>
-            <WrapperStyleColImage span={4}>
-              <WrapperStyleImageSmall
-                src={{ imageProductSmall }}
-                alt="image product"
-                preview={false}
-              />
-            </WrapperStyleColImage>
-            <WrapperStyleColImage span={4}>
-              <WrapperStyleImageSmall
-                src={{ imageProductSmall }}
-                alt="image product"
-                preview={false}
-              />
-            </WrapperStyleColImage>
+            {props.images?.map((value, index) => (
+              <WrapperStyleColImage span={4}>
+                <WrapperStyleImageSmall
+                  src={`http://localhost:3001/static/${value}`}
+                  alt="image product"
+                  preview={false}
+                  onClick={() => setIndex(index)}
+                />
+              </WrapperStyleColImage>
+            ))}
           </Row>
         </Col>
-        <Col span={14} style={{ paddingLeft: "10px" }}>
-          <WrapperStyleNameProduct>Sách truyện</WrapperStyleNameProduct>
-          <div>
-            <StarFilled
-              style={{ fontSize: "12px", color: "rgb(253, 216, 54)" }}
-            />{" "}
-            <StarFilled
-              style={{ fontSize: "12px", color: "rgb(253, 216, 54)" }}
-            />{" "}
-            <StarFilled
-              style={{ fontSize: "12px", color: "rgb(253, 216, 54)" }}
+        <Col
+          span={7}
+          style={{
+            borderRight: "1px solid #e5e5e5",
+            padding: "20px",
+          }}
+        >
+          <p style={{ display: "flex", alignItems: "center" }}>
+            <img
+              alt="#"
+              style={{ width: "90px", marginRight: "10px" }}
+              src="/images/chinhhang.png"
             />
-            <WrapperStyleTextSell> | Đã bán 1000+</WrapperStyleTextSell>
+            <span style={{ fontWeight: 500 }}>Thương hiệu: </span> {props.brand}
+          </p>
+          <WrapperStyleNameProduct>{props.name}</WrapperStyleNameProduct>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <h2 className="font-bold text-2xl" style={{ margin: "0" }}>
+              {props.rate}
+            </h2>
+
+            <Rate
+              disabled
+              value={props.rate}
+              style={{ fontSize: "15px", paddingLeft: "10px" }}
+            />
           </div>
-          <WrapperPriceProduct>
-            <WrapperPriceTextProduct>20000000đ</WrapperPriceTextProduct>
-          </WrapperPriceProduct>
-          <WrapperAddressProduct>
-            <span>Giao đến </span>
-            <span className="change-address">Đổi địa chỉ</span>
-          </WrapperAddressProduct>
+          <WrapperPriceTextProduct>
+            {Number(props.price).toLocaleString("vi-VN", {
+              style: "currency",
+              currency: "VND",
+            })}
+          </WrapperPriceTextProduct>
+
+          <p
+            style={{
+              paddingTop: "10px",
+              fontWeight: 500,
+              borderTop: "1px solid #e5e5e5",
+            }}
+          >
+            Mô tả
+          </p>
+          <div>{props.description}</div>
           <div
             style={{
               margin: "10px 0 20px",
@@ -107,7 +184,13 @@ const ProductDetailsComponent = () => {
               borderBottom: "1px solid #e5e5e5",
             }}
           >
-            <div style={{ marginBottom: "10px" }}>Số lượng</div>
+            <div className="flex items-center mb-2">
+              <div style={{ fontWeight: 500 }}>Số lượng</div>
+              <p style={{ paddingLeft: "10px", fontSize: "10px" }}>
+                ( còn {props.quantity} )
+              </p>
+            </div>
+
             <WrapperQualityProduct>
               <button
                 style={{
@@ -115,16 +198,16 @@ const ProductDetailsComponent = () => {
                   background: "transparent",
                   cursor: "pointer",
                 }}
-                // onClick={() => handleChangeCount("decrease", numProduct === 1)}
+                onClick={() => handleChangeCount("decrease", numProduct === 1)}
               >
                 <MinusOutlined style={{ color: "#000", fontSize: "20px" }} />
               </button>
               <WrapperInputNumber
-                // onChange={onChange}
+                onChange={onChange}
                 defaultValue={1}
-                // max={productDetails?.countInStock}
+                max={props.quantity}
                 min={1}
-                // value={numProduct}
+                value={numProduct}
                 size="small"
               />
               <button
@@ -133,12 +216,9 @@ const ProductDetailsComponent = () => {
                   background: "transparent",
                   cursor: "pointer",
                 }}
-                // onClick={() =>
-                //   handleChangeCount(
-                //     "increase",
-                //     numProduct === productDetails?.countInStock
-                //   )
-                // }
+                onClick={() =>
+                  handleChangeCount("increase", numProduct === props?.quantity)
+                }
               >
                 <PlusOutlined style={{ color: "#000", fontSize: "20px" }} />
               </button>
@@ -155,7 +235,7 @@ const ProductDetailsComponent = () => {
                   border: "none",
                   borderRadius: "4px",
                 }}
-                // onClick={handleAddOrderProduct}
+                onClick={handleAddOrderProduct}
                 textbutton={"Chọn mua"}
                 styleTextButton={{
                   color: "#fff",
@@ -163,20 +243,29 @@ const ProductDetailsComponent = () => {
                   fontWeight: "700",
                 }}
               ></ButtonComponent>
-              {/* {errorLimitOrder && <div style={{color: 'red'}}>Sản phẩm hết hng</div>} */}
+              {errorLimitOrder && (
+                <div style={{ color: "red" }}>Sản phẩm hết hng</div>
+              )}
             </div>
-            <ButtonComponent
-              size={40}
-              styleButton={{
-                background: "#fff",
-                height: "48px",
-                width: "220px",
-                border: "1px solid rgb(13, 92, 182)",
-                borderRadius: "4px",
-              }}
-              textbutton={"Mua trả sau"}
-              styleTextButton={{ color: "rgb(13, 92, 182)", fontSize: "15px" }}
-            ></ButtonComponent>
+          </div>
+        </Col>
+        <Col span={7} style={{ paddingLeft: "20px" }}>
+          <div>
+            <p className="font-bold text-2xl">Chi tiết sản phẩm</p>
+            <p className="font-bold text-lg">Loại đồng hồ:</p>
+            <span>{props.category}</span>
+            <p className="font-bold text-lg">Kiểu máy:</p>
+            <span>{props.caliber}</span>
+            <p className="font-bold text-lg">Kiểu dây:</p>
+            <span>{props.type}</span>
+            <p className="font-bold text-lg">Size:</p>
+            <span>{props.size}</span>
+            <p className="font-bold text-lg">Loại kính:</p>
+            <span>{props.glass}</span>
+            <p className="font-bold text-lg">Chống nước:</p>
+            <span>{props.waterResistant}</span>
+            <p className="font-bold text-lg">Nhà phân phối:</p>
+            <span>{props.supplier}</span>
           </div>
         </Col>
       </Row>

@@ -6,6 +6,7 @@ const router = express.Router();
 
 router.post("/", verify.verifyUser, orderController.createOrder);
 router.get("/", verify.verifyUser, orderController.getAllOrderUser);
+router.get("/all-order", verify.verifyUser, verify.verifyAdmin, orderController.getAllOrders);
 router.get("/:id", orderController.getDetailOrder);
 router.patch("/:id/cancel", verify.verifyUser, orderController.cancelOrder);
 router.patch(
