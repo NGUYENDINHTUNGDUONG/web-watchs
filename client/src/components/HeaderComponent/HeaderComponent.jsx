@@ -19,7 +19,7 @@ import {
   WrapperType,
 } from "./style";
 
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import * as UserService from "../../services/UserService";
 import { modalState, resetUser } from "../../redux/slides/userSlide";
@@ -33,10 +33,11 @@ import ProfileComponent from "../ProfileComponet/ProfileComponent";
 
 const HeaderComponent = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const [userName, setUserName] = useState("");
-  const [userAvatar, setUserAvatar] = useState("");
+
   const [search, setSearch] = useState("");
   const [isOpenPopup, setIsOpenPopup] = useState(false);
   const order = useSelector((state) => state.order);
@@ -74,7 +75,7 @@ const HeaderComponent = () => {
         },
       });
     }
-  }
+  };
 
   const openSignIn = useSelector((state) => state.user.modalSignIn);
 
@@ -88,7 +89,7 @@ const HeaderComponent = () => {
     setLoading(false);
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
-    navigate("/");
+    navigate("", { state: location?.pathname });
   };
 
   const handleOpenProfile = () => {
@@ -98,7 +99,6 @@ const HeaderComponent = () => {
   useEffect(() => {
     setLoading(true);
     setUserName(user?.fullName);
-    setUserAvatar(user?.avatar);
     setLoading(false);
   }, [user?.fullName, user?.avatar]);
 
@@ -126,7 +126,7 @@ const HeaderComponent = () => {
   const handleClickNavigate = (type) => {
     if (type === "profile") {
       // navigate("/profile-user");
-      dispatch(modalState({ modalProfile: true }))
+      dispatch(modalState({ modalProfile: true }));
     } else if (type === "admin") {
       navigate("/admin");
     } else if (type === "my-order") {
@@ -185,29 +185,12 @@ const HeaderComponent = () => {
             span={4}
             style={{
               display: "flex",
-              gap: "20px",
               alignItems: "center",
-              justifyContent: "flex-end",
+              justifyContent: "space-around",
             }}
           >
             <WrapperHeaderAccount>
-              {userAvatar ? (
-                <img
-                  src={userAvatar}
-                  alt="avatar"
-                  style={{
-                    height: "30px",
-                    width: "30px",
-                    borderRadius: "50%",
-                    objectFit: "cover",
-                  }}
-                />
-              ) : (
-                <UserOutlined
-                  style={{ fontSize: "30px" }}
-
-                />
-              )}
+              <UserOutlined style={{ fontSize: "30px" }} />
               {user?.access_token ? (
                 <>
                   <Popover content={content} trigger="click" open={isOpenPopup}>
