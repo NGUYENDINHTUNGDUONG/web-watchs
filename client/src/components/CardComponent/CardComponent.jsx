@@ -12,9 +12,8 @@ import {
 const CartComponent = (props) => {
   const navigate = useNavigate();
   return (
-    <a href={`/product-details/${props.id}`}>
       <WrapperCardStyle
-        // onClick={() => navigate(`/product-details/${props.id}`)}
+        onClick={() => navigate(`/product-details/${props.id}`)}
         hoverable
         headStyle={{ width: "220px", height: "300px" }}
         style={{ width: "100%", height: "100%" }}
@@ -76,7 +75,6 @@ const CartComponent = (props) => {
           </WrapperPriceText>
         </div>
       </WrapperCardStyle>
-    </a>
   );
 };
 

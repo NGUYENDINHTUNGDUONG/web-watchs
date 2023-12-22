@@ -1,21 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { Form, Image, Input } from "antd";
-import { EyeFilled, EyeInvisibleFilled } from "@ant-design/icons";
 import { Button } from "antd";
 
 import * as UserService from "../../services/UserService";
 import * as message from "../Message/Message";
 import imageLogoLogin from "../../assets/images/logo-login.png";
-
-import ButtonComponent from "../ButtonComponent/ButtonComponent";
-import InputFormComponent from "../InputFormComponent/InputFormComponent";
 import { useMutationHooks } from "../../hooks/useMutationHook";
-import {
-  WrapperContainerLeft,
-  WrapperContainerRight,
-  WrapperTextLight,
-} from "../SignInComponent/style";
+import { WrapperTextLight } from "../SignInComponent/style";
 import { useDispatch } from "react-redux";
 import { modalState } from "../../redux/slides/userSlide";
 
@@ -25,10 +16,7 @@ const SignUpComponent = () => {
   const phoneRegex = /^0[0-9]{9,10}$/;
   const passwordRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
-  const navigate = useNavigate();
 
-  const [isShowPassword, setIsShowPassword] = useState(false);
-  const [isShowConfirmPassword, setIsShowConfirmPassword] = useState(false);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -40,9 +28,10 @@ const SignUpComponent = () => {
   const { data, isSuccess, isError } = mutation;
   useEffect(() => {
     if (isSuccess) {
-      message.success("Đăng ký tài khoản thành công");
-      // handleNavigateSignIn();
-      handleOpenSignIn();
+      if (data) {
+        message.success("Đăng ký tài khoản thành công");
+        handleOpenSignIn();
+      }
     } else if (isError) {
       message.error();
     }
@@ -137,7 +126,7 @@ const SignUpComponent = () => {
                   },
                 ]}
               >
-                <Input
+                <Input.Password
                   type="password"
                   placeholder="Mật khẩu"
                   value={password}
@@ -154,7 +143,7 @@ const SignUpComponent = () => {
                   },
                 ]}
               >
-                <Input
+                <Input.Password
                   type="password"
                   placeholder="Xác nhận mật khẩu"
                   value={confirmPassword}
@@ -168,6 +157,10 @@ const SignUpComponent = () => {
                   {
                     required: true,
                     message: "Vui lòng nhập số điện thoại của bạn!",
+                  },
+                  {
+                    pattern: phoneRegex,
+                    message: "Vui lòng nhập đúng định dạng số điện thoại",
                   },
                 ]}
               >
@@ -189,7 +182,7 @@ const SignUpComponent = () => {
                   onChange={handleOnchangeAddress}
                 />
               </Form.Item>
-              <Form.Item>
+              <Form.Item className="text-center">
                 <Button
                   htmlType="submit"
                   className="text-black"
@@ -200,8 +193,6 @@ const SignUpComponent = () => {
               </Form.Item>
             </Form>
           </div>
-
-          {/* </Loading> */}
           <p>
             Bạn đã có tài khoản?{" "}
             <WrapperTextLight onClick={handleOpenSignIn}>

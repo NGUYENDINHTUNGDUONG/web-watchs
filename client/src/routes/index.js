@@ -5,7 +5,7 @@ import NotFoundPage from "../pages/NotFoundPage/NotFoundPage";
 import ProductDetailsPage from "../pages/ProductsPage/ProductDetailsPage";
 import AdminPage from "../pages/AdminPage/AdminPage";
 import MyOrderPage from "../pages/MyOder";
-import PaymentPage from "../pages/PaymentPage";
+import PaymentPage from "../pages/PaymentPage/PaymentPage";
 import OrderSucess from "../pages/OrderSuccess";
 import DetailsOrderPage from "../pages/DetailsOrderPage/DetailsOrderPage";
 
@@ -22,9 +22,7 @@ export const routes = [
     element: MyOrderPage,
     isShowHeader: true,
   },
-  { path: "/orderSuccess",
-  element: OrderSucess,
-  isShowHeader: true },
+  { path: "/orderSuccess", element: OrderSucess, isShowHeader: true },
   {
     path: "/order",
     element: OrderPage,

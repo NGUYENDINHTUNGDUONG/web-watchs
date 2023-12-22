@@ -16,6 +16,7 @@ router.get(
   verify.verifyAdmin,
   userController.getAllUsers
 );
+router.post("/change-password", userController.changePassword);
 router.post("/forgot-password", userController.forgotPassword);
 router.post(
   "/reset-password/:resetPasswordToken",

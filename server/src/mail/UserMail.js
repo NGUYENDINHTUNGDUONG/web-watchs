@@ -49,8 +49,8 @@ const sendEmailCreateUser = async (data) => {
     html,
     attachments: [
       {
-        filename: "logo.png",
-        path: path.join(__dirname, ".", "images", "logo.png"),
+        filename: "full-logo.png",
+        path: path.join(__dirname, ".", "images", "full-logo.png"),
         cid: "logo",
       },
     ],
@@ -77,15 +77,15 @@ const sendEmailForgotPassword = async (data) => {
       <mj-column>
         <mj-image src="cid:logo" alt="Logo" width="150px" padding="0 15px 15px 0"></mj-image>
         <mj-text font-size="24px" color="#000000" font-weight="bold" line-height="30px" padding="0 0 15px 0">Reset Password</mj-text>
-        <mj-text font-size="16px" color="#000000" line-height="24px" padding="0 0 15px 0">Hello ${data.fullName},</mj-text>
-        <mj-text font-size="16px" color="#000000" line-height="24px" padding="0 0 15px 0">You are receiving this email because we received a request to reset your password for your account.</mj-text>
-        <mj-text font-size="16px" color="#000000" line-height="24px" padding="0 0 15px 0">Click the button below to reset your password:</mj-text>
+        <mj-text font-size="16px" color="#000000" line-height="24px" padding="0 0 15px 0">Xin chào ${data.fullName},</mj-text>
+        <mj-text font-size="16px" color="#000000" line-height="24px" padding="0 0 15px 0">Bạn nhận được email này vì chúng tôi đã nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn.</mj-text>
+        <mj-text font-size="16px" color="#000000" line-height="24px" padding="0 0 15px 0">Nhấp vào nút bên dưới để đặt lại mật khẩu của bạn:</mj-text>
         <mj-button href="${process.env.CLIENT_URL}/reset-password/${data.access_token}">Reset Password</mj-button>
-        <mj-text font-size="16px" color="#000000" line-height="24px" padding="15px 0 0 0">This link will expire in 1 hour.</mj-text>
-        <mj-text font-size="16px" color="#000000" line-height="24px" padding="15px 0 0 0">If you did not request a password reset, no further action is required.</mj-text>
+        <mj-text font-size="16px" color="#000000" line-height="24px" padding="15px 0 0 0">Liên kết này sẽ hết hạn sau 1 giờ.</mj-text>
+        <mj-text font-size="16px" color="#000000" line-height="24px" padding="15px 0 0 0">Nếu bạn không yêu cầu đặt lại mật khẩu thì không cần thực hiện thêm hành động nào.</mj-text>
         <mj-divider border-color="#e5e5e5" padding="15px 0"></mj-divider>
-        <mj-text font-size="14px" color="#000000" line-height="20px" padding="15px 0 0 0">If you’re having trouble clicking the "Reset Password" button, copy and paste the URL below into your web browser:</mj-text>
-        <mj-text font-size="14px" color="#000000" line-height="20px" padding="0 0 15px 0">{{ resetUrl }}</mj-text>
+        <mj-text font-size="14px" color="#000000" line-height="20px" padding="15px 0 0 0">Nếu bạn gặp khó khăn khi nhấp vào nút "Đặt lại mật khẩu",</mj-text>
+
       </mj-column>
     </mj-section>
   </mj-body>
@@ -100,8 +100,8 @@ const sendEmailForgotPassword = async (data) => {
     html,
     attachments: [
       {
-        filename: "logo.png",
-        path: path.join(__dirname, ".", "images", "logo.png"),
+        filename: "full-logo.png",
+        path: path.join(__dirname, ".", "images", "full-logo.png"),
         cid: "logo",
       },
     ],

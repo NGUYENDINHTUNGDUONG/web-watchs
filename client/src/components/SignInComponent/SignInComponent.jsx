@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, Form, Image, Input } from "antd";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { LockOutlined, MailOutlined } from "@ant-design/icons";
 
@@ -12,11 +12,11 @@ import { WrapperTextLight } from "./style.js";
 
 const SignInPage = () => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const passwordRegex =/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
   const location = useLocation();
   const [form] = Form.useForm();
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.user);
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -40,8 +40,10 @@ const SignInPage = () => {
       } else {
         navigate("/");
       }
-      localStorage.setItem("access_token", `${data?.access_token}`);
-      localStorage.setItem("refresh_token", `${data?.refresh_token}`);
+      if (data) {
+        localStorage.setItem("access_token", `${data?.access_token}`);
+        localStorage.setItem("refresh_token", `${data?.refresh_token}`);
+      }
       if (data?.access_token) {
         handleGetDetailsUser(data?.access_token);
       }
@@ -52,10 +54,9 @@ const SignInPage = () => {
     const refreshToken = localStorage.getItem("refresh_token");
     const res = await UserService.getDetailsUser(token);
     dispatch(updateUser({ ...res?.data, access_token: token, refreshToken }));
-    console.log(res);
   };
 
-  const handleOnchangeEmail = (e) => {
+  const handleOnchangeEmail = async (e) => {
     setEmail(e.target.value);
   };
 
@@ -102,8 +103,9 @@ const SignInPage = () => {
               rules={[
                 { required: true, message: "Vui lòng nhập mật khẩu!" },
                 {
-                  pattern:passwordRegex,
-                  message: "Mật khẩu cần ít nhất 1 ký tự chữ hoa, 1 ký tự chữ thường,1 ký tự số, 1 kí tự đặc biệt"
+                  pattern: passwordRegex,
+                  message:
+                    "Mật khẩu cần ít nhất 1 ký tự chữ hoa, 1 ký tự chữ thường,1 ký tự số, 1 kí tự đặc biệt",
                 },
               ]}
             >
@@ -114,9 +116,8 @@ const SignInPage = () => {
                 onChange={handleOnchangePassword}
               />
             </Form.Item>
-
-            <Form.Item>
-              <Button htmlType="submit" className="text-black">
+            <Form.Item className="text-center">
+              <Button htmlType="submit" className="text-black ">
                 Đăng nhập
               </Button>
             </Form.Item>

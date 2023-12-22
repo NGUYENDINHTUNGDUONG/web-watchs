@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ProductDetailsComponent from "../../components/ProductDetailsComponent/ProductDetailsComponent";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import * as ProductService from "../../services/ProductService";
 import { Carousel } from "antd";
 import CardComponent from "../../components/CardComponent/CardComponent";
@@ -15,13 +15,13 @@ const ProductDetailsPage = () => {
   const location = useLocation();
   const pathname = location.pathname;
   const parts = pathname.split("/");
-  const id = parts.pop();
+  const { id } = useParams();
 
   const getDetailsProduct = async () => {
     const res = await ProductService.getDetailsProduct(id);
     if (res?.data) {
       setProduct(res?.data);
-      console.log(res.data)
+      console.log(res.data);
     }
   };
   const getAllBrands = async () => {
@@ -40,7 +40,7 @@ const ProductDetailsPage = () => {
   useEffect(() => {
     getDetailsProduct();
     getAllBrands();
-  }, []);
+  }, [id]);
   useEffect(() => {
     getAllProducts();
   }, [product?.brand]);

@@ -14,7 +14,7 @@ export const loginUser = async (data) => {
     );
     return res.data;
   } catch (error) {
-    message.error(error.response.data.message)
+    message.error(error.response.data.message);
   }
 };
 
@@ -26,7 +26,7 @@ export const registerUser = async (data) => {
     );
     return res.data;
   } catch (error) {
-    message.error(error.response.data.message)
+    message.error(error.response.data.message);
   }
 };
 
@@ -60,7 +60,9 @@ export const refreshToken = async (refreshToken) => {
 
 export const logoutUser = async () => {
   try {
-    const res = await axios.post(`${process.env.REACT_APP_API_URL}/user/log-out`);
+    const res = await axios.post(
+      `${process.env.REACT_APP_API_URL}/user/log-out`
+    );
     return res.data;
   } catch (error) {
     console.log(error);
@@ -112,5 +114,33 @@ export const deleteUser = async (id, access_token, data) => {
     return res.data;
   } catch (error) {
     console.log(error);
+  }
+};
+export const SendMail = async (data) => {
+  try {
+    const res = await axios.post(
+      `${process.env.REACT_APP_API_URL}/user/forgot-password`,
+      data,
+      {
+        withCredentials: true,
+      }
+    );
+    return res.data;
+  } catch (error) {
+    message.error(error.response.data.message);
+  }
+};
+export const changePassword = async (data) => {
+  try {
+    const res = await axiosJWT.post(
+      `${process.env.REACT_APP_API_URL}/user/change-password`,
+      data,
+      {
+        withCredentials: true,
+      }
+    );
+    return res.data;
+  } catch (error) {
+    message.error(error.response.data.message);
   }
 };

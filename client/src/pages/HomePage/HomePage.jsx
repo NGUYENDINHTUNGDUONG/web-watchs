@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
 import * as ProductService from "../../services/ProductService";
 
-import { WrapperProducts } from "./style";
+import { WrapperButtonMore, WrapperProducts } from "./style";
 
 import CardComponent from "../../components/CardComponent/CardComponent";
 import SliderComponent from "../../components/SliderComponent/SliderComponent";
 import FooterComponent from "../../components/FooterComponent/FooterComponent";
-import { useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
+
+import { events } from "./config";
+import EventComponent from "../../components/EventComponent/EventComponent";
 
 const HomePage = () => {
   const [product, setProduct] = useState([]);
@@ -38,16 +41,6 @@ const HomePage = () => {
         <div className="w-full text-center">Sản phẩm mới</div>
         <hr className="w-full mr-32" />
       </div>
-
-      {/* <div className="flex justify-center gap-x-10 mb-10">
-        <Button size={"large"} className="!bg-gray-300">
-          Đồng hồ nam
-        </Button>
-        <Button size={"large"} className="!bg-gray-300">
-          Đồng hồ nữ
-        </Button>
-      </div> */}
-
       <WrapperProducts>
         {product.slice(0, 8).map((value, index) => (
           <CardComponent
@@ -66,47 +59,37 @@ const HomePage = () => {
         ))}
       </WrapperProducts>
 
-      {/* <div className="text-4xl items-center justify-between font-medium my-10 flex">
-        <hr className="w-full ml-32" />
-        <div className="w-full text-center">
-          Khách hàng nói về <br />
-          chúng tôi
-        </div>
-        <hr className="w-full mr-32" />
-      </div>
-      <WrapperProducts>
-        <CardComponent />
-        <CardComponent />
-        <CardComponent />
-        <CardComponent />
-      </WrapperProducts>
-
       <div className="text-4xl items-center justify-between font-medium my-10 flex">
-        <hr className="w-full ml-32" />
-        <div className="w-full text-center">Thẩm định đồng hồ</div>
-        <hr className="w-full mr-32" />
-      </div>
-      <WrapperProducts>
-        <CardComponent />
-        <CardComponent />
-        <CardComponent />
-        <CardComponent />
-      </WrapperProducts>
-
-      <div className="text-4xl items-center justify-between font-medium my-10 flex">
-        <hr className="w-full ml-32" />
-        <div className="w-full text-center mx-10">
-          Dwatch_Tin tức và <br />
-          sự kiện
+        <div className="w-3/4">
+          <div>
+            <div className="w-full text-4xl font-medium ml-14">
+              Dwatch_Tin tức và sự kiện
+            </div>
+            <div className="grid grid-cols-3 mx-10 mb-5">
+              {events.map((event) => (
+                <EventComponent
+                  image={event.image}
+                  title={event.title}
+                  time={event.time}
+                  content={event.content}
+                />
+              ))}
+            </div>
+          </div>
         </div>
-        <hr className="w-full mr-32" />
+        <div className="mt-5 ml-10 w-1/4">
+          <h1 className="font-medium text-2xl">Báo dân chí nói về Dwatch</h1>
+          <hr className="w-8 h-1 bg-orange-400 my-5" />
+          <img src="images/event/dantri.jpeg" alt="" className="w-3/5" />
+          <img
+            src="images/event/vietnamnet.png"
+            alt=""
+            className="mb-5 w-3/5"
+          />
+          <img src="images/event/vtv1.png" alt="" className="w-3/5" />
+        </div>
       </div>
-      <WrapperProducts>
-        <CardComponent />
-        <CardComponent />
-        <CardComponent />
-        <CardComponent />
-      </WrapperProducts>
+
       <div
         style={{
           width: "100%",
@@ -126,11 +109,11 @@ const HomePage = () => {
             borderRadius: "4px",
           }}
           onClick={() => {
-            navigate("/products");
+            Navigate("/products");
           }}
           styleTextButton={{ fontWeight: 500 }}
         />
-      </div> */}
+      </div>
       <div className="mt-10">
         <FooterComponent />
       </div>

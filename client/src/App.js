@@ -6,7 +6,6 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { routes } from "./routes";
 import * as UserService from "./services/UserService";
 import { resetUser, updateUser } from "./redux/slides/userSlide";
-// import Loading from "./components/LoadingComponent/LoadingComponent";
 import DefaultComponent from "./components/DefaultComponent/DefaultComponent";
 
 function App() {

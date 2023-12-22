@@ -30,8 +30,6 @@ import {
 } from "../../redux/slides/orderSlide";
 import { useMemo } from "react";
 import ModalComponent from "../../components/ModalComponent/ModalComponent";
-import { useMutationHooks } from "../../hooks/useMutationHook";
-import * as UserService from "../../services/UserService";
 import * as PaymentService from "../../services/PaymentService";
 import * as message from "../../components/Message/Message";
 import { useNavigate } from "react-router-dom";
@@ -48,12 +46,6 @@ const OrderPage = () => {
   const [isCouponOpen, setIsCouponOpen] = useState(false);
   const [isOpenModalUpdateInfo, setIsOpenModalUpdateInfo] = useState(false);
   const [maximumDiscountAmount, setMaximumDiscountAmount] = useState();
-  const [stateUserDetails, setStateUserDetails] = useState({
-    name: "",
-    phone: "",
-    address: "",
-    email: "",
-  });
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [city, setCity] = useState("");
@@ -132,7 +124,7 @@ const OrderPage = () => {
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [res]);
   const listCoupons = useSelector((state) => state.order.listCoupons);
   const handleDeleteOrder = (idProduct) => {
     dispatch(removeOrderProduct({ idProduct }));
@@ -152,17 +144,6 @@ const OrderPage = () => {
   useEffect(() => {
     dispatch(selectedOrder({ listChecked }));
   }, [listChecked]);
-
-  useEffect(() => {
-    if (isOpenModalUpdateInfo) {
-      setStateUserDetails({
-        name: names,
-        address: addresses,
-        phone: phone,
-        email: email,
-      });
-    }
-  }, [isOpenModalUpdateInfo]);
 
   useEffect(() => {
     const res = listCoupons?.filter((coupon) => coupon._id === checkCoupon[0]);
@@ -219,35 +200,18 @@ const OrderPage = () => {
     }
   };
 
-  const handleAddCard = () => {
+  const handleAddCard = async () => {
     if (!order?.orderItemsSlected?.length) {
       message.error("Vui lòng chọn sản phẩm");
     } else if (!phone || !addresses || !names || !email) {
       setIsOpenModalUpdateInfo(true);
     } else {
+      const access_token = localStorage.getItem("access_token");
+      const data = { couponId: checkCoupon[0] };
+      const res = await PaymentService.usedCoupon(data, access_token);
       navigate("/payment");
     }
   };
-
-  const mutationUpdate = useMutationHooks((data) => {
-    const { id, token, ...rests } = data;
-    const res = UserService.updateUser(id, { ...rests }, token);
-    return res;
-  });
-
-  const { isLoading, data } = mutationUpdate;
-
-  const handleCancleUpdate = () => {
-    setStateUserDetails({
-      name: "",
-      email: "",
-      phone: "",
-      address: "",
-    });
-    form.resetFields();
-    setIsOpenModalUpdateInfo(false);
-  };
-
   const handleAddress = () => {
     if (city && district && ward) {
       dispatch(
@@ -262,27 +226,7 @@ const OrderPage = () => {
       setIsOpenModalUpdateInfo(false);
     }
   };
-  const handleUpdateInforUser = () => {
-    const { name, address, phone, email } = stateUserDetails;
-    if (name && phone && address && email) {
-      dispatch(
-        addShippingAddresses({
-          address: address,
-          name: name,
-          email: email,
-          phone: phone,
-        })
-      );
-      setIsOpenModalUpdateInfo(false);
-      form.resetFields();
-    }
-  };
-  const handleOnchangeDetails = (e) => {
-    setStateUserDetails({
-      ...stateUserDetails,
-      [e.target.name]: e.target.value,
-    });
-  };
+
   const itemsDelivery = [
     {
       title: "20.000 VND",
@@ -313,7 +257,7 @@ const OrderPage = () => {
                     : diliveryPriceMemo === 10000
                     ? 1
                     : order.orderItemsSlected.length === 0
-                    ? 2
+                    ? 0
                     : 2
                 }
               />
@@ -628,13 +572,14 @@ const OrderPage = () => {
       <ModalComponent
         title="Cập nhật thông tin giao hàng"
         open={isOpenModalUpdateInfo}
-        onCancel={handleCancleUpdate}
-        onOk={handleAddress}
+        footer={null}
+        // onCancel={() => setIsOpenModalUpdateInfo(false)}
+        // onOk={handleAddress}
       >
         <Form
           name="basic"
+          onFinish={handleAddress}
           layout="vertical"
-          //   onFinish={onUpdateUser}
           autoComplete="on"
           form={form}
         >
@@ -700,13 +645,16 @@ const OrderPage = () => {
               value={address}
             />
           </Form.Item>
+          <Form.Item className="text-center">
+            <Button htmlType="submit">Ok</Button>
+          </Form.Item>
         </Form>
       </ModalComponent>
       <Modal
         open={isCouponOpen}
         onCancel={() => setIsCouponOpen(false)}
         title="Chọn mã giảm giá"
-        width={350}
+        width={500}
         footer={null}
       >
         <Checkbox.Group value={checkCoupon}>
@@ -724,15 +672,22 @@ const OrderPage = () => {
                       value={coupon?._id}
                       onChange={onChangeCoupon}
                     >
-                      <div className="flex items-center justify-between">
-                        Mã giảm giá {coupon?.discountPercent}% ( tối đa{" "}
-                        <span>
-                          {Number(coupon?.maximumDiscountAmount).toLocaleString(
-                            "vi-VN",
-                            { style: "currency", currency: "VND" }
-                          )}
-                        </span>
-                        )
+                      <div className=" items-center flex-start">
+                        <p style={{ fontSize: "18px" }}>
+                          Mã giảm giá {coupon?.code}
+                        </p>
+                        <p style={{ fontSize: "14px" }}>
+                          Giảm {coupon?.discountPercent}% (tối đa{" "}
+                          <span style={{ color: "red" }}>
+                            {Number(
+                              coupon?.maximumDiscountAmount
+                            ).toLocaleString("vi-VN", {
+                              style: "currency",
+                              currency: "VND",
+                            })}
+                          </span>
+                          )
+                        </p>
                       </div>
                     </Checkbox>
                   );

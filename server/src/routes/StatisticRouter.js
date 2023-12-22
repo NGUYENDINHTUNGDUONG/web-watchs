@@ -6,8 +6,8 @@ const router = express.Router();
 
 router.get(
 	'/',
-	verify.verifyUser,
-	verify.verifyAdmin,
+	// verify.verifyUser,
+	// verify.verifyAdmin,
 	StatisticController.getStatistic
 );
 

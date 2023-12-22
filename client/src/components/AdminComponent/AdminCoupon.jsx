@@ -14,7 +14,7 @@ import {
 export default function AdminCoupon() {
   const [isOpen, setIsOpen] = useState(false);
   const [form] = Form.useForm();
-  const [rowSelected, setRowSelected] = useState();
+  // const [rowSelected, setRowSelected] = useState();
   const [coupons, setCoupons] = useState([]);
   const searchInput = useRef(null);
 
@@ -83,7 +83,6 @@ export default function AdminCoupon() {
         />
         <Space>
           <Button
-
             onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
             icon={<SearchOutlined />}
             size="small"
@@ -210,9 +209,9 @@ export default function AdminCoupon() {
           data={dataTable}
           onRow={(record, rowIndex) => {
             return {
-              onClick: (event) => {
-                setRowSelected(record._id);
-              },
+              // onClick: (event) => {
+              //   setRowSelected(record._id);
+              // },
             };
           }}
         />

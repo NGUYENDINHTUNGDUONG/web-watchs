@@ -33,11 +33,11 @@ export const createCoupon = async (data, access_token) => {
     console.log(error);
   }
 };
-export const useCoupon = async (couponId, access_token) => {
+export const usedCoupon = async (data, access_token) => {
   try {
     const res = await axiosJWT.post(
       `${process.env.REACT_APP_API_URL}/coupon/used`,
-      { couponId },
+      data,
       {
         headers: {
           authorization: `Bearer ${access_token}`,

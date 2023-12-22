@@ -18,7 +18,6 @@ const ProductsPage = () => {
   const [product, setProduct] = useState([]);
   const [brand, setBrand] = useState([]);
   const search = useSelector((state) => state.product.search);
-  console.log(search,"a")
 
   const getAllBrands = async () => {
     try {

@@ -19,29 +19,26 @@ import {
   WrapperType,
 } from "./style";
 
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import * as UserService from "../../services/UserService";
 import { modalState, resetUser } from "../../redux/slides/userSlide";
 import { useState } from "react";
 import { useEffect } from "react";
-import { searchProduct } from "../../redux/slides/productSlide";
 import SignInComponent from "../SignInComponent/SignInComponent";
-import SignUpComponent from "../SignUpComponent/SignUpPage";
-import Email from "../ForgotPasswordComponent/Email";
+import SignUpComponent from "../SignUpComponent/SignUpComponent";
+import SendEmailComponent from "../ForgotPasswordComponent/SendEmailComponent";
 import ProfileComponent from "../ProfileComponet/ProfileComponent";
+import ChangePasswordComponent from "../ChangePasswordComponent/ChangePasswordComponent";
 
 const HeaderComponent = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const [userName, setUserName] = useState("");
 
-  const [search, setSearch] = useState("");
   const [isOpenPopup, setIsOpenPopup] = useState(false);
   const order = useSelector((state) => state.order);
-  const [loading, setLoading] = useState(false);
 
   const handleOpenSignIn = () => {
     dispatch(modalState({ modalSignIn: true }));
@@ -57,6 +54,9 @@ const HeaderComponent = () => {
 
   const handleCancelEmail = () => {
     dispatch(modalState({ modalEmail: false }));
+  };
+  const handleCancelChangePassword = () => {
+    dispatch(modalState({ modalChangePassword: false }));
   };
 
   const handleCancelProfile = () => {
@@ -82,24 +82,20 @@ const HeaderComponent = () => {
   const openSignUp = useSelector((state) => state.user.modalSignUp);
 
   const openEmail = useSelector((state) => state.user.modalEmail);
+  const openChangePassword = useSelector(
+    (state) => state.user.modalChangePassword
+  );
   const handleLogout = async () => {
-    setLoading(true);
     await UserService.logoutUser();
     dispatch(resetUser());
-    setLoading(false);
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
-    navigate("", { state: location?.pathname });
+    navigate("/");
   };
 
-  const handleOpenProfile = () => {
-    dispatch(modalState({ modalProfile: true }));
-  };
   const openProfile = useSelector((state) => state.user.modalProfile);
   useEffect(() => {
-    setLoading(true);
     setUserName(user?.fullName);
-    setLoading(false);
   }, [user?.fullName, user?.avatar]);
 
   const content = (
@@ -125,7 +121,6 @@ const HeaderComponent = () => {
 
   const handleClickNavigate = (type) => {
     if (type === "profile") {
-      // navigate("/profile-user");
       dispatch(modalState({ modalProfile: true }));
     } else if (type === "admin") {
       navigate("/admin");
@@ -141,11 +136,6 @@ const HeaderComponent = () => {
     }
     setIsOpenPopup(false);
   };
-
-  // const onSearch = (e) => {
-  //   setSearch(e.target.value);
-  //   dispatch(searchProduct(e.target.value));
-  // };
 
   const arr = [
     { title: <HomeOutlined />, url: "/" },
@@ -185,8 +175,9 @@ const HeaderComponent = () => {
             span={4}
             style={{
               display: "flex",
+              gap: "20px",
               alignItems: "center",
-              justifyContent: "space-around",
+              justifyContent: "space-evenly",
             }}
           >
             <WrapperHeaderAccount>
@@ -258,7 +249,14 @@ const HeaderComponent = () => {
       </Modal>
 
       <Modal open={openEmail} onCancel={handleCancelEmail} footer={false}>
-        <Email />
+        <SendEmailComponent />
+      </Modal>
+      <Modal
+        open={openChangePassword}
+        onCancel={handleCancelChangePassword}
+        footer={false}
+      >
+        <ChangePasswordComponent />
       </Modal>
 
       <Modal open={openProfile} onCancel={handleCancelProfile} footer={false}>

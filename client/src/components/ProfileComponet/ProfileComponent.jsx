@@ -9,19 +9,18 @@ import {
   WrapperHeader,
   WrapperInput,
   WrapperLabel,
-  WrapperUploadFile,
 } from "./style";
 import InputFormComponent from "../InputFormComponent/InputFormComponent";
 import ButtonComponent from "../ButtonComponent/ButtonComponent";
-import { Button } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
-import { getBase64 } from "../../util/utils";
 import * as message from "../../components/Message/Message";
+import { Modal } from "antd";
+import { modalState } from "../../redux/slides/userSlide";
+import ChangePasswordComponent from "../ChangePasswordComponent/ChangePasswordComponent";
 
 const ProfileComponent = () => {
   const user = useSelector((state) => state.user);
   const [email, setEmail] = useState("");
-  const [fullName, setfullName] = useState("");
+  const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const access_token = localStorage.getItem("access_token");
@@ -31,28 +30,28 @@ const ProfileComponent = () => {
   });
 
   const dispatch = useDispatch();
-  const { data, isLoading, isSuccess, isError } = mutation;
+  const { isSuccess, isError } = mutation;
 
   useEffect(() => {
     setEmail(user?.email);
-    setfullName(user?.fullName);
+    setFullName(user?.fullName);
     setPhone(user?.phone);
     setAddress(user?.address);
-
   }, [user]);
 
   useEffect(() => {
     if (isSuccess) {
-      message.success();
+      message.success("Cập nhật thành công");
       handleGetDetailsUser(user?.id, user?.access_token);
     } else if (isError) {
       message.error();
     }
   }, [isSuccess, isError]);
 
+
   const handleGetDetailsUser = async (id, token) => {
     const res = await UserService.getDetailsUser(id, token);
-    dispatch(updateUser({ ...res?.data, access_token: token }));
+    updateUser({ ...res?.data, access_token: token });
     console.log(res);
   };
 
@@ -60,13 +59,17 @@ const ProfileComponent = () => {
     setEmail(value);
   };
   const handleOnchangeName = (value) => {
-    setfullName(value);
+    setFullName(value);
   };
   const handleOnchangePhone = (value) => {
     setPhone(value);
   };
   const handleOnchangeAddress = (value) => {
     setAddress(value);
+  };
+  const openChangePassword = useSelector((state) => state.user.modalChangePassword);
+  const handleOpenChangePassword = () => {
+    dispatch(modalState({ modalChangePassword: true }));
   };
 
   const handleUpdate = () => {
@@ -182,8 +185,28 @@ const ProfileComponent = () => {
             }}
           ></ButtonComponent>
         </WrapperInput>
+        <WrapperInput style={{ display: "flex", justifyContent: "center" }}>
+          <ButtonComponent
+            onClick={handleOpenChangePassword}
+            size={40}
+            styleButton={{
+              height: "30px",
+              width: "fit-content",
+              borderRadius: "4px",
+              padding: "2px 6px 6px",
+            }}
+            textbutton={"Đổi mật khẩu"}
+            styleTextButton={{
+              color: "rgb(26, 148, 255)",
+              fontSize: "15px",
+              fontWeight: "700",
+            }}
+          ></ButtonComponent>
+        </WrapperInput>
       </WrapperContentProfile>
-      {/* </Loading> */}
+      <Modal open={openChangePassword} footer={false}>
+        <ChangePasswordComponent />
+      </Modal>
     </div>
   );
 };

@@ -60,12 +60,12 @@ const createOrder = async (req, res, next) => {
     await UserRepo.increaseOrderNumber(req.payload._id, 1, session);
 
     const listProductNames = order.orderItem.map((item) => item.name);
-    // order.orderItem.forEach(async (item) => {
-    // 	await ProductRepo.updateAmountProduct(item.id, item.amount, session);
-    // });
-
     for (let item of order.orderItem) {
-      await ProductRepo.updateAmountProduct(item.product, -item.amount, session);
+      await ProductRepo.updateAmountProduct(
+        item.product,
+        -item.amount,
+        session
+      );
       await ProductRepo.updateSoldProduct(item.product, item.amount, session);
     }
 
@@ -74,9 +74,10 @@ const createOrder = async (req, res, next) => {
     void Mail.sendEmailOrderProduct({
       fullName: req.payload.fullName,
       email: req.payload.email,
-      orderId: order.id,
-      listProductNames,
-      // amount,
+      // orderId: order.id,
+      orderItem: order.orderItem,
+      totalPrice: order.totalPrice,
+
     }).catch((err) => console.log(err));
 
     return res.status(200).json({ message: "Order success", data: order });

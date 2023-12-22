@@ -13,6 +13,7 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendEmailOrderProduct = async (data) => {
+  const { orderItem } = data;
   const mjmlTemplate = `
   <mjml>
   <mj-head>
@@ -26,9 +27,34 @@ const sendEmailOrderProduct = async (data) => {
       <mj-column>
       <mj-image src="cid:logo" alt="Logo" width="150px" padding="0 15px 15px 0"></mj-image>
         <mj-text font-size="20px" color="#000000" font-family="Arial, sans-serif">Chào mừng bạn đến với trang web của chúng tôi!</mj-text>
-        <mj-text font-size="16px" color="#000000" font-family="Arial, sans-serif">Xin chào ${data.fullName},</mj-text>
-        <mj-text font-size="16px" color="#000000" font-family="Arial, sans-serif">Cảm ơn bạn đã đặt hàng thành công. đơn hàng của bạn sẽ được sử lý sớm
+        <mj-text font-size="16px" color="#000000" font-family="Arial, sans-serif">Xin chào ${
+          data.fullName
+        },</mj-text>
+        <mj-text font-size="16px" color="#000000" font-family="Arial, sans-serif">Cảm ơn bạn đã đặt hàng. đơn hàng của bạn sẽ được sử lý sớm
         !</mj-text>
+        <mj-table>
+        <tr style="border-bottom:1px solid #ecedee;text-align:left;padding:15px 0;">
+          <th style="padding: 0 15px 0 0;">Tên sản phẩm</th>
+          <th style="padding: 0 0 15px0 ;">Số lượng</th>
+          <th style="padding: 0 0 0 15px;">Giá</th>
+        </tr>
+        <tr style="border-bottom:1px solid #ecedee;text-align:left;padding:15px 0;">
+          <td style="padding: 0 15px 0 0;"> ${orderItem
+            .map((item) => `${item.name}`)
+            .join(",")}</td>
+          <td style="padding: 0 15px;">${orderItem
+            .map((item) => `${item.amount}`)
+            .join(",")}</td>
+          <td style="padding: 0 0 0 15px;">${orderItem
+            .map((item) => `${item.price}`)
+            .join(",")}</td>
+        </tr>
+        <tr style="border-bottom:1px;text-align:left;padding:15px 0;">
+          <th style="padding:15px 0  0 0;">Tổng tiền</th>
+          <th style="padding: 0 0 15px0 ;"></th>
+          <th style="padding: 0 0 0 15px;">${data.totalPrice}</th>
+      </mj-table>
+
       </mj-column>
     </mj-section>
   </mj-body>
@@ -43,8 +69,8 @@ const sendEmailOrderProduct = async (data) => {
     html,
     attachments: [
       {
-        filename: "logo.png",
-        path: path.join(__dirname, ".", "images", "logo.png"),
+        filename: "full-logo.png",
+        path: path.join(__dirname, ".", "images", "full-logo.png"),
         cid: "logo",
       },
     ],
